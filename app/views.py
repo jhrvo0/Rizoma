@@ -55,7 +55,7 @@ class CadastrarView(View):
             user.backend = 'django.contrib.auth.backends.ModelBackend'
             user.set_password(form.cleaned_data['password']) 
             user.save()
-            login(request, user, backend='app.backends.EmailBackend') # Yuri te amo ♥ / yuri rainha gabi nadinha
+            login(request, user, backend='app.backends.EmailBackend') # Yuri te amo ♥ / Yuri rainha Gabi nadinha
             messages.success(request, f'Bem-vindo, {user.username}!') 
             return redirect('login') 
 

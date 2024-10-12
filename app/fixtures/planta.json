@@ -1,0 +1,68 @@
+[
+    {
+        "model": "App.planta", 
+        "pk": 1,
+        "fields": {
+            "nome": "Tomate",
+            "dias_de_cultivo": 80,
+            "fase_da_lua": "crescente",
+            "inicio_de_temporada": "2024-01-01",
+            "fim_de_temporada": "2024-05-01"
+        }
+    },
+    {
+        "model": "App.planta",
+        "pk": 2,
+        "fields": {
+            "nome": "Alface",
+            "dias_de_cultivo": 30,
+            "fase_da_lua": "nova",
+            "inicio_de_temporada": "2024-02-01",
+            "fim_de_temporada": "2024-03-01"
+        }
+    },
+    {
+        "model": "App.planta",
+        "pk": 3,
+        "fields": {
+            "nome": "Cenoura",
+            "dias_de_cultivo": 75,
+            "fase_da_lua": "cheia",
+            "inicio_de_temporada": "2024-03-01",
+            "fim_de_temporada": "2024-06-01"
+        }
+    },
+    {
+        "model": "App.planta",
+        "pk": 4,
+        "fields": {
+            "nome": "Pimentão",
+            "dias_de_cultivo": 90,
+            "fase_da_lua": "minguante",
+            "inicio_de_temporada": "2024-01-15",
+            "fim_de_temporada": "2024-06-15"
+        }
+    },
+    {
+        "model": "App.planta",
+        "pk": 5,
+        "fields": {
+            "nome": "Pimenta",
+            "dias_de_cultivo": 90,
+            "fase_da_lua": "minguante",
+            "inicio_de_temporada": "2024-01-15",
+            "fim_de_temporada": "2024-06-15"
+        }
+    },
+    {
+        "model": "App.planta",
+        "pk": 6,
+        "fields": {
+            "nome": "Macaxeira",
+            "dias_de_cultivo": 90,
+            "fase_da_lua": "minguante",
+            "inicio_de_temporada": "2024-01-15",
+            "fim_de_temporada": "2024-06-15"
+        }
+    }
+]

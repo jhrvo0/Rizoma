@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage - Rizoma</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
+</head>
+<body class="bg-gray-200 flex flex-col min-h-screen">
+    <!-- Barra de Navegação Sticky usando Tailwind -->
+    {% include "components/header.html" %}
+    
+    <!-- Conteúdo Principal com Scroll -->
+    <main class="pt-10 flex-1 w-full bg-gray-200 p-4 space-y-16 rounded-t-3xl overflow-y-auto">
+        <!-- Lista de Campos -->
+        <div id="lista-campos">
+            {% if campos %}
+                {% include "components/lista_campos.html" %}
+            {% else %}
+                <div class="border bg-gray-600 p-4 rounded-lg shadow-md text-gray-100">
+                    <h2 class="text-center font-bold">Adicione um terreno para continuar</h2>
+                </div>
+            {% endif %}
+        </div>
+        <!-- Botão para adicionar terreno -->
+        <button id="add-terreno-btn" class="border bg-gray-300 p-4 rounded-lg shadow-md text-center font-bold hover:bg-gray-400 transition-colors duration-300 w-full">
+            Adicionar Terreno
+        </button>
+    </main>
+    
+    <!-- Sidebar -->
+    {% include "components/sidebar.html" %}
+    
+    <!-- Menu opções rodapé Sticky usando Tailwind -->
+    <footer>
+        {% include 'components/footer.html' with current_page=current_page %}
+    </footer>
+    
+    <!-- Popup Menu perto do FAB -->
+    {% include "components/popup_fab_menu.html" %}
+    
+    <!-- Modal Popup Adicionar Terreno -->
+    <div id="modal-add-terreno" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white p-6 m-6 rounded-lg shadow-lg w-96 z-50">
+            <h2 class="text-xl font-bold mb-4">Adicionar Terreno</h2>
+            <!-- Formulário de Adição de Terreno -->
+            <form id="terreno-form" method="post" action="{% url 'novo-campo' %}">
+                {% csrf_token %}
+                <div class="mb-4">
+                    <label for="terreno-nome" class="block text-gray-700">Nome do Terreno</label>
+                    <input type="text" id="terreno-nome" name="nome" class="w-full px-4 py-2 border rounded-md focus:ring focus:ring-opacity-50 focus:ring-gray-500">
+                </div>
+                <div class="mb-4">
+                    <label for="terreno-icone" class="block text-gray-700">Escolha um Ícone</label>
+                    <select id="terreno-icone" name="icone" class="w-full px-4 py-2 border rounded-md">
+                        <option value="bi-house-fill">Casa</option>
+                        <option value="bi-tree-fill">Árvore</option>
+                        <option value="bi-cloud-fill">Nuvem</option>
+                        <option value="bi-flower1">Flor</option>
+                    </select>
+                </div>
+                <div class="flex justify-center gap-4">
+                    <button type="button" id="cancelar-btn" class="px-4 py-2 bg-gray-400 text-white rounded-md">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 bg-gray-600 text-white rounded-md">Adicionar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Script para controlar o popup, sidebar e o modal de adicionar terreno -->
+    <script>
+        // Modal Adicionar Terreno
+        const addTerrenoBtn = document.getElementById('add-terreno-btn');
+        const modalAddTerreno = document.getElementById('modal-add-terreno');
+        const cancelarBtn = document.getElementById('cancelar-btn');
+        const form = document.getElementById('terreno-form');
+        
+        // Mostrar o modal ao clicar em "Adicionar Terreno"
+        addTerrenoBtn.addEventListener('click', () => {
+            modalAddTerreno.classList.remove('hidden');
+        });
+        
+        // Fechar o modal ao clicar em "Cancelar"
+        cancelarBtn.addEventListener('click', () => {
+            modalAddTerreno.classList.add('hidden');
+        });
+        
+        // Submeter o formulário via AJAX
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(form);
+            
+            fetch("{% url 'novo-campo' %}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                },
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Fechar o modal
+                    modalAddTerreno.classList.add('hidden');
+                    // Adicionar o novo campo à lista de campos
+                    const listaCampos = document.getElementById('lista-campos');
+                    const novoCampo = `
+                        <div class="border bg-gray-300 p-4 rounded-lg shadow-md">
+                            <div class="flex gap-3">
+                                <i class="bi ${data.icone} text-2xl text-gray-600"></i>
+                                <h2 class="text-gray-800 font-semibold my-auto">${data.nome}</h2>
+                            </div>
+                        </div>
+                    `;
+                    listaCampos.insertAdjacentHTML('beforeend', novoCampo);
+                } else {
+                    console.error('Erro ao adicionar terreno:', data.errors);
+                }
+            })
+            .catch(error => console.error('Erro na requisição:', error));
+        });
+        
+        // Sidebar Script
+        const openSidebarBtn = document.getElementById('open-sidebar');
+        const closeSidebarBtn = document.getElementById('close-sidebar');
+        const sidebar = document.getElementById('sidebar');
+        
+        openSidebarBtn.addEventListener('click', () => {
+            sidebar.classList.remove('translate-x-full'); // Mostra o sidebar
+        });
+        
+        closeSidebarBtn.addEventListener('click', () => {
+            sidebar.classList.add('translate-x-full'); // Esconde o sidebar
+        });
+    </script>
+</body>
+</html>

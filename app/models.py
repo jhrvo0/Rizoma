@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from decimal import Decimal
 
@@ -40,7 +40,7 @@ class Campo(models.Model):
         return self.nome
 
     def get_plantas_cultivadas(self):
-        return list(self.plantas_cultivadas.all())
+        return self.plantas_cultivadas.all()
 
 
 # Quando planta se relaciona com campo, temos PlantaCultivada, com outros campos importantes:
@@ -64,17 +64,42 @@ class PlantaCultivada(models.Model):
         return self.data_plantio
 
 
+class CustomUserManager(BaseUserManager):
+    def create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError('The Email field must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+
+        return self.create_user(email, password, **extra_fields)
+
+
 # Para permitir o login com o e-mail, precisamos de um usuário customizado, que é esse:
 class Agricultor(AbstractUser):
-    username = models.CharField(max_length = 100, unique=False)
+    username = models.CharField(max_length=100, unique=False)
     email = models.EmailField(unique=True)
     campos = models.ManyToManyField('Campo')
 
-    USERNAME_FIELD = 'email'  # Usar o email para autenticação
-    REQUIRED_FIELDS = []  # Aqui você pode definir outros campos obrigatórios, se necessário
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['username']  # Add other required fields as needed
+
+    objects = CustomUserManager()
 
     def __str__(self):
         return self.username
 
-    def listar_campos(self):
+    def get_campos(self):
         return self.campos.all()
+    

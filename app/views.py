@@ -1,6 +1,5 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
@@ -23,20 +22,16 @@ class LoginView(View):
 
     def post(self, request):
         form = LoginForm(request.POST)
-        
         if form.is_valid():
             email = form.cleaned_data.get('email')
             password = form.cleaned_data.get('password')
-
-            user = authenticate(request, email=email, password=password, backend='app.backends.EmailBackend')
-
+            user = authenticate(request, username=email, password=password, backend='app.backends.EmailBackend')
             if user is not None:
                 login(request, user)
                 messages.success(request, f'Bem-vindo, {user.username}!')
                 return redirect('home')
             else:
                 messages.error(request, 'Email ou senha incorretos.')
-
         return render(request, self.template_name, {'form': form})
 
 # Cadastrar
@@ -57,7 +52,7 @@ class CadastrarView(View):
             user.save()
             login(request, user, backend='app.backends.EmailBackend') # Yuri te amo ♥ / Yuri rainha Gabi nadinha
             messages.success(request, f'Bem-vindo, {user.username}!') 
-            return redirect('login') 
+            return redirect('home') 
 
         return render(request, self.template_name, {'form': form})
 
@@ -91,8 +86,8 @@ class LogoutView(View):
 
 # Criar Campo
 class CriarCampoView(LoginRequiredMixin, View):
-    template_name = 'criar_campo.html'
-    login_url = '/login/'  # Redirect here if the user is not logged in
+    template_name = 'campo.html'
+    login_url = '/login/'
 
     def get(self, request, *args, **kwargs):
         form = CampoForm()
@@ -101,12 +96,21 @@ class CriarCampoView(LoginRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         form = CampoForm(request.POST)
         if form.is_valid():
-            campo = form.save()  # Save the form and the object
+            campo = form.save()
             return redirect(self.get_success_url(campo.id))
         return render(request, self.template_name, {'form': form})
 
     def get_success_url(self, campo_id):
         return reverse('detalhes_campo', kwargs={'campo_id': campo_id})
+    
+# Visualizar Campo
+class VisualizarCampoView(View):
+    def get(self, request):
+        context = {
+            "campos": request.user.get_campos(),
+            "current_page" : "campos",
+        }
+        return render(request, "campos.html", context)
 
 # Adicionar Planta
 class AdicionarPlantaNoCampoView(LoginRequiredMixin, View):
@@ -139,6 +143,14 @@ class DetalhesCampoView(LoginRequiredMixin, View):
             'plantas_plantadas': plantas_plantadas
         })
 
+
+class HomeView(View):
+    def get(self, request):
+        context = {
+            "user" : request.user,
+            "current_page" : "home",
+        }
+        return render(request, "home.html", context)
 
 """ REDIRECT """
 

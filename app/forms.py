@@ -14,28 +14,60 @@ class CustomAuthenticationForm(AuthenticationForm):
         fields = ('email', 'password')
 
 class RegistrationForm(forms.ModelForm):
-    password = forms.CharField(widget=forms.PasswordInput)
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'w-full px-4 py-2 rounded-md border-2 border-[#899953] bg-[#ffede4] focus:outline-none focus:ring-2 focus:ring-[#f09b6a]',
+            'placeholder': 'Digite sua senha'
+        })
+    )
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'class': 'w-full px-4 py-2 rounded-md border-2 border-[#899953] bg-[#ffede4] focus:outline-none focus:ring-2 focus:ring-[#f09b6a]',
+            'placeholder': 'Confirme sua senha'
+        })
+    )
 
     class Meta:
         model = Agricultor
-        fields = ['username', 'email', 'password']  # Inclua todos os campos necessários
+        fields = ['username', 'email', 'password'] # Campos de registro
 
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.set_password(self.cleaned_data['password'])  # Define a senha
+        user.set_password(self.cleaned_data['password'])
         if commit:
             user.save()
         return user
+
+    def __init__(self, *args, **kwargs):
+        super(RegistrationForm, self).__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({
+            'class': 'w-full px-4 py-2 rounded-md border-2 border-[#899953] bg-[#ffede4] focus:outline-none focus:ring-2 focus:ring-[#f09b6a]',
+            'placeholder': 'Digite seu nome de usuário'
+        })
+        self.fields['email'].widget.attrs.update({
+            'class': 'w-full px-4 py-2 rounded-md border-2 border-[#899953] bg-[#ffede4] focus:outline-none focus:ring-2 focus:ring-[#f09b6a]',
+            'placeholder': 'Digite seu e-mail'
+        })
+
+     
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get("password")
+        confirm_password = cleaned_data.get("confirm_password")
+
+        if password != confirm_password:
+            raise forms.ValidationError(
+                "As senhas não coincidem. Por favor, tente novamente."
+            )
     
 
 class LoginForm(forms.Form):
-
+    
     email = forms.EmailField(
         label='Email',
         max_length=100,
         widget=forms.EmailInput(attrs={'placeholder': 'Digite seu email', 'class': 'form-control'})
     )
-
     password = forms.CharField(
         label='Senha',
         widget=forms.PasswordInput(attrs={'placeholder': 'Digite sua senha', 'class': 'form-control'})

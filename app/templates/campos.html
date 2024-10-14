@@ -38,7 +38,7 @@
         {% include 'components/footer.html' with current_page=current_page %}
     </footer>
     
-    <!-- Popup Menu perto do FAB -->
+    <!-- FAB -->
     {% include "components/popup_fab_menu.html" %}
     
     <!-- Modal Popup Adicionar Terreno -->
@@ -54,7 +54,7 @@
                 </div>
                 <div class="mb-4">
                     <label for="terreno-icone" class="block text-gray-700">Escolha um Ícone</label>
-                    <select id="terreno-icone" name="icone" class="w-full px-4 py-2 border rounded-md">
+                    <select id="terreno-icone" name="icon" class="w-full px-4 py-2 border rounded-md">
                         <option value="bi-house-fill">Casa</option>
                         <option value="bi-tree-fill">Árvore</option>
                         <option value="bi-cloud-fill">Nuvem</option>
@@ -71,68 +71,75 @@
     
     <!-- Script para controlar o popup, sidebar e o modal de adicionar terreno -->
     <script>
-        // Modal Adicionar Terreno
-        const addTerrenoBtn = document.getElementById('add-terreno-btn');
-        const modalAddTerreno = document.getElementById('modal-add-terreno');
-        const cancelarBtn = document.getElementById('cancelar-btn');
-        const form = document.getElementById('terreno-form');
-        
-        // Mostrar o modal ao clicar em "Adicionar Terreno"
-        addTerrenoBtn.addEventListener('click', () => {
-            modalAddTerreno.classList.remove('hidden');
-        });
-        
-        // Fechar o modal ao clicar em "Cancelar"
-        cancelarBtn.addEventListener('click', () => {
-            modalAddTerreno.classList.add('hidden');
-        });
-        
-        // Submeter o formulário via AJAX
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const formData = new FormData(form);
-            
-            fetch("{% url 'novo-campo' %}", {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-                },
-                body: formData,
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    // Fechar o modal
+        document.addEventListener('DOMContentLoaded', function() {
+            // Modal Adicionar Terreno
+            const addTerrenoBtn = document.getElementById('add-terreno-btn');
+            const modalAddTerreno = document.getElementById('modal-add-terreno');
+            const cancelarBtn = document.getElementById('cancelar-btn');
+            const form = document.getElementById('terreno-form');
+
+            // Confirm elements exist before adding event listeners
+            if (addTerrenoBtn && modalAddTerreno && cancelarBtn && form) {
+                // Mostrar o modal ao clicar em "Adicionar Terreno"
+                addTerrenoBtn.addEventListener('click', () => {
+                    modalAddTerreno.classList.remove('hidden');
+                });
+
+                // Fechar o modal ao clicar em "Cancelar"
+                cancelarBtn.addEventListener('click', () => {
                     modalAddTerreno.classList.add('hidden');
-                    // Adicionar o novo campo à lista de campos
-                    const listaCampos = document.getElementById('lista-campos');
-                    const novoCampo = `
-                        <div class="border bg-gray-300 p-4 rounded-lg shadow-md">
-                            <div class="flex gap-3">
-                                <i class="bi ${data.icone} text-2xl text-gray-600"></i>
-                                <h2 class="text-gray-800 font-semibold my-auto">${data.nome}</h2>
-                            </div>
-                        </div>
-                    `;
-                    listaCampos.insertAdjacentHTML('beforeend', novoCampo);
-                } else {
-                    console.error('Erro ao adicionar terreno:', data.errors);
-                }
-            })
-            .catch(error => console.error('Erro na requisição:', error));
-        });
-        
-        // Sidebar Script
-        const openSidebarBtn = document.getElementById('open-sidebar');
-        const closeSidebarBtn = document.getElementById('close-sidebar');
-        const sidebar = document.getElementById('sidebar');
-        
-        openSidebarBtn.addEventListener('click', () => {
-            sidebar.classList.remove('translate-x-full'); // Mostra o sidebar
-        });
-        
-        closeSidebarBtn.addEventListener('click', () => {
-            sidebar.classList.add('translate-x-full'); // Esconde o sidebar
+                });
+
+                // Submeter o formulário via AJAX
+                form.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    const formData = new FormData(form);
+                    console.log(...formData); // Debug the form data
+
+                    fetch("{% url 'novo-campo' %}", {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                        },
+                        body: formData,
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data); // Debug the response
+                        if (data.status === 'success') {
+                            // Fechar o modal
+                            modalAddTerreno.classList.add('hidden');
+                            // Recarregar a página para mostrar o novo campo
+                            location.reload();
+                        } else {
+                            console.error('Erro ao adicionar terreno:', data.errors);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erro na requisição:', error);
+                        alert('Algo deu errado ao adicionar o campo. Verifique o console para mais detalhes.');
+                    });
+                });
+            } else {
+                console.error('Element(s) not found: make sure #add-terreno-btn, #modal-add-terreno, #cancelar-btn, and #terreno-form exist.');
+            }
+
+            // Sidebar Script
+            const openSidebarBtn = document.getElementById('open-sidebar');
+            const closeSidebarBtn = document.getElementById('close-sidebar');
+            const sidebar = document.getElementById('sidebar');
+
+            if (openSidebarBtn && closeSidebarBtn && sidebar) {
+                openSidebarBtn.addEventListener('click', () => {
+                    sidebar.classList.remove('translate-x-full'); // Mostra o sidebar
+                });
+
+                closeSidebarBtn.addEventListener('click', () => {
+                    sidebar.classList.add('translate-x-full'); // Esconde o sidebar
+                });
+            } else {
+                console.error('Element(s) not found: make sure #open-sidebar, #close-sidebar, and #sidebar exist.');
+            }
         });
     </script>
 </body>

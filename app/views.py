@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views import View
@@ -97,14 +98,21 @@ class CriarCampoView(LoginRequiredMixin, View):
         form = CampoForm(request.POST)
         if form.is_valid():
             campo = form.save()
-            return redirect(self.get_success_url(campo.id))
-        return render(request, self.template_name, {'form': form})
-
-    def get_success_url(self, campo_id):
-        return reverse('detalhes_campo', kwargs={'campo_id': campo_id})
+            request.user.campos.add(campo)  # Adiciona um campo para um agricultor.
+            response_data = {
+                'status': 'success',
+                'nome': campo.nome,
+                'icone': campo.icon  # Pega o ícone da form.
+            }
+            return JsonResponse(response_data)
+        else:
+            errors = form.errors.as_json()
+            return JsonResponse({'status': 'error', 'errors': errors})
     
 # Visualizar Campo
-class VisualizarCampoView(View):
+class VisualizarCampoView(LoginRequiredMixin, View):
+    login_url = '/login/' # Se o usuário não estiver autenticado, ele volta pro login.
+    
     def get(self, request):
         context = {
             "campos": request.user.get_campos(),
@@ -114,6 +122,8 @@ class VisualizarCampoView(View):
 
 # Adicionar Planta
 class AdicionarPlantaNoCampoView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    
     def get(self, request, campo_id):
         campo = get_object_or_404(Campo, id=campo_id)
         form = PlantaCultivadaForm()
@@ -127,6 +137,7 @@ class AdicionarPlantaNoCampoView(LoginRequiredMixin, View):
             planta_cultivada.campo = campo
             planta_cultivada.save()
             return redirect('detalhes_campo', campo_id=campo.id)
+        
         return render(request, 'registrar_plantas.html', {'form': form, 'campo': campo})
 
 
@@ -144,19 +155,23 @@ class DetalhesCampoView(LoginRequiredMixin, View):
         })
 
 
-class HomeView(View):
-    def get(self, request):
-        context = {
-            "user" : request.user,
-            "current_page" : "home",
-        }
-        return render(request, "home.html", context)
 
-""" REDIRECT """
+
+""" Landing Route """
 
 class LandingView(View):
     def get(self, request):
         if request.user.is_authenticated:
-            return redirect('login')
+            return redirect('home')
         else:
             return redirect('login')
+
+""" Home """
+
+class HomeView(View):
+    def get(self, request):
+        context = {
+            "user" : request.user,
+            "current_page" : "home", # Colocando a página atual no contexto para o componente do footer.
+        }
+        return render(request, "home.html", context)

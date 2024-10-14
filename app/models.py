@@ -34,6 +34,7 @@ class Planta(models.Model):
 # A representação de um campo em nosso código:
 class Campo(models.Model):
     nome = models.CharField(max_length=100)
+    icon = models.CharField(max_length=50, default='bi-house-fill') # Ícone do campo
     plantas_cultivadas = models.ManyToManyField('Planta', through='PlantaCultivada')
 
     def __str__(self):

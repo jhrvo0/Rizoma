@@ -1,7 +1,8 @@
 {% for campo in campos %}
-<div class="border bg-gray-300 p-4 rounded-lg shadow-md hover:bg-gray-400 transition-colors duration-300">
-    <div class="flex gap-3">
-    <h2 class="text-gray-800 font-semibold my-auto">{{ campo.nome }}</h2>
+    <div class="border bg-gray-300 p-4 rounded-lg shadow-md hover:bg-gray-400 transition-colors duration-300">
+        <div class="flex gap-3">
+            <i class="bi {{ campo.icon }} text-2xl text-gray-600"></i>
+            <h2 class="text-gray-800 font-semibold my-auto">{{ campo.nome }}</h2>
+        </div>
     </div>
-</div>
 {% endfor %}

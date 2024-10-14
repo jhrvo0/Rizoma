@@ -76,12 +76,19 @@ class LoginForm(forms.Form):
 class CampoForm(forms.ModelForm):
     class Meta:
         model = Campo
-        fields = ['nome']
+        fields = ['nome', 'icon']
         labels = {
             'nome': 'Nome do Campo',
+            'icon': 'Escolha um Ícone',
         }
         widgets = {
             'nome': forms.TextInput(attrs={'placeholder': 'Nome do Campo', 'class': 'form-control'}),
+            'icon': forms.Select(choices=[
+                ('bi-house-fill', 'Casa'),
+                ('bi-tree-fill', 'Árvore'),
+                ('bi-cloud-fill', 'Nuvem'),
+                ('bi-flower1', 'Flor'),
+            ], attrs={'class': 'form-control'}),
         }
 
 class PlantaCultivadaForm(forms.ModelForm):

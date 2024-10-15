@@ -1,20 +1,47 @@
-import os # importado p/ login
 from pathlib import Path
+import os
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-2rbhja+2^#%+jli-y_nwcgw7x(1)3oimb3(bqyhn5_#(2b=mxb'
+load_dotenv(BASE_DIR / '.env')
+TARGET_ENV = os.getenv('TARGET_ENV')
+NOT_PROD = not TARGET_ENV.lower().startswith('prod')
 
-DEBUG = True
-
-ALLOWED_HOSTS = []
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if NOT_PROD:
+    DEBUG = True
+    SECRET_KEY = '<A SECRET KEY DO SEU PROJETO>'
+    ALLOWED_HOSTS = []
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
+else:
+    SECRET_KEY = os.getenv('django-insecure-2rbhja+2^#%+jli-y_nwcgw7x(1)3oimb3(bqyhn5_#(2b=mxb')
+    DEBUG = os.getenv('DEBUG', '0').lower() in ['true', 't', '1']
+    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(' ')
+    CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS').split(' ')
+
+    SECURE_SSL_REDIRECT = \
+        os.getenv('SECURE_SSL_REDIRECT', '0').lower() in ['true', 't', '1']
+
+    if SECURE_SSL_REDIRECT:
+        SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.environ.get('DBNAME'),
+            'HOST': os.environ.get('DBHOST'),
+            'USER': os.environ.get('DBUSER'),
+            'PASSWORD': os.environ.get('DBPASS'),
+            'OPTIONS': {'sslmode': 'require'},
+        }
+    }
+    
+# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -30,10 +57,12 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'social_django',
     'app',
+    "whitenoise.runserver_nostatic",
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -43,6 +72,11 @@ MIDDLEWARE = [
     'social_django.middleware.SocialAuthExceptionMiddleware', # Não esquecer de salvar isso aqui e adicionar depois do ctrl + v do deploy
     'allauth.account.middleware.AccountMiddleware', # Não esquecer de salvar isso aqui e adicionar depois do ctrl + v do deploy
 ]
+
+STATIC_URL = os.environ.get('DJANGO_STATIC_URL', "/static/")
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_STORAGE = ('whitenoise.storage.CompressedManifestStaticFilesStorage')
 
 ROOT_URLCONF = 'rizoma.urls'
 WSGI_APPLICATION = 'rizoma.wsgi.application'

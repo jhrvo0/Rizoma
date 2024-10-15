@@ -1,8 +1,12 @@
 {% for campo in campos %}
-    <div class="border bg-gray-300 p-4 rounded-lg shadow-md hover:bg-gray-400 transition-colors duration-300">
-        <div class="flex gap-3">
-            <i class="bi {{ campo.icon }} text-2xl text-gray-600"></i>
-            <h2 class="text-gray-800 font-semibold my-auto">{{ campo.nome }}</h2>
+<a href="{% url 'detalhes-campo' campo.id %}">
+    <div class="bg-[#f09b6a] my-2 p-4 rounded-lg shadow-md hover:bg-gray-400 transition-colors duration-300 grid grid-cols-[100px_1fr] grid-rows-[100px_1fr]">
+        <div class="flex items-center justify-center bg-gray-200 rounded-lg w-full h-full">
+            <i class="bi {{ campo.icon }} text-4xl text-gray-600"></i>
+        </div>
+        <div class="flex items-center my-auto p-4">
+            <h2 class="text-gray-800 font-semibold">{{ campo.nome }}</h2>
         </div>
     </div>
+</a>
 {% endfor %}

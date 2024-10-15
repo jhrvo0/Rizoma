@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views import View
-from .models import Agricultor, Campo, PlantaCultivada
+from .models import Agricultor, Campo, PlantaCultivada, Planta
 from .forms import LoginForm, RegistrationForm, CampoForm, PlantaCultivadaForm
 
 
@@ -127,8 +127,13 @@ class AdicionarPlantaNoCampoView(LoginRequiredMixin, View):
     def get(self, request, campo_id):
         campo = get_object_or_404(Campo, id=campo_id)
         form = PlantaCultivadaForm()
-        return render(request, 'registrar_plantas.html', {'form': form, 'campo': campo})
-
+        context = {
+            'form': form,
+            'campo': campo,
+            'plantas': Planta.objects.all(),
+        }
+        return render(request, 'detalhes_campo.html', context)
+    
     def post(self, request, campo_id):
         campo = get_object_or_404(Campo, id=campo_id)
         form = PlantaCultivadaForm(request.POST)
@@ -136,25 +141,32 @@ class AdicionarPlantaNoCampoView(LoginRequiredMixin, View):
             planta_cultivada = form.save(commit=False)
             planta_cultivada.campo = campo
             planta_cultivada.save()
-            return redirect('detalhes_campo', campo_id=campo.id)
-        
-        return render(request, 'registrar_plantas.html', {'form': form, 'campo': campo})
+            response_data = {
+                'status': 'success',
+                'nome': planta_cultivada.planta.nome,
+                'data_plantio': planta_cultivada.data_plantio,
+                'quantidade_plantada': planta_cultivada.quantidade_plantada,
+            }
+            return JsonResponse(response_data)
+        else:
+            errors = form.errors.as_json()
+            return JsonResponse({'status': 'error', 'errors': errors})
 
 
 # Dá detalhes sobre o campo
 class DetalhesCampoView(LoginRequiredMixin, View):
-    template_name = 'detalhes_campo.html'
+    
+    def get(self, request, id, *args, **kwargs):
+        campo = get_object_or_404(Campo, id=id, agricultor=request.user)
+        plantas_cultivadas = PlantaCultivada.objects.filter(campo=campo)
 
-    def get(self, request, campo_id, *args, **kwargs):
-        campo = get_object_or_404(Campo, id=campo_id)
-        plantas_plantadas = PlantaCultivada.objects.filter(campo=campo)
-        
-        return render(request, self.template_name, {
+        context = {
             'campo': campo,
-            'plantas_plantadas': plantas_plantadas
-        })
+            'lista_plantas' : Planta.objects.all(),
+            'plantas_cultivadas': plantas_cultivadas,
+        }
 
-
+        return render(request, 'detalhes_campo.html', context)
 
 
 """ Landing Route """

@@ -18,6 +18,7 @@ class Planta(models.Model):
     fase_da_lua = models.CharField(max_length=10, choices=FASES_DA_LUA)
     inicio_de_temporada = models.DateField()
     fim_de_temporada = models.DateField()
+    icone = models.CharField(max_length=50, blank=True, null=True)
 
     def __str__(self):
         return self.nome
@@ -48,9 +49,9 @@ class Campo(models.Model):
 class PlantaCultivada(models.Model):
     planta = models.ForeignKey(Planta, on_delete=models.CASCADE)
     campo = models.ForeignKey(Campo, on_delete=models.CASCADE)
-    data_plantio = models.DateField()
-    quantidade_plantada = models.IntegerField()
-    percentual_perda = models.DecimalField(max_digits=5, decimal_places=2)
+    data_plantio = models.DateField(blank=True, null=True)
+    quantidade_plantada = models.IntegerField(blank=True, null=True)
+    percentual_perda = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
 
     def __str__(self):
         return f"{self.planta} plantada no {self.campo} em {self.data_plantio}"
@@ -94,7 +95,7 @@ class Agricultor(AbstractUser):
     campos = models.ManyToManyField('Campo')
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']  # Add other required fields as needed
+    REQUIRED_FIELDS = ['username']  
 
     objects = CustomUserManager()
 

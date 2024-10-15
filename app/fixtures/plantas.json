@@ -1,0 +1,197 @@
+[
+    {
+        "model": "app.planta",
+        "pk": 1,
+        "fields": {
+            "nome": "Tomate",
+            "dias_de_cultivo": 80,
+            "fase_da_lua": "crescente",
+            "inicio_de_temporada": "2024-01-01",
+            "fim_de_temporada": "2024-03-21",
+            "plantas_amigas": [2, 3, 4, 5, 11, 13],
+            "plantas_inimigas": [6, 7, 15]
+        }
+    },
+    {
+        "model": "app.planta",
+        "pk": 2,
+        "fields": {
+            "nome": "Alface",
+            "dias_de_cultivo": 30,
+            "fase_da_lua": "nova",
+            "inicio_de_temporada": "2024-02-01",
+            "fim_de_temporada": "2024-03-02",
+            "plantas_amigas": [3, 8, 9, 10, 14],
+            "plantas_inimigas": [1, 5, 6]
+        }
+    },
+    {
+        "model": "app.planta",
+        "pk": 3,
+        "fields": {
+            "nome": "Cenoura",
+            "dias_de_cultivo": 75,
+            "fase_da_lua": "minguante",
+            "inicio_de_temporada": "2024-03-01",
+            "fim_de_temporada": "2024-05-14",
+            "plantas_amigas": [2, 4, 10, 11, 12],
+            "plantas_inimigas": [5, 15]
+        }
+    },
+    {
+        "model": "app.planta",
+        "pk": 4,
+        "fields": {
+            "nome": "Pimentão",
+            "dias_de_cultivo": 90,
+            "fase_da_lua": "minguante",
+            "inicio_de_temporada": "2024-01-15",
+            "fim_de_temporada": "2024-04-14",
+            "plantas_amigas": [1, 2, 5, 8, 11],
+            "plantas_inimigas": [6, 7, 15]
+        }
+    },
+    {
+        "model": "app.planta",
+        "pk": 5,
+        "fields": {
+            "nome": "Pimenta",
+            "dias_de_cultivo": 90,
+            "fase_da_lua": "minguante",
+            "inicio_de_temporada": "2024-01-15",
+            "fim_de_temporada": "2024-04-14",
+            "plantas_amigas": [2, 4],
+            "plantas_inimigas": [1, 6]
+        }
+    },
+    {
+        "model": "app.planta",
+        "pk": 6,
+        "fields": {
+            "nome": "Macaxeira",
+            "dias_de_cultivo": 90,
+            "fase_da_lua": "minguante",
+            "inicio_de_temporada": "2024-01-15",
+            "fim_de_temporada": "2024-04-14",
+            "plantas_amigas": [2, 4],
+            "plantas_inimigas": [1, 3]
+        }
+    },
+    {
+        "model": "app.planta",
+        "pk": 7,
+        "fields": {
+            "nome": "Berinjela",
+            "dias_de_cultivo": 90,
+            "fase_da_lua": "crescente",
+            "inicio_de_temporada": "2024-01-01",
+            "fim_de_temporada": "2024-03-21",
+            "plantas_amigas": [1, 2, 4, 5, 11],
+            "plantas_inimigas": [3, 6, 15]
+        }
+    },
+    {
+        "model": "app.planta",
+        "pk": 8,
+        "fields": {
+            "nome": "Banana",
+            "dias_de_cultivo": 180,
+            "fase_da_lua": "crescente",
+            "inicio_de_temporada": "2024-02-01",
+            "fim_de_temporada": "2024-07-30",
+            "plantas_amigas": [2, 5],
+            "plantas_inimigas": [1, 4]
+        }
+    },
+    {
+        "model": "app.planta",
+        "pk": 9,
+        "fields": {
+            "nome": "Rúcula",
+            "dias_de_cultivo": 40,
+            "fase_da_lua": "crescente",
+            "inicio_de_temporada": "2024-03-01",
+            "fim_de_temporada": "2024-04-10",
+            "plantas_amigas": [2, 10],
+            "plantas_inimigas": [1, 6]
+        }
+    },
+    {
+        "model": "app.planta",
+        "pk": 10,
+        "fields": {
+            "nome": "Acelga",
+            "dias_de_cultivo": 70,
+            "fase_da_lua": "crescente",
+            "inicio_de_temporada": "2024-01-15",
+            "fim_de_temporada": "2024-03-25",
+            "plantas_amigas": [2, 3, 11],
+            "plantas_inimigas": [1, 5, 15]
+        }
+    },
+    {
+        "model": "app.planta",
+        "pk": 11,
+        "fields": {
+            "nome": "Brócolis",
+            "dias_de_cultivo": 90,
+            "fase_da_lua": "crescente",
+            "inicio_de_temporada": "2024-01-15",
+            "fim_de_temporada": "2024-04-14",
+            "plantas_amigas": [2, 4, 5, 10],
+            "plantas_inimigas": [1, 7]
+        }
+    },
+    {
+        "model": "app.planta",
+        "pk": 12,
+        "fields": {
+            "nome": "Limão",
+            "dias_de_cultivo": 360,
+            "fase_da_lua": "crescente",
+            "inicio_de_temporada": "2024-01-15",
+            "fim_de_temporada": "2025-01-15",
+            "plantas_amigas": [1, 5],
+            "plantas_inimigas": [3, 4]
+        }
+    },
+    {
+        "model": "app.planta",
+        "pk": 13,
+        "fields": {
+            "nome": "Couve",
+            "dias_de_cultivo": 80,
+            "fase_da_lua": "crescente",
+            "inicio_de_temporada": "2024-01-01",
+            "fim_de_temporada": "2024-03-21",
+            "plantas_amigas": [2, 3, 10],
+            "plantas_inimigas": [1, 4]
+        }
+    },
+    {
+        "model": "app.planta",
+        "pk": 14,
+        "fields": {
+            "nome": "Cebolinha",
+            "dias_de_cultivo": 30,
+            "fase_da_lua": "nova",
+            "inicio_de_temporada": "2024-02-01",
+            "fim_de_temporada": "2024-03-02",
+            "plantas_amigas": [2, 3, 11],
+            "plantas_inimigas": [1, 5, 7]
+        }
+    },
+    {
+        "model": "app.planta",
+        "pk": 15,
+        "fields": {
+            "nome": "Batata",
+            "dias_de_cultivo": 75,
+            "fase_da_lua": "crescente",
+            "inicio_de_temporada": "2024-03-01",
+            "fim_de_temporada": "2024-05-14",
+            "plantas_amigas": [2, 4, 10, 11],
+            "plantas_inimigas": [1, 3, 7]
+        }
+    }
+]

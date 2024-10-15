@@ -94,18 +94,16 @@ class CampoForm(forms.ModelForm):
 class PlantaCultivadaForm(forms.ModelForm):
     class Meta:
         model = PlantaCultivada
-        fields = ['planta', 'data_plantio', 'quantidade_plantada', 'percentual_perda']
+        fields = ['planta', 'data_plantio', 'quantidade_plantada']
 
         labels = {
             'planta': 'Planta',
             'data_plantio': 'Data do Plantio',
             'quantidade_plantada': 'Quantidade Plantada',
-            'percentual_perda': 'Percentual de Perda',
         }
 
         widgets = {
             'planta': forms.Select(attrs={'class': 'form-control'}),
             'data_plantio': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'quantidade_plantada': forms.NumberInput(attrs={'placeholder': 'Quantidade', 'class': 'form-control'}),
-            'percentual_perda': forms.NumberInput(attrs={'placeholder': 'Percentual de Perda', 'class': 'form-control'}),
         }

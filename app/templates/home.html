@@ -10,23 +10,19 @@
 </head>
 <body class="bg-gray-200 flex flex-col min-h-screen">
 
-  <!-- Barra de Navegação Sticky usando Tailwind -->
+  <!-- Barra de navegação -->
   {% include "components/header.html" %}
 
   <!-- Conteúdo Principal com Scroll -->
-  <main class="flex-1 w-full bg-gray-200 p-4 space-y-4 rounded-t-3xl overflow-y-auto">
+  <main class="flex-1 w-full bg-[#f9e0cb] p-4 space-y-4 rounded-t-3xl overflow-y-auto min-h-screen">
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"> <!-- Mudança para grid -->
 
       <!-- Novo contêiner de datas -->
-      <div id="date-container" class="p-4 bg-white rounded-lg shadow-md">
-        <div id="current-date" class="text-lg text-center font-semibold mb-4"></div>
-        <div class="flex justify-between" id="date-range">
-          <!-- As datas serão inseridas aqui via JavaScript -->
-        </div>
-      </div>
+      {% include 'components/home_calendar.html' %}
+
 
       <!-- Conteúdo repetido -->
-      <div class="border bg-gray-300 flex items-center p-4 rounded-lg shadow-md hover:bg-gray-400 transition-colors duration-300">
+      <div class="bg-[#f09b6a] flex items-center p-4 rounded-lg shadow-md hover:bg-gray-400">
         <i class="bi bi-flower1 text-2xl text-gray-600"></i>
         <div class="ml-4 flex-1">
           <h2 class="text-gray-800 font-semibold">Quinta</h2>
@@ -39,7 +35,7 @@
     </div>
 
     <!-- Novo contêiner 1 -->
-    <div class="border bg-gray-300 p-4 rounded-lg shadow-md hover:bg-gray-400 transition-colors duration-300">
+    <div class=" bg-[#f09b6a] p-4 rounded-lg shadow-md hover:bg-gray-400">
       <div class="flex gap-3">
         <i class="bi bi-list-check text-2xl text-gray-600"></i>
         <h2 class="text-gray-800 font-semibold my-auto">Atividades de hoje</h2>
@@ -54,7 +50,7 @@
     </div>
 
     <!-- Novo contêiner 2 -->
-    <div class="border bg-gray-300 p-4 rounded-lg shadow-md hover:bg-gray-400 transition-colors duration-300">
+    <div class=" bg-[#f09b6a]  p-4 rounded-lg shadow-md hover:bg-gray-400">
       <div class="flex gap-3">
         <i class="bi bi-list-check text-2xl text-gray-600"></i>
         <h2 class="text-gray-800 font-semibold my-auto">Entrega dos produtos</h2>
@@ -73,97 +69,11 @@
   <!-- Sidebar -->
   {% include 'components/sidebar.html' %}
 
-  <!-- Menu opções rodapé Sticky usando Tailwind -->
-  <footer>
-    {% include 'components/footer.html' with current_page=current_page %}
-  </footer>
+  <!-- Footer -->
+  {% include 'components/footer.html' with current_page=current_page %}
 
-  <!-- FAB Botão -->
-  <button id="fab-btn" class="fixed right-4 bottom-20 bg-gray-600 text-white p-4 rounded-full shadow-lg focus:outline-none">
-    <i id="fab-icon" class="bi bi-plus-lg text-2xl"></i>
-  </button>
-
-  <!-- Popup Menu perto do FAB -->
-  <div id="popup-menu" class="fixed right-4 bottom-40 w-64 bg- p-4 hidden">
-    <!-- Botão de fechar no canto superior direito -->
-    <button id="close-popup" class="absolute top-2 right-2 text-gray-800">
-     
-    </button>
-    <div class="flex justify-end">
-      <ul class="space-y-3">
-        <li class="bg-slate-600 rounded-xl px-8 py-1 flex items-center gap-4">
-          <i class="bi bi-house-fill text-gray-800 text-2xl"></i>
-          <a href="#" class="text-white gray-800 text-md hover:underline">Clientes</a>
-        </li>
-        <li class="bg-slate-600 rounded-xl px-8 py-1 flex items-center gap-4">
-          <i class="bi bi-house-fill text-gray-800 text-2xl"></i>
-          <a href="#" class="text-white gray-800 text-md hover:underline">Clientes</a>
-        </li>
-        <li class="bg-slate-600 rounded-xl px-8 py-1 flex items-center gap-4">
-          <i class="bi bi-house-fill text-gray-800 text-2xl"></i>
-          <a href="#" class="text-white gray-800 text-md hover:underline">Clientes</a>
-        </li>
-      </ul>
-    </div>
-  </div>
-
-  <!-- Script para controlar o popup, sidebar e o contêiner de data -->
-  <script>
-    const fabBtn = document.getElementById('fab-btn');
-    const popupMenu = document.getElementById('popup-menu');
-    const closePopup = document.getElementById('close-popup');
-    const fabIcon = document.getElementById('fab-icon');
-
-    fabBtn.addEventListener('click', () => {
-      popupMenu.classList.toggle('hidden');
-
-      // Alterna o ícone entre "+" e "X"
-      if (popupMenu.classList.contains('hidden')) {
-        fabIcon.classList.remove('bi-x-lg');
-        fabIcon.classList.add('bi-plus-lg');
-      } else {
-        fabIcon.classList.remove('bi-plus-lg');
-        fabIcon.classList.add('bi-x-lg');
-      }
-    });
-
-    // Script para exibir o intervalo de datas
-    document.addEventListener('DOMContentLoaded', function () {
-      const currentDate = new Date();
-      const dateRange = [];
-      for (let i = -2; i <= 2; i++) {
-        const date = new Date(currentDate);
-        date.setDate(currentDate.getDate() + i);
-        dateRange.push(date);
-      }
-
-      const formatDate = (date) => date.getDate();
-      const formatDay = (date) => date.toLocaleString('pt-BR', { weekday: 'short' }).slice(0, 3);
-      const formatMonthYear = (date) => date.toLocaleString('pt-BR', { month: 'long', day: 'numeric' });
-
-      document.getElementById('current-date').textContent = `Hoje, ${formatMonthYear(currentDate)}`;
-
-      const dateContainer = document.getElementById('date-range');
-      dateRange.forEach((date) => {
-        const dateElement = document.createElement('div');
-        dateElement.className = `flex flex-col items-center`;
-
-        const dayElement = document.createElement('div');
-        dayElement.className = 'text-xs text-gray-500 mb-1';
-        dayElement.textContent = formatDay(date);
-
-        const dateNumberElement = document.createElement('div');
-        dateNumberElement.className = `w-10 h-10 flex items-center justify-center rounded-full ${
-          date.getDate() === currentDate.getDate() ? 'bg-gray-500 text-white' : 'text-gray-700'
-        }`;
-        dateNumberElement.textContent = formatDate(date);
-
-        dateElement.appendChild(dayElement);
-        dateElement.appendChild(dateNumberElement);
-        dateContainer.appendChild(dateElement);
-      });
-    });
-  </script>
+  <!-- FAB -->
+  {% include 'components/fab_home.html' %}
 
 </body>
 </html>

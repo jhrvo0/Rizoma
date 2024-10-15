@@ -1,23 +1,24 @@
 <aside id="sidebar" class="fixed top-0 right-0 w-64 h-full bg-white shadow-lg transform translate-x-full transition-transform duration-300 z-50">
-<div class="p-4 flex justify-between items-center bg-gray-200">
-    <h2 id="user-name" class="text-lg font-semibold">
-    {% if user.is_authenticated %}
-        {{ user.username }}
-    {% else %}
-        Visitante
-    {% endif %}
-    </h2>
-    
-    <button id="close-sidebar" class="text-gray-800">
-    <i class="bi bi-x-lg text-2xl"></i>
-    </button>
-</div>
-<ul class="p-4 space-y-4">
-    <li><a href="#" class="text-gray-800 hover:underline">Opção 1</a></li>
-    <li><a href="#" class="text-gray-800 hover:underline">Opção 2</a></li>
-    <li><a href="#" class="text-gray-800 hover:underline">Opção 3</a></li>
-</ul>
+    <div class="p-4 flex justify-between items-center bg-gray-200">
+        <h2 id="user-name" class="text-lg font-semibold">
+        {% if user.is_authenticated %}
+            {{ user.username }}
+        {% else %}
+            Visitante
+        {% endif %}
+        </h2>
+        
+        <button id="close-sidebar" class="text-gray-800">
+        <i class="bi bi-x-lg text-2xl"></i>
+        </button>
+    </div>
+    <ul class="p-4 space-y-4">
+        <li><a href="#" class="text-gray-800">Opção 1</a></li>
+        <li><a href="#" class="text-gray-800">Opção 2</a></li>
+        <li><a href="{% url 'logout' %}" class="text-gray-800 font-medium">Sair</a></li>
+    </ul>
 </aside>
+
 
 <script>
     // Sidebar Script

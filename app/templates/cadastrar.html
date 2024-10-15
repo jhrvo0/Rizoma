@@ -32,12 +32,11 @@
     </button>
     </form>
 
-    <!-- Espaço para ou -->
     <div class="flex items-center justify-center my-4">
       <span class="text-[#623721]">ou</span>
     </div>
 
-    <!-- Cadastro com Google -->
+    <!--  Google -->
     <div class="flex justify-center">
       <a
         href="{% url 'social:begin' 'google-oauth2' %}"
@@ -45,6 +44,12 @@
       >
         Cadastro com Google
       </a>
+    </div>
+
+    <!-- Link para login caso o cara ja tenha conta criada -->
+    <div class="text-center mt-4">
+      <span class="text-[#623721]">Já tem uma conta?</span>
+      <a href="{% url 'login' %}" class="text-[#623721] font-medium">Clique aqui para fazer login</a>
     </div>
   </div>
 </body>

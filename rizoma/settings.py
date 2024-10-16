@@ -10,7 +10,7 @@ NOT_PROD = not TARGET_ENV.lower().startswith('prod')
 
 if NOT_PROD:
     DEBUG = True
-    SECRET_KEY = '<A SECRET KEY DO SEU PROJETO>'
+    SECRET_KEY = 'django-insecure-2rbhja+2^#%+jli-y_nwcgw7x(1)3oimb3(bqyhn5_#(2b=mxb'
     ALLOWED_HOSTS = []
     DATABASES = {
         'default': {

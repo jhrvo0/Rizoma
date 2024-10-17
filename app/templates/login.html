@@ -9,21 +9,21 @@
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
 
-  <body class="min-h-screen bg-[#ffede4]">
+  <body class="min-h-screen bg-[]">
     <div class="flex items-center justify-center min-h-screen px-4 md:px-8 lg:px-12">
-      <div class="max-w-md w-full p-6 rounded-lg shadow-lg bg-[#f9e0cb]">
+      <div class="max-w-md w-full p-6 rounded-lg shadow-lg bg-[]">
         <div class="text-center mb-6">
           {% include "components/logo.html" %}
         </div>
 
         {% if user.is_authenticated %}
-          <p class="text-center text-[#623721]">Usuário logado como: {{ user.username }}</p>
+          <p class="text-center text-[]">Usuário logado como: {{ user.username }}</p>
 
           <form method="post" action="{% url 'logout' %}" class="mt-4">
     {% csrf_token %}
     <button
         type="submit"
-        class="w-full px-4 py-2 rounded-md bg-[#899953] text-[#ffede4] font-medium hover:bg-[#7a8648] focus:outline-none focus:ring-2 focus:ring-[#f09b6a]"
+        class="w-full px-4 py-2 rounded-md bg-[] text-[] font-medium hover:bg-[] focus:outline-none focus:ring-2 focus:ring-[]"
     >
         Sair
     </button>
@@ -32,21 +32,21 @@
   <form method="post" action="{% url 'login' %}" class="space-y-4">
     {% csrf_token %}
     <div>
-        <label for="email" class="block mb-1 text-[#623721] font-medium">E-mail</label>
+        <label for="email" class="block mb-1 text-[] font-medium">E-mail</label>
         <input
             id="email"
             name="email"
             type="email"
             placeholder="Digite seu e-mail"
             required
-            class="w-full px-4 py-2 rounded-md border-2 border-[#899953] bg-[#ffede4] focus:outline-none focus:ring-2 focus:ring-[#f09b6a]"
+            class="w-full px-4 py-2 rounded-md border-2 border-[] bg-[] focus:outline-none focus:ring-2 focus:ring-[]"
         />
         {% if form.email.errors %}
             <div class="text-red-600">{{ form.email.errors }}</div>
         {% endif %}
     </div>
     <div>
-        <label for="password" class="block mb-1 text-[#623721] font-medium">
+        <label for="password" class="block mb-1 text-[] font-medium">
             Senha
         </label>
         <input
@@ -55,7 +55,7 @@
             type="password"
             placeholder="Digite sua senha"
             required
-            class="w-full px-4 py-2 rounded-md border-2 border-[#899953] bg-[#ffede4] focus:outline-none focus:ring-2 focus:ring-[#f09b6a]"
+            class="w-full px-4 py-2 rounded-md border-2 border-[] bg-[] focus:outline-none focus:ring-2 focus:ring-[]"
         />
         {% if form.password.errors %}
             <div class="text-red-600">{{ form.password.errors }}</div>
@@ -63,7 +63,7 @@
     </div>
     <button
         type="submit"
-        class="w-full px-4 py-2 rounded-md bg-[#899953] text-[#ffede4] font-medium hover:bg-[#7a8648] focus:outline-none focus:ring-2 focus:ring-[#f09b6a]"
+        class="w-full px-4 py-2 rounded-md bg-gray-300 text-[] font-medium hover:bg-[] focus:outline-none focus:ring-2 focus:ring-[]"
     >
         Login
     </button>
@@ -78,14 +78,14 @@
           <div class="flex justify-center space-x-4 mt-4">
             <a
               href="{% url 'social:begin' 'google-oauth2' %}"
-              class="w-full px-4 py-2 rounded-md bg-[#dd4b39] text-[#ffede4] font-medium hover:bg-[#c23321] focus:outline-none focus:ring-2 focus:ring-[#f09b6a] text-center"
+              class="w-full px-4 py-2 rounded-md bg-gray-300 text-[] font-medium hover:bg-[] focus:outline-none focus:ring-2 focus:ring-[] text-center"
             >
               Login com Google
             </a>
           </div>
 
-          <div class="text-center mt-4">
-            <a href="{% url 'cadastrar' %}" class="text-[#623721] font-medium">Cadastrar</a>
+          <div class="text-center mt-4 ">
+            <a href="{% url 'cadastrar' %}" class="text-[] font-medium">Cadastrar</a>
           </div>
         {% endif %}
       </div>

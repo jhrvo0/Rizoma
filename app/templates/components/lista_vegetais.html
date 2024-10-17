@@ -9,11 +9,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
-    <button id="fab-btn" class="fixed right-4 bottom-20 bg-[#623721] text-white p-4 rounded-full shadow-lg focus:outline-none">
+    <button id="fab-btn" class="fixed right-4 bottom-20 bg-[#] text-white p-4 rounded-full shadow-lg focus:outline-none">
         <i id="fab-icon" class="bi bi-plus-lg text-2xl"></i>
     </button>
     <div id="modal-add-terreno" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-        <div class="bg-[#f9e0cb] p-6 m-6 rounded-lg shadow-lg w-96 z-50 max-h-[80vh] overflow-hidden">
+        <div class="bg-[#] p-6 m-6 rounded-lg shadow-lg w-96 z-50 max-h-[80vh] overflow-hidden">
             <form id="terreno-form" method="post" action="{% url 'adicionar-planta' campo_id=campo.id %}">
                 {% csrf_token %}
                 <div class="overflow-y-auto max-h-[60vh]">

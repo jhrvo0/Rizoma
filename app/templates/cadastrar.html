@@ -7,10 +7,10 @@
     <title>Cadastro - Rizoma</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="min-h-screen bg-[#ffede4] flex items-center justify-center px-4 md:px-8 lg:px-12">
-  <div class="max-w-md w-full p-6 rounded-lg shadow-lg bg-[#f9e0cb]">
+<body class="min-h-screen bg-[#] flex items-center justify-center px-4 md:px-8 lg:px-12">
+  <div class="max-w-md w-full p-6 rounded-lg shadow-lg bg-[#]">
     <div class="text-center mb-6">
-      <h2 class="text-3xl font-bold text-[#623721]">Cadastrar-se</h2>
+      <h2 class="text-3xl font-bold text-[#]">Cadastrar-se</h2>
     </div>
 
     <!-- Formulário de cadastro tradicional -->
@@ -18,7 +18,7 @@
     {% csrf_token %}
     {% for field in form %}
         <div>
-            <label for="{{ field.id_for_label }}" class="block mb-1 text-[#623721] font-medium">
+            <label for="{{ field.id_for_label }}" class="block mb-1 text-[] font-medium">
                 {{ field.label }}
             </label>
             {{ field }}
@@ -27,20 +27,20 @@
             {% endif %}
         </div>
     {% endfor %}
-    <button type="submit" class="w-full px-4 py-2 rounded-md bg-[#899953] text-[#ffede4] font-medium hover:bg-[#7a8648] focus:outline-none focus:ring-2 focus:ring-[#f09b6a]">
+    <button type="submit" class="w-full px-4 py-2 rounded-md bg-gray-300 text-[#] font-medium">
         Cadastrar
     </button>
     </form>
 
     <div class="flex items-center justify-center my-4">
-      <span class="text-[#623721]">ou</span>
+      <span class="text-[#]">ou</span>
     </div>
 
     <!--  Google -->
     <div class="flex justify-center">
       <a
         href="{% url 'social:begin' 'google-oauth2' %}"
-        class="w-full px-4 py-2 rounded-md bg-[#dd4b39] text-[#ffede4] font-medium hover:bg-[#c23321] focus:outline-none focus:ring-2 focus:ring-[#f09b6a] text-center"
+        class="w-full px-4 py-2 rounded-md bg-gray-300 text-[#] font-medium text-center"
       >
         Cadastro com Google
       </a>
@@ -48,8 +48,8 @@
 
     <!-- Link para login caso o cara ja tenha conta criada -->
     <div class="text-center mt-4">
-      <span class="text-[#623721]">Já tem uma conta?</span>
-      <a href="{% url 'login' %}" class="text-[#623721] font-medium">Clique aqui para fazer login</a>
+      <span class="text-[#]">Já tem uma conta?</span>
+      <a href="{% url 'login' %}" class="text-[#] font-medium">Clique aqui para fazer login</a>
     </div>
   </div>
 </body>

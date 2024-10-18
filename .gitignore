@@ -1,8 +1,11 @@
 # Ignorar a venv que o usuário criar
 venv/
 
-# ignorar bancos de dados locais 
+# Ignorar bancos de dados locais 
 *.sqlite3
 
 # Ignorar o diretorio migrations
 migrations/
+
+# Ignorar environment
+*.env

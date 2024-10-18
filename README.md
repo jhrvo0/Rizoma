@@ -19,7 +19,7 @@ O objetivo do Rizoma é fornecer uma solução digital que auxilie os agricultor
 5. **Registro e Análise de Dados** ( Não implementado )
 
 * [Histórias de Usuário](https://docs.google.com/spreadsheets/d/1u7Sbr49sgcGPpF7OguJGkhFB1Q6MhPgf9jAShsBseE0/edit?gid=258470929#gid=258470929)
-* [Sketches e Storyboards](https://drive.google.com/drive/folders/1OMUtl5edkLgw_eQ5Fal60GribPvDlB5m)
+* [Sketches e Storyboards](https://drive.google.com/drive/folders/1YM1CqGRBP17U1Yykp0vckzq89gFPgzGB)
 
 ## Acesse nossas atividades:
 
@@ -44,7 +44,7 @@ O objetivo do Rizoma é fornecer uma solução digital que auxilie os agricultor
 ## 🧩Diagrama de atividades:
 <br>
 
-![Diagrama](https://github.com/user-attachments/assets/995158b9-9051-41d7-9cc0-b544ecec4993)
+![Diagrama](https://github.com/user-attachments/assets/a2a321e3-4b54-42d0-9e02-dd797a219281)
 
 <br>
 

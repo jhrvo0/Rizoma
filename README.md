@@ -1,6 +1,6 @@
 
 
-# <h1 align="center"> <img src="https://github.com/jhrvo0/Rizoma/raw/main/app/static/app/images/Icone%20Rizoma%20-%20Positivo%201.png" alt="Ícone Rizoma" width="100">Rizoma</h1>
+# <h1 align="center"> <img src="https://github.com/jhrvo0/Rizoma/raw/main/app/static/app/images/Icone%20Rizoma%20-%20Positivo%201.png" alt="Ícone Rizoma" width="100"><br>Rizoma</h1>
 
 
 ## Bem vindo(a) ao Rizoma!

@@ -16,13 +16,13 @@ class CustomAuthenticationForm(AuthenticationForm):
 class RegistrationForm(forms.ModelForm):
     password = forms.CharField(
         widget=forms.PasswordInput(attrs={
-            'class': 'w-full px-4 py-2 rounded-md border-2 border-[#899953] bg-[#ffede4] focus:outline-none focus:ring-2 focus:ring-[#f09b6a]',
+            'class': 'w-full px-4 py-2 rounded-md border-2 border-[#999] bg-[#fff] focus:outline-none focus:ring-2',
             'placeholder': 'Digite sua senha'
         })
     )
     confirm_password = forms.CharField(
         widget=forms.PasswordInput(attrs={
-            'class': 'w-full px-4 py-2 rounded-md border-2 border-[#899953] bg-[#ffede4] focus:outline-none focus:ring-2 focus:ring-[#f09b6a]',
+            'class': 'w-full px-4 py-2 rounded-md border-2 border-[#999] bg-[#fff] focus:outline-none focus:ring-2',
             'placeholder': 'Confirme sua senha'
         })
     )
@@ -41,11 +41,11 @@ class RegistrationForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(RegistrationForm, self).__init__(*args, **kwargs)
         self.fields['username'].widget.attrs.update({
-            'class': 'w-full px-4 py-2 rounded-md border-2 border-[#899953] bg-[#ffede4] focus:outline-none focus:ring-2 focus:ring-[#f09b6a]',
+            'class': 'w-full px-4 py-2 rounded-md border-2 border-[#999999] bg-[#ffffff]',
             'placeholder': 'Digite seu nome de usuário'
         })
         self.fields['email'].widget.attrs.update({
-            'class': 'w-full px-4 py-2 rounded-md border-2 border-[#899953] bg-[#ffede4] focus:outline-none focus:ring-2 focus:ring-[#f09b6a]',
+            'class': 'w-full px-4 py-2 rounded-md border-2 border-[#999999] bg-[#ffffff]',
             'placeholder': 'Digite seu e-mail'
         })
 

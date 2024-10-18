@@ -1,3 +1,5 @@
+[Rizoma](https://github.com/jhrvo0/Rizoma/blob/main/app/static/app/images/Icone%20Rizoma%20-%20Positivo%201.png)
+
 # <h1 align="center"> 🌾Rizoma  </h1>
 
 

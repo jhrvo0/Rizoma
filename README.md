@@ -65,9 +65,7 @@ O objetivo do Rizoma é fornecer uma solução digital que auxilie os agricultor
 
 [Relatório do Pair Programming](https://docs.google.com/document/d/1yhjUij1SeJiJFzoGvzn4JuuQ_ir3wu0o9FnXx2oN3o8/edit#heading=h.dfhbxcwcw9si)
 
-[Cronograma Detalhado](https://drive.google.com/drive/folders/1cFVOSJfkAmsbpBymewv4ZbD-WT_OayZn)
-
-[Cronograma Macro](https://drive.google.com/drive/folders/1cFVOSJfkAmsbpBymewv4ZbD-WT_OayZn)
+[Cronograma Detalhado e Macro](https://drive.google.com/drive/folders/1cFVOSJfkAmsbpBymewv4ZbD-WT_OayZn)
 
 <br>
 

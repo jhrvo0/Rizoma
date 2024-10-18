@@ -34,7 +34,6 @@ O objetivo do Rizoma é fornecer uma solução digital que auxilie os agricultor
 
 ## 💻 Tecnologias Utilizadas:
 
-| Tecnologia  | Nome |
 | ------------- | ------------- |
 | **Framework Backend**  | Django  |
 | **Frontend**  | HTML, Javascript, Tailwind CSS  |

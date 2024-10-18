@@ -44,7 +44,7 @@ O objetivo do Rizoma é fornecer uma solução digital que auxilie os agricultor
 ## 🧩Diagrama de atividades:
 <br>
 
-# <h1 align="center"> <img src="https://media.discordapp.net/attachments/1224467499807150110/1296671246368505886/Untitled.jpg" alt="Diagrama de Atividades" width="500">
+<img src="https://media.discordapp.net/attachments/1224467499807150110/1296671246368505886/Untitled.jpg" alt="Diagrama de Atividades" width="500">
 
 <br>
 

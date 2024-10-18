@@ -43,6 +43,7 @@ O objetivo do Rizoma é fornecer uma solução digital que auxilie os agricultor
 | **Gerenciamento de Pacotes**  | Pip para pacotes de Python  |
 | **Configuração do Ambiente**  | Azure App Service  |
 | **Versionamento**  | GitHub  |
+| | |
 
 
 ## 🧑‍🌾 Equipe:

@@ -31,7 +31,9 @@ O objetivo do Rizoma é fornecer uma solução digital que auxilie os agricultor
 
 # 📝 Status Report 1
 
-## [Screencast do Projeto]()
+## [Screencast do Protótipo de Baixa](https://www.youtube.com/watch?v=-GpG7A2c_mQ)
+## [Screencast do Uso do Sistema](https://www.youtube.com/watch?v=o80aWHHs5f4)
+
 
 
 ## 🐛Issue/Bug Tracker:

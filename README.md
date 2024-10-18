@@ -11,13 +11,13 @@ O objetivo do Rizoma é fornecer uma solução digital que auxilie os agricultor
 
 1. **Criação de Área Personalizada**
 
-2. **Notificações e Alertas** 
+2. **Notificações e Alertas** ( Não implementado )
 
-3. **Calendário de Plantio Inteligente** 
+3. **Calendário de Plantio Inteligente** ( Não implementado )
 
-4. **Chatbot via WhatsApp**
+4. **Chatbot via WhatsApp** ( Não implementado )
 
-5. **Registro e Análise de Dados**
+5. **Registro e Análise de Dados** ( Não implementado )
 
 
 
@@ -33,9 +33,17 @@ O objetivo do Rizoma é fornecer uma solução digital que auxilie os agricultor
 
 
 ## 💻 Tecnologias Utilizadas:
-* **Frontend**: HTML, Tailwind, Javascript
-* **Backend**: Django (Python)
-* **Banco de Dados**: PostgreSQL
+
+| Tecnologia  | Nome |
+| ------------- | ------------- |
+| **Framework Backend**  | Django  |
+| **Frontend**  | HTML, Javascript, Tailwind CSS  |
+| **Banco de Dados**  | PostgreSQL  |
+| **Hospedagem**  | Azure App Service  |
+| **Autenticação**  | Django Authentication + OAuth2  |
+| **Gerenciamento de Pacotes**  | Pip para pacotes de Python  |
+| **Configuração do Ambiente**  | Azure App Service  |
+| **Versionamento**  | GitHub  |
 
 
 ## 🧑‍🌾 Equipe:

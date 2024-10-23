@@ -108,6 +108,15 @@ class CriarCampoView(LoginRequiredMixin, View):
         else:
             errors = form.errors.as_json()
             return JsonResponse({'status': 'error', 'errors': errors})
+        
+# Deletar Campo
+class DeletarCampoView(LoginRequiredMixin, View):
+    login_url = '/login/'
+    
+    def post(self, request, campo_id):
+        campo = get_object_or_404(Campo, id=campo_id)
+        campo.delete()
+        return redirect('campos')
     
 # Visualizar Campo
 class VisualizarCampoView(LoginRequiredMixin, View):
@@ -152,21 +161,36 @@ class AdicionarPlantaNoCampoView(LoginRequiredMixin, View):
             errors = form.errors.as_json()
             return JsonResponse({'status': 'error', 'errors': errors})
 
+class DeletarPlantaView(LoginRequiredMixin, View):
+    def post(self, request, planta_id):
+        planta = get_object_or_404(PlantaCultivada, id=planta_id)
+        campo_id = planta.campo.id
+        planta.delete()
+        messages.success(request, 'Planta deletada com sucesso.')
+        return redirect('detalhes-campo', campo_id=campo_id)
 
 # Dá detalhes sobre o campo
 class DetalhesCampoView(LoginRequiredMixin, View):
-    
-    def get(self, request, id, *args, **kwargs):
-        campo = get_object_or_404(Campo, id=id, agricultor=request.user)
-        plantas_cultivadas = PlantaCultivada.objects.filter(campo=campo)
+    login_url = '/login/'
 
+    def get(self, request, campo_id):
+        campo = get_object_or_404(Campo, id=campo_id)
+        plantas_cultivadas = PlantaCultivada.objects.filter(campo=campo)
         context = {
             'campo': campo,
-            'lista_plantas' : Planta.objects.all(),
             'plantas_cultivadas': plantas_cultivadas,
+            'plantas': Planta.objects.all(),  # Adicione as plantas ao contexto
         }
-
         return render(request, 'detalhes_campo.html', context)
+
+    def post(self, request, campo_id):
+        campo = get_object_or_404(Campo, id=campo_id)
+        nome = request.POST.get('nome')
+        if nome:
+            campo.nome = nome
+            campo.save()
+            messages.success(request, 'Nome do campo atualizado com sucesso.')
+        return redirect('detalhes-campo', campo_id=campo_id)
 
 
 """ Landing Route """

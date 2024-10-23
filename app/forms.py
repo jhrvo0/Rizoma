@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Agricultor, Campo, PlantaCultivada
+from .models import Agricultor, Campo, PlantaCultivada, Planta
 from app.models import Agricultor
 
 class CustomAuthenticationForm(AuthenticationForm):
@@ -107,3 +107,14 @@ class PlantaCultivadaForm(forms.ModelForm):
             'data_plantio': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'quantidade_plantada': forms.NumberInput(attrs={'placeholder': 'Quantidade', 'class': 'form-control'}),
         }
+    def clean_data_plantio(self):
+        data_plantio = self.cleaned_data.get('data_plantio')
+        if not data_plantio:
+            raise forms.ValidationError('A data de plantio é obrigatória.')
+        return data_plantio
+
+    def clean_quantidade_plantada(self):
+        quantidade = self.cleaned_data.get('quantidade_plantada')
+        if quantidade is None or quantidade <= 0:
+            raise forms.ValidationError('A quantidade plantada deve ser maior que 0.')
+        return quantidade

@@ -214,9 +214,6 @@ class HomeView(View):
             "user": request.user,
             "current_page": "home",
         }
-<<<<<<< Updated upstream
-        return render(request, "home.html", context)
-=======
         return render(request, "home.html", context)
 
 class CalendarioView(View):
@@ -287,4 +284,3 @@ class CalendarioView(View):
             return JsonResponse({"status": "success"})
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
->>>>>>> Stashed changes

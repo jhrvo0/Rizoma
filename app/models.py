@@ -105,3 +105,11 @@ class Agricultor(AbstractUser):
     def get_campos(self):
         return self.campos.all()
     
+class Evento(models.Model):
+    descricao = models.CharField(max_length=255)
+    data_inicio = models.DateField()
+    data_fim = models.DateField(null=True, blank=True)
+    cor = models.CharField(max_length=7, default='#FF5733')  # Cor padrão
+
+    def __str__(self):
+        return self.descricao

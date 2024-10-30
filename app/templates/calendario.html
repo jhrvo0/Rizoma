@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendário Interativo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css">
+</head>
+<body class="flex flex-col items-center bg-slate-300 justify-center h-screen bg-gray-100">
+    <div class="w-full max-w-md p-4 bg-white rounded-lg shadow-lg flex-1">
+        <div class="flex items-center justify-between mb-4">
+            <button id="prevMonth" class="bg-blue-500 rounded-full px-2 text-lg font-bold text-white">
+                <i class="bi bi-arrow-left-short"></i>
+            </button>
+            <h2 id="monthYear" class="text-xl font-semibold"></h2>
+            <button id="nextMonth" class="bg-blue-500 rounded-full px-2 text-lg font-bold text-white">
+                <i class="bi bi-arrow-right-short"></i>
+            </button>
+        </div>
+        <div class="grid grid-cols-7 gap-2 text-center font-semibold">
+            <div>Dom</div>
+            <div>Seg</div>
+            <div>Ter</div>
+            <div>Qua</div>
+            <div>Qui</div>
+            <div>Sex</div>
+            <div>Sab</div>
+        </div>
+        <div id="calendarDays" class="grid grid-cols-7 mt-2 gap-1"></div>
+    </div>
+    <div id="eventModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white p-6 rounded-lg w-80">
+            <h2 class="text-lg font-semibold mb-4 text-center" id="modalDate">Dia</h2>
+            <div id="eventList" class="mb-4"></div>
+            <button onclick="openAddEventModal()" class="w-full bg-blue-500 text-white py-2 rounded-md mb-2">Adicionar Atividade</button>
+            <button onclick="closeModal()" class="w-full bg-gray-500 text-white py-2 rounded-md">Fechar</button>
+        </div>
+    </div>
+    <div id="addEventModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white p-6 rounded-lg w-80">
+            <h2 class="text-lg font-semibold mb-4 text-center">Adicionar Nova Atividade</h2>
+            <form id="addEventForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Nome da Atividade</label>
+                    <input type="text" id="eventName" class="w-full mt-1 p-2 border border-gray-300 rounded-md" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Data Final</label>
+                    <div class="flex items-center mt-1 space-x-2">
+                        <input type="date" id="eventEndDate" class="w-full p-2 border border-gray-300 rounded-md">
+                        <label class="flex items-center space-x-2">
+                            <input type="checkbox" id="singleDay" class="form-checkbox h-9 w-9 text-blue-600">
+                            <span class="text-sm text-gray-700 font-medium">Dia Único</span>
+                        </label>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Cor da Atividade</label>
+                    <div id="colorOptions" class="flex space-x-2 mt-1">
+                        <!-- Cores com quadrados clicáveis -->
+                        <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#FF0000" style="background-color: #FF0000;"></div> <!-- Vermelho -->
+                        <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#FD7E14" style="background-color: #FD7E14;"></div> <!-- Laranja -->
+                        <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#FFC107" style="background-color: #FFC107;"></div> <!-- Amarelo -->
+                        <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#28A745" style="background-color: #28A745;"></div> <!-- Verde -->
+                        <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#007BFF" style="background-color: #007BFF;"></div> <!-- Azul -->
+                        <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#8A2BE2" style="background-color: #8A2BE2;"></div> <!-- Violeta -->
+                        <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#FF5733" style="background-color: #FF5733;"></div> <!-- Laranja Escuro -->
+                        <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#17A2B8" style="background-color: #17A2B8;"></div> <!-- Azul Claro -->
+                        <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#DA70D6" style="background-color: #DA70D6;"></div> <!-- Rosa -->
+                        <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#FFFF00" style="background-color: #FFFF00;"></div> <!-- Amarelo Brilhante -->
+                        
+                    </div>
+                    <input type="hidden" id="eventColor" value="#FF5733">
+                </div>
+                <div class="flex justify-end space-x-2">
+                    <button type="button" onclick="closeAddEventModal()" class="bg-gray-500 text-white py-2 px-4 rounded-md">Cancelar</button>
+                    <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md">Adicionar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação de Remoção -->
+    <div id="confirmRemoveModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white p-6 rounded-lg w-80">
+            <h2 class="text-lg font-semibold mb-4 text-center">Remover Atividade</h2>
+            <p class="text-center mb-4">Você deseja remover esta atividade apenas deste dia ou de todos os dias?</p>
+            <div class="flex justify-between">
+                <button id="removeSingleDayBtn" class="bg-red-500 text-white text-md mx-4 py-2 rounded-md">Apenas deste dia</button>
+                <button id="removeAllDaysBtn" class="bg-red-500 text-white text-md mx-4 py-2 rounded-md">Todos os dias</button>
+            </div>
+            <button onclick="closeConfirmRemoveModal()" class="w-full bg-gray-500 text-white py-2 rounded-md mt-4">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- Incluir o footer -->
+    {% include 'components/footer.html' with current_page='calendario' %}
+
+    <script>
+        const monthYearDisplay = document.getElementById('monthYear');
+        const prevMonthBtn = document.getElementById('prevMonth');
+        const nextMonthBtn = document.getElementById('nextMonth');
+        const calendarDaysContainer = document.getElementById('calendarDays');
+        const eventModal = document.getElementById('eventModal');
+        const addEventModal = document.getElementById('addEventModal');
+        const modalDateDisplay = document.getElementById('modalDate');
+        const eventList = document.getElementById('eventList');
+        const addEventForm = document.getElementById('addEventForm');
+        const singleDayCheckbox = document.getElementById('singleDay');
+        const endDateInput = document.getElementById('eventEndDate');
+        const eventColorInput = document.getElementById('eventColor');
+        const colorOptions = document.querySelectorAll('.color-square');
+
+        let currentDate = new Date();
+        let events = JSON.parse('{{ eventos|safe }}');
+        let selectedDate = '';
+        let eventIdToRemove = null;
+        let removeSingleDay = false;
+
+        function formatDate(day, month, year) {
+            const dayStr = day.toString().padStart(2, '0');
+            const monthStr = (month + 1).toString().padStart(2, '0');
+            return `${year}-${monthStr}-${dayStr}`;
+        }
+
+        function parseDateBrazilianFormat(dateString) {
+            const [day, month, year] = dateString.split('/').map(Number);
+            return new Date(year, month - 1, day, 12, 0, 0);
+        }
+
+        function loadCalendar() {
+            calendarDaysContainer.innerHTML = '';
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            monthYearDisplay.textContent = currentDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDay = firstDay.getDay();
+            for (let i = 0; i < startDay; i++) {
+                const emptyCell = document.createElement('div');
+                calendarDaysContainer.appendChild(emptyCell);
+            }
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const dayCell = document.createElement('div');
+                dayCell.classList.add('text-center', 'py-2', 'rounded-lg', 'cursor-pointer', 'relative');
+                const dayNumber = document.createElement('div');
+                dayNumber.textContent = day;
+                dayNumber.classList.add('font-bold');
+                dayCell.appendChild(dayNumber);
+                const date = formatDate(day, month, year);
+                dayCell.dataset.date = date;
+                dayCell.addEventListener('click', () => openModal(date));
+                const eventsForDay = events.filter(e => e.data_inicio <= date && (!e.data_fim || e.data_fim >= date));
+                eventsForDay.forEach(event => {
+                    const eventBar = document.createElement('div');
+                    eventBar.classList.add('h-1', 'mt-1', 'rounded');
+                    eventBar.style.backgroundColor = event.cor;
+                    dayCell.appendChild(eventBar);
+                });
+                calendarDaysContainer.appendChild(dayCell);
+            }
+        }
+
+        function formatDateBrazilian(date) {
+            const [year, month, day] = date.split('-');
+            return `${day}/${month}/${year}`;
+        }
+
+        function openModal(date) {
+            selectedDate = date;
+            const formattedDate = formatDateBrazilian(date);
+            modalDateDisplay.textContent = `Eventos para ${formattedDate}`;
+            displayEvents(date);
+            eventModal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            eventModal.classList.add('hidden');
+        }
+
+        function openAddEventModal() {
+            addEventModal.classList.remove('hidden');
+        }
+
+        function closeAddEventModal() {
+            addEventModal.classList.add('hidden');
+        }
+
+        function displayEvents(date) {
+            eventList.innerHTML = '';
+            const eventsForDate = events.filter(e => e.data_inicio <= date && (!e.data_fim || e.data_fim >= date));
+            if (eventsForDate.length === 0) {
+                eventList.innerHTML = '<p class="text-gray-500 text-center">Nenhum evento para este dia.</p>';
+            } else {
+                eventsForDate.forEach(event => {
+                    const eventItem = document.createElement('div');
+                    eventItem.classList.add('bg-blue-100', 'p-2', 'rounded-md', 'mb-2', 'flex', 'justify-between', 'items-center');
+                    eventItem.innerHTML = `
+                        <div class="flex items-center">
+                            <span class="inline-block w-3 h-3 rounded-full mr-2" style="background-color: ${event.cor};"></span>
+                            <span>${event.descricao}</span>
+                        </div>
+                        <button class="bg-red-500 text-white px-2 py-1 rounded-md" onclick="confirmRemoveEvent(${event.id}, '${date}', '${event.data_inicio}', '${event.data_fim}')">Remover</button>
+                    `;
+                    eventList.appendChild(eventItem);
+                });
+            }
+        }
+
+        function confirmRemoveEvent(eventId, date, dataInicio, dataFim) {
+            eventIdToRemove = eventId;
+            selectedDate = date;
+            if (dataInicio !== dataFim) {
+                document.getElementById('confirmRemoveModal').classList.remove('hidden');
+            } else {
+                removeSingleDay = false;
+                removeEvent(eventIdToRemove);
+            }
+        }
+
+        function closeConfirmRemoveModal() {
+            document.getElementById('confirmRemoveModal').classList.add('hidden');
+            eventIdToRemove = null;
+            removeSingleDay = false;
+        }
+
+        document.getElementById('removeSingleDayBtn').addEventListener('click', () => {
+            removeSingleDay = true;
+            removeEvent(eventIdToRemove);
+        });
+
+        document.getElementById('removeAllDaysBtn').addEventListener('click', () => {
+            removeSingleDay = false;
+            removeEvent(eventIdToRemove);
+        });
+
+        function removeEvent(eventId) {
+            const url = removeSingleDay ? `/calendario/${eventId}/?single_day=true&date=${selectedDate}` : `/calendario/${eventId}/`;
+            fetch(url, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    location.reload(); // Recarregar a página após a remoção
+                } else {
+                    console.error("Erro ao remover evento:", data.message);
+                    alert("Algo deu errado ao remover o evento. Verifique o console para mais detalhes.");
+                }
+            })
+            .catch(error => {
+                console.error("Erro na requisição:", error);
+                alert("Algo deu errado ao remover o evento. Verifique o console para mais detalhes.");
+            });
+        }
+
+        addEventForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const descricao = document.getElementById('eventName').value;
+            const data_inicio = selectedDate;
+            const data_fim = singleDayCheckbox.checked ? data_inicio : document.getElementById('eventEndDate').value;
+            const cor = eventColorInput.value;
+
+            const event = { descricao, data_inicio, data_fim, cor };
+
+            fetch("{% url 'calendario' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}",
+                },
+                body: JSON.stringify(event),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    event.id = data.evento_id;
+                    events.push(event);
+                    closeAddEventModal();
+                    loadCalendar();
+                    displayEvents(selectedDate);
+                } else {
+                    console.error("Erro ao adicionar evento:", data.message);
+                }
+            })
+            .catch(error => {
+                console.error("Erro na requisição:", error);
+                alert("Algo deu errado ao adicionar o evento. Verifique o console para mais detalhes.");
+            });
+        });
+
+        prevMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            loadCalendar();
+        });
+
+        nextMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            loadCalendar();
+        });
+
+        singleDayCheckbox.addEventListener('change', () => {
+            if (singleDayCheckbox.checked) {
+                endDateInput.disabled = true;
+                endDateInput.classList.add('line-through', 'text-gray-400');
+            } else {
+                endDateInput.disabled = false;
+                endDateInput.classList.remove('line-through', 'text-gray-400');
+            }
+        });
+
+        colorOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                colorOptions.forEach(opt => opt.classList.remove('ring-2', 'ring-offset-2', 'ring-blue-500'));
+                option.classList.add('ring-2', 'ring-offset-2', 'ring-blue-500');
+                eventColorInput.value = option.getAttribute('data-color');
+            });
+        });
+
+        loadCalendar();
+    </script>
+</body>
+</html>

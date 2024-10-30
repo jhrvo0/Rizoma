@@ -5,8 +5,12 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import View
-from .models import Agricultor, Campo, PlantaCultivada, Planta
+from .models import Agricultor, Campo, PlantaCultivada, Planta, Evento
 from .forms import LoginForm, RegistrationForm, CampoForm, PlantaCultivadaForm
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+import json
+from datetime import date, datetime, timedelta
 
 
 
@@ -207,7 +211,80 @@ class LandingView(View):
 class HomeView(View):
     def get(self, request):
         context = {
-            "user" : request.user,
-            "current_page" : "home", # Colocando a página atual no contexto para o componente do footer.
+            "user": request.user,
+            "current_page": "home",
         }
+<<<<<<< Updated upstream
         return render(request, "home.html", context)
+=======
+        return render(request, "home.html", context)
+
+class CalendarioView(View):
+    def get(self, request):
+        eventos = list(Evento.objects.values())
+        for evento in eventos:
+            evento['data_inicio'] = evento['data_inicio'].strftime('%Y-%m-%d')
+            if evento['data_fim']:
+                evento['data_fim'] = evento['data_fim'].strftime('%Y-%m-%d')
+        context = {
+            "eventos": json.dumps(eventos),
+            "current_page": "calendario",
+        }
+        return render(request, 'calendario.html', context)
+
+    @method_decorator(csrf_exempt)
+    def post(self, request):
+        try:
+            data = json.loads(request.body)
+            descricao = data.get('descricao')
+            data_inicio = data.get('data_inicio')
+            data_fim = data.get('data_fim')
+            cor = data.get('cor', '#FF5733')
+
+            evento = Evento.objects.create(
+                descricao=descricao,
+                data_inicio=data_inicio,
+                data_fim=data_fim,
+                cor=cor
+            )
+            return JsonResponse({"status": "success", "evento_id": evento.id})
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+
+    @method_decorator(csrf_exempt)
+    def delete(self, request, evento_id):
+        try:
+            evento = get_object_or_404(Evento, id=evento_id)
+            single_day = request.GET.get('single_day') == 'true'
+            date = request.GET.get('date')
+            if single_day and date:
+                # Convert the date string to a date object
+                date_obj = datetime.strptime(date, '%Y-%m-%d').date()
+                
+                # If the event starts and ends on the same day, delete it
+                if evento.data_inicio == evento.data_fim:
+                    evento.delete()
+                # If the event starts on the date to be removed, move the start date to the next day
+                elif evento.data_inicio == date_obj:
+                    evento.data_inicio = date_obj + timedelta(days=1)
+                    evento.save()
+                # If the event ends on the date to be removed, move the end date to the previous day
+                elif evento.data_fim == date_obj:
+                    evento.data_fim = date_obj - timedelta(days=1)
+                    evento.save()
+                # If the event spans the date to be removed, split the event into two
+                else:
+                    Evento.objects.create(
+                        descricao=evento.descricao,
+                        data_inicio=date_obj + timedelta(days=1),
+                        data_fim=evento.data_fim,
+                        cor=evento.cor
+                    )
+                    evento.data_fim = date_obj - timedelta(days=1)
+                    evento.save()
+            else:
+                evento.delete()
+            return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+>>>>>>> Stashed changes

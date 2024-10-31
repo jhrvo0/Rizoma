@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from app.views import HomeView, CalendarioView, LoginView, LogoutView, CadastrarView, VisualizarCampoView, CriarCampoView, AdicionarPlantaNoCampoView, DetalhesCampoView, LandingView, google_login
+from app.views import HomeView, CalendarioView, LoginView, LogoutView, CadastrarView, VisualizarCampoView, CriarCampoView, AdicionarPlantaNoCampoView, DetalhesCampoView, LandingView, google_login, DeletarCampoView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -21,4 +21,5 @@ urlpatterns = [
     path('campos/<int:id>/', DetalhesCampoView.as_view(), name='detalhes-campo'),
     path('calendario/', CalendarioView.as_view(), name='calendario'),
     path('calendario/<int:evento_id>/', CalendarioView.as_view(), name='calendario-delete'),
+    path('deletar-campo/<int:campo_id>/', DeletarCampoView.as_view(), name='deletar-campo'),
 ]

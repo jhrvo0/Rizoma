@@ -21,28 +21,50 @@
         <main class="flex-1 w-full bg-white px-4 py-2 space-y-16 overflow-y-auto">
             <div class="max-w-4x1 mx-auto space-y-4">
                 <div class="w-full h-12 flex items-center justify-center">
-                    <div class="grid grid-cols-[36px_1fr_36px] w-full gap-4">
+                    <div class="grid grid-cols-[36px_1fr_72px] w-full gap-4">
+                        <!-- Botão de Voltar -->
                         <a href="{% url 'campos' %}">
                             <button class="text-xl font-bold text-left">
                                 <i class="bi bi-arrow-left-circle-fill text-4xl"></i>
                             </button>
                         </a>
-                        <h1 class="text-2xl font-bold text-center">{{ campo.nome }}</h1>
-                        <form action="{% url 'deletar-campo' campo.id %}" method="post" class="text-right">
-                            {% csrf_token %}
-                            <button type="submit" class="text-xl font-bold text-red-600">
-                                <i class="bi bi-trash-fill text-4xl"></i>
+                        
+                        <!-- Nome do Campo (Modo de Visualização) -->
+                        <h1 class="text-2xl font-bold text-center my-auto" id="campo-nome-text">{{ campo.nome }}</h1>
+                
+                        <!-- Formulário para Editar e Deletar -->
+                        <div class="flex justify-end space-x-2">
+                            <!-- Botão de Editar Nome -->
+                            <button id="edit-campo-btn" class="">
+                                <i class="bi bi-pencil-fill text-4xl"></i>
                             </button>
+                            <!-- Botão de Deletar -->
+                            <form action="{% url 'deletar-campo' campo.id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="">
+                                    <i class="bi bi-trash-fill text-4xl"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="edit-campo-modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+                    <div class="bg-white p-6 rounded-lg w-80">
+                        <h2 class="text-lg font-semibold mb-4 text-center">Editar Nome do Campo</h2>
+                        <form id="edit-campo-form" method="post" action="{% url 'detalhes-campo' campo.id %}" class="space-y-4">
+                            {% csrf_token %}
+                            <div>
+                                <label for="campo-nome-input" class="block text-sm font-medium text-gray-700">Nome do Campo</label>
+                                <input type="text" name="nome" value="{{ campo.nome }}" id="campo-nome-input" class="w-full mt-1 p-2 border border-gray-300 rounded-md">
+                            </div>
+                            <div class="flex justify-evenly space-x-2">
+                                <button type="submit" id="save-campo-btn" class="bg-blue-500 text-white py-2 px-4 rounded-md text-center">Salvar</button>
+                                <button type="button" id="cancel-edit-btn" class="bg-gray-300 text-gray-700 py-2 px-4 rounded-md text-center">Cancelar</button>
+                            </div>
                         </form>
                     </div>
                 </div>
-
-                <form id="edit-campo-form" method="post" action="{% url 'detalhes-campo' campo.id %}">
-                    {% csrf_token %}
-                	<input type="text" name="nome" value="{{ campo.nome }}" id="campo-nome-input" class="hidden">
-                    <button type="submit" class="hidden" id="save-campo-btn">Salvar</button>
-                </form>
-                <button id="edit-campo-btn">Editar Nome</button>
 
                 {% if plantas_cultivadas %}
                 <div class="grid grid-cols-2 gap-4">
@@ -70,9 +92,6 @@
             </div>
         </main>
 
-        <!-- Sidebar -->
-        {% include 'components/sidebar.html' %}
-
         <!-- Footer -->
         {% include 'components/footer.html' with current_page=current_page current_page='campos' %}
 
@@ -80,10 +99,27 @@
         {% include 'components/fab_visualizar_campo.html' with lista_plantas=plantas %}
 
         <script>
-            document.getElementById('edit-campo-btn').addEventListener('click', function() {
-                document.getElementById('campo-nome-input').classList.remove('hidden');
-                document.getElementById('save-campo-btn').classList.remove('hidden');
-                this.classList.add('hidden');
+            // Seleciona os elementos do DOM
+            const editBtn = document.getElementById('edit-campo-btn');
+            const editModal = document.getElementById('edit-campo-modal');
+            const cancelEditBtn = document.getElementById('cancel-edit-btn');
+        
+            // Abre o modal ao clicar no botão de edição
+            editBtn.addEventListener('click', () => {
+                editModal.classList.remove('hidden');
+                document.getElementById('campo-nome-input').focus();
+            });
+        
+            // Fecha o modal ao clicar no botão de cancelar
+            cancelEditBtn.addEventListener('click', () => {
+                editModal.classList.add('hidden');
+            });
+        
+            // Fecha o modal ao clicar fora da área do modal
+            window.addEventListener('click', (e) => {
+                if (e.target === editModal) {
+                    editModal.classList.add('hidden');
+                }
             });
         </script>
     </body>

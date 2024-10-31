@@ -218,16 +218,38 @@ class HomeView(View):
 
 class CalendarioView(View):
     def get(self, request):
-        eventos = list(Evento.objects.values())
+        terrenos = list(request.user.campos.all())
+        terreno_id = request.GET.get('terreno_id')
+
+        if terreno_id:
+            terreno_atual = get_object_or_404(Campo, id=terreno_id, agricultor=request.user)
+        else:
+            terreno_atual = terrenos[0] if terrenos else None
+        
+        terreno_index = terrenos.index(terreno_atual) if terreno_atual in terrenos else 0
+        terreno_anterior = terrenos[terreno_index - 1] if terreno_index > 0 else terrenos[-1]
+        terreno_proximo = terrenos[terreno_index + 1] if terreno_index < len(terrenos) - 1 else terrenos[0]
+
+        eventos = list(terreno_atual.eventos.values()) if terreno_atual else []
+
         for evento in eventos:
             evento['data_inicio'] = evento['data_inicio'].strftime('%Y-%m-%d')
             if evento['data_fim']:
                 evento['data_fim'] = evento['data_fim'].strftime('%Y-%m-%d')
+
         context = {
             "eventos": json.dumps(eventos),
+            "terreno_atual": terreno_atual,
+            "terreno_anterior": terreno_anterior,
+            "terreno_proximo": terreno_proximo,
+            "terrenos": terrenos,
             "current_page": "calendario",
         }
         return render(request, 'calendario.html', context)
+
+
+
+
 
     @method_decorator(csrf_exempt)
     def post(self, request):
@@ -236,6 +258,7 @@ class CalendarioView(View):
             descricao = data.get('descricao')
             data_inicio = data.get('data_inicio')
             data_fim = data.get('data_fim')
+            campo_ids = data.get('campos', [])
             cor = data.get('cor', '#FF5733')
 
             evento = Evento.objects.create(
@@ -244,6 +267,9 @@ class CalendarioView(View):
                 data_fim=data_fim,
                 cor=cor
             )
+
+            campos = Campo.objects.filter(id__in=campo_ids)
+            evento.campos.set(campos)
             return JsonResponse({"status": "success", "evento_id": evento.id})
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=500)

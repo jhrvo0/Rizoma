@@ -32,20 +32,21 @@ class Planta(models.Model):
     def get_dias_de_cultivo(self):
         return self.dias_de_cultivo
 
-# A representação de um campo em nosso código:
 class Campo(models.Model):
     nome = models.CharField(max_length=100)
     icon = models.CharField(max_length=50, default='bi-house-fill') # Ícone do campo
     plantas_cultivadas = models.ManyToManyField('Planta', through='PlantaCultivada')
+    eventos = models.ManyToManyField('Evento', related_name='campos')
 
     def __str__(self):
         return self.nome
 
     def get_plantas_cultivadas(self):
         return self.plantas_cultivadas.all()
+    
+    def get_eventos(self):
+        return self.eventos.all()
 
-
-# Quando planta se relaciona com campo, temos PlantaCultivada, com outros campos importantes:
 class PlantaCultivada(models.Model):
     planta = models.ForeignKey(Planta, on_delete=models.CASCADE)
     campo = models.ForeignKey(Campo, on_delete=models.CASCADE)
@@ -64,7 +65,6 @@ class PlantaCultivada(models.Model):
     def get_data_de_plantio(self):
         """Retorna a data de plantio."""
         return self.data_plantio
-
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -104,8 +104,12 @@ class Agricultor(AbstractUser):
 
     def get_campos(self):
         return self.campos.all()
+
+    def get_eventos(self):
+        return Evento.objects.filter(campos__in=self.campos.all()).distinct()
     
 class Evento(models.Model):
+
     descricao = models.CharField(max_length=255)
     data_inicio = models.DateField()
     data_fim = models.DateField(null=True, blank=True)

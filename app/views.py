@@ -216,26 +216,36 @@ class HomeView(View):
         }
         return render(request, "home.html", context)
 
+from django.shortcuts import render, get_object_or_404
+from django.views import View
+from .models import Campo, Evento
+import json
+
 class CalendarioView(View):
     def get(self, request):
         terrenos = list(request.user.campos.all())
         terreno_id = request.GET.get('terreno_id')
 
-        if terreno_id:
-            terreno_atual = get_object_or_404(Campo, id=terreno_id, agricultor=request.user)
+        if terrenos:
+            if terreno_id:
+                terreno_atual = get_object_or_404(Campo, id=terreno_id, agricultor=request.user)
+            else:
+                terreno_atual = terrenos[0]
+            
+            terreno_index = terrenos.index(terreno_atual) if terreno_atual in terrenos else 0
+            terreno_anterior = terrenos[terreno_index - 1] if terreno_index > 0 else terrenos[-1]
+            terreno_proximo = terrenos[terreno_index + 1] if terreno_index < len(terrenos) - 1 else terrenos[0]
+            
+            eventos = list(terreno_atual.eventos.values())
+            for evento in eventos:
+                evento['data_inicio'] = evento['data_inicio'].strftime('%Y-%m-%d')
+                if evento['data_fim']:
+                    evento['data_fim'] = evento['data_fim'].strftime('%Y-%m-%d')
         else:
-            terreno_atual = terrenos[0] if terrenos else None
-        
-        terreno_index = terrenos.index(terreno_atual) if terreno_atual in terrenos else 0
-        terreno_anterior = terrenos[terreno_index - 1] if terreno_index > 0 else terrenos[-1]
-        terreno_proximo = terrenos[terreno_index + 1] if terreno_index < len(terrenos) - 1 else terrenos[0]
-
-        eventos = list(terreno_atual.eventos.values()) if terreno_atual else []
-
-        for evento in eventos:
-            evento['data_inicio'] = evento['data_inicio'].strftime('%Y-%m-%d')
-            if evento['data_fim']:
-                evento['data_fim'] = evento['data_fim'].strftime('%Y-%m-%d')
+            terreno_atual = "Nenhum campo foi registrado ainda"
+            terreno_anterior = None
+            terreno_proximo = None
+            eventos = []
 
         context = {
             "eventos": json.dumps(eventos),
@@ -246,6 +256,7 @@ class CalendarioView(View):
             "current_page": "calendario",
         }
         return render(request, 'calendario.html', context)
+
 
 
 

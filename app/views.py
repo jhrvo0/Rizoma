@@ -216,10 +216,7 @@ class HomeView(View):
         }
         return render(request, "home.html", context)
 
-from django.shortcuts import render, get_object_or_404
-from django.views import View
-from .models import Campo, Evento
-import json
+""" Calendário """
 
 class CalendarioView(View):
     def get(self, request):
@@ -256,7 +253,6 @@ class CalendarioView(View):
             "current_page": "calendario",
         }
         return render(request, 'calendario.html', context)
-
 
 
 

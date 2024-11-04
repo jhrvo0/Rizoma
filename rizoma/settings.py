@@ -1,6 +1,8 @@
 from pathlib import Path
 import os
 from dotenv import load_dotenv
+from django.conf import settings
+from django.conf.urls.static import static
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -77,6 +79,10 @@ STATIC_URL = os.environ.get('DJANGO_STATIC_URL', "/static/")
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_STORAGE = ('whitenoise.storage.CompressedManifestStaticFilesStorage')
+
+# Configurações de mídia
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 ROOT_URLCONF = 'rizoma.urls'
 WSGI_APPLICATION = 'rizoma.wsgi.application'

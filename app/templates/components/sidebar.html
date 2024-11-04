@@ -1,40 +1,69 @@
+<!-- Botão para abrir o sidebar -->
 <div class="flex items-center space-x-4 pr-4">
     <i id="open-sidebar" class="bi bi-people-fill text-gray-800 text-2xl cursor-pointer"></i>
 </div>
 
-<aside id="sidebar" class="fixed top-0 right-0 w-64 h-full bg-white shadow-lg transform translate-x-full transition-transform duration-300 z-50">
-    <div class="p-4 flex justify-between items-center bg-gray-200">
-        <h2 id="user-name" class="text-lg font-semibold">
-        {% if user.is_authenticated %}
-            {{ user.username }}
-        {% else %}
-            Visitante
-        {% endif %}
-        </h2>
-        
-        <button id="close-sidebar" class="text-gray-800">
-        <i class="bi bi-x-lg text-2xl"></i>
-        </button>
+
+<aside id="sidebar" class="fixed top-0 right-0 w-64 h-full bg-white shadow-lg transform translate-x-full transition-transform duration-300 z-50 flex flex-col justify-between">
+
+    <div>
+        <div class="p-6 flex my-auto justify-between items-center space-x-3">
+
+            <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center">
+                {% if user.profile_picture %}
+                    <img src="{{ user.profile_picture.url }}" alt="Foto de Perfil" class="w-12 h-12 rounded-full">
+                {% else %}
+                    <i class="bi bi-person-circle text-3xl text-gray-700"></i>
+                {% endif %}
+            </div>
+
+            <div>
+                <h2 id="user-name" class="text-lg font-semibold">
+                    {% if user.is_authenticated %}
+                        {{ user.username }}
+                    {% else %}
+                        Visitante
+                    {% endif %}
+                </h2>
+            </div>
+
+            <button id="close-sidebar" class=" text-gray-800">
+                <i class="bi bi-x-lg text-2xl"></i>
+            </button>
+        </div>
+
+        <ul class="p-6 space-y-6">
+            <li class="flex items-center space-x-4">
+                <i class="bi bi-gear-fill text-xl text-gray-700"></i>
+                <a href="#" class="text-gray-800 font-medium">Configurações</a>
+            </li>
+            <li class="flex items-center space-x-4">
+                <i class="bi bi-bell-fill text-xl text-gray-700"></i>
+                <a href="#" class="text-gray-800 font-medium">Notificações</a>
+            </li>
+            <li class="flex items-center space-x-4">
+                <i class="bi bi-shield-lock-fill text-xl text-gray-700"></i>
+                <a href="#" class="text-gray-800 font-medium">Privacidade</a>
+            </li>
+        </ul>
     </div>
-    <ul class="p-4 space-y-4">
-        <li><a href="#" class="text-gray-800">Opção 1</a></li>
-        <li><a href="#" class="text-gray-800">Opção 2</a></li>
-        <li><a href="{% url 'logout' %}" class="text-gray-800 font-medium">Sair</a></li>
-    </ul>
+
+    <div class="pb-72">
+        <a href="{% url 'logout' %}" class="text-gray-800 font-medium block text-center">Sair da conta</a>
+    </div>
 </aside>
 
 
 <script>
-    // Sidebar Script
     const openSidebarBtn = document.getElementById('open-sidebar');
     const closeSidebarBtn = document.getElementById('close-sidebar');
     const sidebar = document.getElementById('sidebar');
 
     openSidebarBtn.addEventListener('click', () => {
-      sidebar.classList.remove('translate-x-full'); // Mostra o sidebar
+        sidebar.classList.remove('translate-x-full'); 
     });
 
     closeSidebarBtn.addEventListener('click', () => {
-      sidebar.classList.add('translate-x-full'); // Esconde o sidebar
+        sidebar.classList.add('translate-x-full'); 
     });
 </script>

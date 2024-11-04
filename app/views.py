@@ -5,12 +5,13 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import View
-from .models import Agricultor, Campo, PlantaCultivada, Planta, Evento
-from .forms import LoginForm, RegistrationForm, CampoForm, PlantaCultivadaForm
+from .models import Agricultor, Campo, PlantaCultivada, Planta, Evento, Atividade
+from .forms import LoginForm, RegistrationForm, CampoForm, PlantaCultivadaForm, ProfileForm
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
 from datetime import date, datetime, timedelta
+from django.utils import timezone
 
 
 
@@ -63,7 +64,7 @@ class CadastrarView(View):
 
 # Google login
 def google_login(backend, user, response, request, *args, **kwargs):
-    if backend.name == 'google-oauth2':
+    if (backend.name == 'google-oauth2'):
         email = response.get('email')
 
         try:
@@ -132,6 +133,33 @@ class VisualizarCampoView(LoginRequiredMixin, View):
             "current_page" : "campos",
         }
         return render(request, "campos.html", context)
+    
+    def Filtrar_campos(request):
+        if request.method == "GET" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            nome = request.GET.get("nome", "")
+            sort = request.GET.get("sort", "az")  # Parâmetro de ordenação
+
+            campos = Campo.objects.all()
+            if nome:
+                campos = campos.filter(nome__icontains=nome)
+
+                    # Ordenação com base na opção selecionada
+            if sort == "az":
+                campos = campos.order_by("nome")  # A-Z
+            elif sort == "za":
+                campos = campos.order_by("-nome")  # Z-A
+            elif sort == "recent":
+                campos = campos.order_by("-created_at")  # Mais recente
+
+            if campos.exists():
+                html = render(request, "components/lista_campos.html", {"campos": campos}).content.decode("utf-8")
+            else:
+
+                html = '<div class="p-4 rounded-lg text-center"><p class="text-gray-600 font-semibold">Nenhum campo encontrado.</p></div>'
+
+            return JsonResponse({"html": html})
+        else:
+            return JsonResponse({"error": "Invalid request"}, status=400)
 
 # Adicionar Planta
 class AdicionarPlantaNoCampoView(LoginRequiredMixin, View):
@@ -210,9 +238,12 @@ class LandingView(View):
 
 class HomeView(View):
     def get(self, request):
+        today = timezone.now().date()
+        eventos_hoje = Evento.objects.filter(data_inicio=today).select_related('campo').order_by('data_inicio')
         context = {
             "user": request.user,
             "current_page": "home",
+            "atividades_hoje": eventos_hoje,
         }
         return render(request, "home.html", context)
 
@@ -224,7 +255,7 @@ class CalendarioView(View):
         terreno_id = request.GET.get('terreno_id')
 
         if terrenos:
-            if terreno_id:
+            if (terreno_id):
                 terreno_atual = get_object_or_404(Campo, id=terreno_id, agricultor=request.user)
             else:
                 terreno_atual = terrenos[0]
@@ -317,3 +348,62 @@ class CalendarioView(View):
             return JsonResponse({"status": "success"})
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
+
+class ProfileView(LoginRequiredMixin, View):
+    login_url = '/login/'
+
+    def get(self, request):
+        user = request.user
+        form = ProfileForm(instance=user)
+        context = {
+            'form': form,
+            'nome': user.username,
+            'email': user.email,
+            'foto_perfil': user.profile_picture.url if user.profile_picture else None,
+            'quantidade_campos': user.campos.count(),
+        }
+        return render(request, 'perfil.html', context)
+
+    def post(self, request):
+        user = request.user
+        form = ProfileForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('perfil')
+        context = {
+            'form': form,
+            'nome': user.username,
+            'email': user.email,
+            'foto_perfil': user.profile_picture.url if user.profile_picture else None,
+            'quantidade_campos': user.campos.count(),
+        }
+        return render(request, 'perfil.html', context)
+
+class CamposView(LoginRequiredMixin, View):
+    login_url = '/login/'
+
+    def get(self, request):
+        # Adicione a lógica para buscar os campos aqui
+        campos = []  # Substitua isso pela lógica real para buscar os campos
+        context = {
+            'campos': campos,
+        }
+        return render(request, 'campos.html', context)
+
+def Filtrar_campos(request):
+    if request.method == "GET" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        nome = request.GET.get("nome", "")
+        tipo = request.GET.get("tipo", "")
+
+        campos = Campo.objects.all()
+        if nome:
+            campos = campos.filter(nome__icontains=nome)
+
+        if campos.exists():
+            html = render(request, "components/lista_campos.html", {"campos": campos}).content.decode("utf-8")
+        else:
+            html = '<div class="p-4 rounded-lg text-center"><p class="text-gray-600 font-semibold">Nenhum campo encontrado.</p></div>'
+
+        return JsonResponse({"html": html})
+    else:
+        return JsonResponse({"error": "Invalid request"}, status=400)

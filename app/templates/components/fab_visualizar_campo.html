@@ -38,17 +38,17 @@
 		const form = document.getElementById("terreno-form");
 
 		if (fabBtn && modalAddTerreno && cancelarBtn && form) {
-			// Show modal on FAB button click
+	
 			fabBtn.addEventListener("click", () => {
 				modalAddTerreno.classList.remove("hidden");
 			});
 
-			// Hide modal on cancel button click
+		
 			cancelarBtn.addEventListener("click", () => {
 				modalAddTerreno.classList.add("hidden");
 			});
 
-			// Submit form via AJAX
+	
 			form.addEventListener("submit", function (event) {
 				event.preventDefault();
 				const formData = new FormData(form);

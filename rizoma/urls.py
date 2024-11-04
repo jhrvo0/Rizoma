@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.urls import path, include
-from app.views import HomeView, CalendarioView, LoginView, LogoutView, CadastrarView, VisualizarCampoView, CriarCampoView, AdicionarPlantaNoCampoView, DetalhesCampoView, LandingView, google_login, DeletarCampoView, DeletarPlantaView
+from django.conf import settings
+from django.conf.urls.static import static
+from app.views import HomeView, CalendarioView, LoginView, LogoutView, CadastrarView, VisualizarCampoView, CriarCampoView, AdicionarPlantaNoCampoView, DetalhesCampoView, LandingView, google_login, DeletarCampoView, DeletarPlantaView, ProfileView, CamposView, Filtrar_campos
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -23,5 +25,10 @@ urlpatterns = [
     path('calendario/<int:evento_id>/', CalendarioView.as_view(), name='calendario-delete'),
     path('deletar-campo/<int:campo_id>/', DeletarCampoView.as_view(), name='deletar-campo'),
     path('deletar-planta/<int:planta_id>/', DeletarPlantaView.as_view(), name='deletar-planta'),
-
+    path('filtrar-campos/', Filtrar_campos, name='Filtrar-campos'),
+    path('perfil/', ProfileView.as_view(), name='perfil'),
+    path('campos/', CamposView.as_view(), name='campos'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

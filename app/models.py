@@ -34,9 +34,10 @@ class Planta(models.Model):
 
 class Campo(models.Model):
     nome = models.CharField(max_length=100)
-    icon = models.CharField(max_length=50, default='bi-house-fill') # Ícone do campo
+    icon = models.CharField(max_length=50, default='bi-house-fill')  # Ícone do campo
     plantas_cultivadas = models.ManyToManyField('Planta', through='PlantaCultivada')
     eventos = models.ManyToManyField('Evento', related_name='campos')
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.nome
@@ -93,10 +94,9 @@ class Agricultor(AbstractUser):
     username = models.CharField(max_length=100, unique=False)
     email = models.EmailField(unique=True)
     campos = models.ManyToManyField('Campo')
-
+    profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']  
-
+    REQUIRED_FIELDS = ['username']
     objects = CustomUserManager()
 
     def __str__(self):
@@ -109,11 +109,18 @@ class Agricultor(AbstractUser):
         return Evento.objects.filter(campos__in=self.campos.all()).distinct()
     
 class Evento(models.Model):
-
     descricao = models.CharField(max_length=255)
     data_inicio = models.DateField()
     data_fim = models.DateField(null=True, blank=True)
-    cor = models.CharField(max_length=7, default='#FF5733')  # Cor padrão
+    cor = models.CharField(max_length=7, default='#FF5733')
+    campo = models.ForeignKey(Campo, on_delete=models.CASCADE, related_name='eventos_do_campo')
 
     def __str__(self):
         return self.descricao
+    
+class Atividade(models.Model):
+    data_inicio = models.DateField()  
+    descricao = models.TextField()  
+
+    def __str__(self):
+        return f"{self.descricao} - {self.data_inicio}"

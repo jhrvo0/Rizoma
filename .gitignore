@@ -1,5 +1,6 @@
 # Ignorar a venv que o usuário criar
 venv/
+.venv
 
 # Ignorar bancos de dados locais 
 *.sqlite3

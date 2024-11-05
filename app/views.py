@@ -5,13 +5,13 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import View
-from .models import Agricultor, Campo, PlantaCultivada, Planta, Evento, Atividade
+from .models import Agricultor, Campo, PlantaCultivada, Planta, Evento
 from .forms import LoginForm, RegistrationForm, CampoForm, PlantaCultivadaForm, ProfileForm
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
-from datetime import date, datetime, timedelta
-from django.utils import timezone
+from datetime import datetime, timedelta
+
 
 
 
@@ -138,11 +138,9 @@ class VisualizarCampoView(LoginRequiredMixin, View):
         if request.method == "GET" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
             nome = request.GET.get("nome", "")
             sort = request.GET.get("sort", "az")  # Parâmetro de ordenação
-
             campos = Campo.objects.all()
             if nome:
                 campos = campos.filter(nome__icontains=nome)
-
                     # Ordenação com base na opção selecionada
             if sort == "az":
                 campos = campos.order_by("nome")  # A-Z
@@ -150,13 +148,10 @@ class VisualizarCampoView(LoginRequiredMixin, View):
                 campos = campos.order_by("-nome")  # Z-A
             elif sort == "recent":
                 campos = campos.order_by("-created_at")  # Mais recente
-
             if campos.exists():
                 html = render(request, "components/lista_campos.html", {"campos": campos}).content.decode("utf-8")
             else:
-
                 html = '<div class="p-4 rounded-lg text-center"><p class="text-gray-600 font-semibold">Nenhum campo encontrado.</p></div>'
-
             return JsonResponse({"html": html})
         else:
             return JsonResponse({"error": "Invalid request"}, status=400)
@@ -238,12 +233,9 @@ class LandingView(View):
 
 class HomeView(View):
     def get(self, request):
-        today = timezone.now().date()
-        eventos_hoje = Evento.objects.filter(data_inicio=today).select_related('campo').order_by('data_inicio')
         context = {
             "user": request.user,
             "current_page": "home",
-            "atividades_hoje": eventos_hoje,
         }
         return render(request, "home.html", context)
 
@@ -319,39 +311,45 @@ class CalendarioView(View):
             single_day = request.GET.get('single_day') == 'true'
             date = request.GET.get('date')
             if single_day and date:
-                # Convert the date string to a date object
                 date_obj = datetime.strptime(date, '%Y-%m-%d').date()
                 
-                # If the event starts and ends on the same day, delete it
                 if evento.data_inicio == evento.data_fim:
                     evento.delete()
-                # If the event starts on the date to be removed, move the start date to the next day
                 elif evento.data_inicio == date_obj:
                     evento.data_inicio = date_obj + timedelta(days=1)
                     evento.save()
-                # If the event ends on the date to be removed, move the end date to the previous day
                 elif evento.data_fim == date_obj:
                     evento.data_fim = date_obj - timedelta(days=1)
                     evento.save()
-                # If the event spans the date to be removed, split the event into two
                 else:
-                    Evento.objects.create(
+                    # Criar um novo evento para os dias após o dia excluído
+                    novo_evento_apos = Evento.objects.create(
                         descricao=evento.descricao,
                         data_inicio=date_obj + timedelta(days=1),
                         data_fim=evento.data_fim,
                         cor=evento.cor
                     )
-                    evento.data_fim = date_obj - timedelta(days=1)
-                    evento.save()
+                    novo_evento_apos.campos.set(evento.campos.all())
+                    
+                    # Criar um novo evento para os dias antes do dia excluído
+                    novo_evento_antes = Evento.objects.create(
+                        descricao=evento.descricao,
+                        data_inicio=evento.data_inicio,
+                        data_fim=date_obj - timedelta(days=1),
+                        cor=evento.cor
+                    )
+                    novo_evento_antes.campos.set(evento.campos.all())
+                    
+                    # Excluir o evento original
+                    evento.delete()
             else:
                 evento.delete()
             return JsonResponse({"status": "success"})
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=500)
-
+        
 class ProfileView(LoginRequiredMixin, View):
     login_url = '/login/'
-
     def get(self, request):
         user = request.user
         form = ProfileForm(instance=user)
@@ -359,11 +357,9 @@ class ProfileView(LoginRequiredMixin, View):
             'form': form,
             'nome': user.username,
             'email': user.email,
-            'foto_perfil': user.profile_picture.url if user.profile_picture else None,
             'quantidade_campos': user.campos.count(),
         }
         return render(request, 'perfil.html', context)
-
     def post(self, request):
         user = request.user
         form = ProfileForm(request.POST, request.FILES, instance=user)
@@ -374,14 +370,13 @@ class ProfileView(LoginRequiredMixin, View):
             'form': form,
             'nome': user.username,
             'email': user.email,
-            'foto_perfil': user.profile_picture.url if user.profile_picture else None,
             'quantidade_campos': user.campos.count(),
         }
         return render(request, 'perfil.html', context)
+    
 
 class CamposView(LoginRequiredMixin, View):
     login_url = '/login/'
-
     def get(self, request):
         # Adicione a lógica para buscar os campos aqui
         campos = []  # Substitua isso pela lógica real para buscar os campos
@@ -389,21 +384,17 @@ class CamposView(LoginRequiredMixin, View):
             'campos': campos,
         }
         return render(request, 'campos.html', context)
-
 def Filtrar_campos(request):
     if request.method == "GET" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
         nome = request.GET.get("nome", "")
         tipo = request.GET.get("tipo", "")
-
         campos = Campo.objects.all()
         if nome:
             campos = campos.filter(nome__icontains=nome)
-
         if campos.exists():
             html = render(request, "components/lista_campos.html", {"campos": campos}).content.decode("utf-8")
         else:
             html = '<div class="p-4 rounded-lg text-center"><p class="text-gray-600 font-semibold">Nenhum campo encontrado.</p></div>'
-
         return JsonResponse({"html": html})
     else:
         return JsonResponse({"error": "Invalid request"}, status=400)

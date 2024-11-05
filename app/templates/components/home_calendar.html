@@ -1,34 +1,111 @@
 <div id="date-container" class="p-4 bg-gray-100 rounded-lg shadow-md">
-    <div id="current-date" class="text-lg text-center font-semibold mb-4"></div>
+    <div class="flex items-center justify-between mb-4">
+        <button id="prevDay" class="bg-slate-500 rounded-full px-2 text-lg font-bold text-white">
+            <i class="bi bi-chevron-left"></i>
+        </button>
+        <div class="text-center">
+            <h2 id="currentDate" class="text-xl font-semibold"></h2>
+            <h3 id="currentDayOfWeek" class="text-lg font-medium"></h3>
+        </div>
+        <button id="nextDay" class="bg-slate-500 rounded-full px-2 text-lg font-bold text-white">
+            <i class="bi bi-chevron-right"></i>
+        </button>
+    </div>
     <div class="flex justify-between" id="date-range">
         <!-- As datas serão inseridas aqui via JavaScript -->
     </div>
 </div>
 <script>
-    // Script para exibir o intervalo de datas
     document.addEventListener("DOMContentLoaded", function () {
-        const currentDate = new Date();
-        const dateRange = [];
-        for (let i = -2; i <= 2; i++) {
-            const date = new Date(currentDate);
-            date.setDate(currentDate.getDate() + i);
-            dateRange.push(date);
-        }
-        const formatDate = (date) => date.getDate();
-        const formatDay = (date) => date.toLocaleString("pt-BR", { weekday: "short" }).slice(0, 3);
-        const formatMonthYear = (date) => date.toLocaleString("pt-BR", { month: "long", day: "numeric" });
+        const currentDateElement = document.getElementById('currentDate');
+        const currentDayOfWeekElement = document.getElementById('currentDayOfWeek');
+        const dateRangeContainer = document.getElementById('date-range');
+        const prevDayButton = document.getElementById('prevDay');
+        const nextDayButton = document.getElementById('nextDay');
+        const selectedDateInput = document.getElementById('selectedDate');
+        const atividadesContainer = document.getElementById('atividades-container');
+        
+        // Definir a data atual
+        let currentDate = new Date();
+        selectedDateInput.value = currentDate.toISOString().split('T')[0];
 
-        const dateRangeContainer = document.getElementById("date-range");
-        dateRange.forEach((date) => {
-            const dateElement = document.createElement("div");
-            dateElement.classList.add("text-center");
-            dateElement.innerHTML = `
-                <div class="text-sm font-medium">${formatDay(date)}</div>
-                <div class="text-lg font-semibold">${formatDate(date)}</div>
-            `;
-            dateRangeContainer.appendChild(dateElement);
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        function updateDateDisplay() {
+            const options = { day: 'numeric', month: 'long' };
+            let dateString = currentDate.toLocaleDateString('pt-BR', options);
+            dateString = dateString.split(' ').map(capitalizeFirstLetter).join(' ');
+            if (isToday(currentDate)) {
+                dateString += ' (Hoje)';
+            }
+            currentDateElement.textContent = dateString;
+            const dayOfWeekOptions = { weekday: 'long' };
+            let dayOfWeekString = currentDate.toLocaleDateString('pt-BR', dayOfWeekOptions);
+            dayOfWeekString = capitalizeFirstLetter(dayOfWeekString);
+            currentDayOfWeekElement.textContent = dayOfWeekString;
+            selectedDateInput.value = currentDate.toISOString().split('T')[0];
+            fetchAtividades();
+            renderDateRange();
+        }
+
+        function isToday(date) {
+            const today = new Date();
+            return date.getDate() === today.getDate() &&
+                   date.getMonth() === today.getMonth() &&
+                   date.getFullYear() === today.getFullYear();
+        }
+
+        function renderDateRange() {
+            dateRangeContainer.innerHTML = '';
+            const startDate = new Date(currentDate);
+            startDate.setDate(currentDate.getDate() - 2);
+            for (let i = 0; i < 5; i++) {
+                const date = new Date(startDate);
+                date.setDate(startDate.getDate() + i);
+                const dateElement = document.createElement('div');
+                dateElement.className = 'text-center p-2 rounded-full cursor-pointer';
+                if (date.toDateString() === currentDate.toDateString()) {
+                    dateElement.classList.add('bg-gray-300');
+                }
+                dateElement.textContent = date.getDate();
+                dateElement.addEventListener('click', () => {
+                    currentDate = date;
+                    updateDateDisplay();
+                });
+                dateRangeContainer.appendChild(dateElement);
+            }
+        }
+
+        prevDayButton.addEventListener('click', () => {
+            currentDate.setDate(currentDate.getDate() - 1);
+            updateDateDisplay();
         });
 
-        document.getElementById("current-date").textContent = formatMonthYear(currentDate);
+        nextDayButton.addEventListener('click', () => {
+            currentDate.setDate(currentDate.getDate() + 1);
+            updateDateDisplay();
+        });
+
+        function fetchAtividades() {
+            const selectedDate = selectedDateInput.value;
+            fetch(`/atividades/${selectedDate}/`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    atividadesContainer.innerHTML = data.html || '<p class="text-gray-600">Nenhuma atividade atribuída ao dia de hoje.</p>';
+                })
+                .catch(error => {
+                    console.error('Erro ao buscar atividades:', error);
+                    atividadesContainer.innerHTML = '<p class="text-gray-600">Erro ao carregar atividades.</p>';
+                });
+        }
+
+        updateDateDisplay();
     });
 </script>

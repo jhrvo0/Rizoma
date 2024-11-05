@@ -16,33 +16,21 @@
 			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
 				<!-- Mudança para grid -->
 
-				<!-- Novo contêiner de datas -->
+				 <!-- Contêiner de datas unificado -->
 				{% include 'components/home_calendar.html' %}
 
 				<!-- Conteúdo repetido -->
 				<div class="bg-gray-100 p-4 rounded-lg shadow-md hover:bg-gray-400">
 					<div class="flex gap-3">
 						<i class="bi bi-list-check text-2xl text-gray-600"></i>
-						<h2 class="text-gray-800 font-semibold my-auto">Atividades de Hoje</h2>
+						<h2 class="text-gray-800 font-semibold my-auto">Atividades do Dia</h2>
 					</div>
-					<div class="ml-4 flex-1">
-						{% if atividades_hoje %}
-							<ul class="list-disc list-inside text-gray-700">
-								{% for evento in atividades_hoje %}
-									<li class="flex items-center gap-2">
-					
-										<span class="inline-block w-2 h-2 rounded-full" style="background-color: {{ evento.cor }};"></span>
-
-										<span>{{ evento.campo.nome }} - {{ evento.descricao }}</span>
-									</li>
-								{% endfor %}
-							</ul>
-						{% else %}
-							<p class="text-gray-600">Nenhuma atividade agendada para hoje.</p>
-						{% endif %}
+					<div class="ml-4 flex-1" id="atividades-container">
+						{% include 'components/atividades_lista.html' %}
 					</div>
-				</div>
+				</div>	
 			</div>
+			<input type="hidden" id="selectedDate" value="{{ current_date }}">
 		</main>
 
 		<!-- Footer -->

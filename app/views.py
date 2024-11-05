@@ -10,7 +10,8 @@ from .forms import LoginForm, RegistrationForm, CampoForm, PlantaCultivadaForm, 
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
+from django.template.loader import render_to_string
 
 
 
@@ -233,11 +234,24 @@ class LandingView(View):
 
 class HomeView(View):
     def get(self, request):
+        current_date = date.today()
+        atividades_hoje = self.get_atividades_por_data(request.user, current_date)
+        
         context = {
-            "user": request.user,
-            "current_page": "home",
+            'atividades_hoje': atividades_hoje,
+            'current_date': current_date.strftime('%Y-%m-%d'),  # Formatar a data corretamente
+            'current_page': 'home',
         }
-        return render(request, "home.html", context)
+        return render(request, 'home.html', context)
+    
+    def get_atividades_por_data(self, user, data):
+        return Evento.objects.filter(data_inicio__lte=data, data_fim__gte=data, campos__agricultor=user)
+
+def atividades_por_data(request, data):
+    data = datetime.strptime(data, '%Y-%m-%d').date()
+    atividades = HomeView().get_atividades_por_data(request.user, data)
+    html = render_to_string('components/atividades_lista.html', {'atividades_hoje': atividades})
+    return JsonResponse({'html': html})
 
 """ Calendário """
 

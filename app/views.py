@@ -392,23 +392,36 @@ class ProfileView(LoginRequiredMixin, View):
 class CamposView(LoginRequiredMixin, View):
     login_url = '/login/'
     def get(self, request):
-        # Adicione a lógica para buscar os campos aqui
-        campos = []  # Substitua isso pela lógica real para buscar os campos
+
+        campos = []  
         context = {
             'campos': campos,
         }
         return render(request, 'campos.html', context)
+    
 def Filtrar_campos(request):
     if request.method == "GET" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
         nome = request.GET.get("nome", "")
         tipo = request.GET.get("tipo", "")
+        sort = request.GET.get("sort", "az") 
+        
         campos = Campo.objects.all()
+
         if nome:
             campos = campos.filter(nome__icontains=nome)
+        
+        if sort == "az":
+            campos = campos.order_by("nome") 
+        elif sort == "za":
+            campos = campos.order_by("-nome") 
+        elif sort == "recent":
+            campos = campos.order_by("-created_at")  
+
         if campos.exists():
-            html = render(request, "components/lista_campos.html", {"campos": campos}).content.decode("utf-8")
+            html = render_to_string("components/lista_campos.html", {"campos": campos}, request=request)
         else:
             html = '<div class="p-4 rounded-lg text-center"><p class="text-gray-600 font-semibold">Nenhum campo encontrado.</p></div>'
+
         return JsonResponse({"html": html})
     else:
         return JsonResponse({"error": "Invalid request"}, status=400)

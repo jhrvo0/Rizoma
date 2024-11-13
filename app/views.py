@@ -12,7 +12,7 @@ from django.utils.decorators import method_decorator
 import json
 from datetime import date, datetime, timedelta
 from django.template.loader import render_to_string
-
+from .weather_api import get_weather_data
 
 
 
@@ -240,7 +240,7 @@ class HomeView(View):
         context = {
             'atividades_hoje': atividades_hoje,
             'current_date': current_date.strftime('%Y-%m-%d'),  # Formatar a data corretamente
-            'current_page': 'home',
+            'current_page': 'home',  # adiciona o clima ao contexto
         }
         return render(request, 'home.html', context)
     
@@ -281,6 +281,8 @@ class CalendarioView(View):
             terreno_proximo = None
             eventos = []
 
+        weather_data = get_weather_data('Carpina')
+
         context = {
             "eventos": json.dumps(eventos),
             "terreno_atual": terreno_atual,
@@ -288,6 +290,12 @@ class CalendarioView(View):
             "terreno_proximo": terreno_proximo,
             "terrenos": terrenos,
             "current_page": "calendario",
+
+            "city": weather_data["city"],
+            "temperature": weather_data["temperature"],
+            "condition": weather_data["condition"],
+            "icon": weather_data["icon"],
+            "moon_phase": weather_data["moon_phase"]
         }
         return render(request, 'calendario.html', context)
 
@@ -425,3 +433,28 @@ def Filtrar_campos(request):
         return JsonResponse({"html": html})
     else:
         return JsonResponse({"error": "Invalid request"}, status=400)
+
+# Importando a função que faz a requisição
+from django.shortcuts import render
+from django.views import View
+
+#class WeatherView(View):
+#    def get(self, request, *args, **kwargs):
+#        #city = request.GET.get('city', 'Carpina')
+#        
+#        # Chama a função que faz a requisição à API e retorna os dados de clima
+#        weather_data = get_weather_data('Carpina')
+#        
+#        if weather_data:
+#            context = {
+#                "city": weather_data["city"],
+#                "temperature": weather_data["temperature"],
+#                "condition": weather_data["condition"],
+#                "icon": weather_data["icon"],
+#                "moon_phase": weather_data["moon_phase"]
+#            }
+#        else:
+#            context = {"error": "Não foi possível obter os dados de clima."}
+#        return render(request, 'calendario.html', context)
+
+    

@@ -8,6 +8,7 @@ load_dotenv(BASE_DIR / '.env')
 TARGET_ENV = os.getenv('TARGET_ENV', 'development')
 NOT_PROD = not TARGET_ENV.lower().startswith('prod')
 
+
 if NOT_PROD:
     DEBUG = True
     SECRET_KEY = 'django-insecure-2rbhja+2^#%+jli-y_nwcgw7x(1)3oimb3(bqyhn5_#(2b=mxb'
@@ -51,6 +52,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+    'clearcache',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -139,6 +141,7 @@ ACCOUNT_EMAIL_VERIFICATION = False
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
 
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
@@ -152,3 +155,4 @@ SOCIAL_AUTH_PIPELINE = (
 )
 
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
+

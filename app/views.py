@@ -282,21 +282,34 @@ class CalendarioView(View):
             eventos = []
 
         weather_data = get_weather_data('Carpina')
-
-        context = {
-            "eventos": json.dumps(eventos),
-            "terreno_atual": terreno_atual,
-            "terreno_anterior": terreno_anterior,
-            "terreno_proximo": terreno_proximo,
-            "terrenos": terrenos,
-            "current_page": "calendario",
-
-            "city": weather_data["city"],
-            "temperature": weather_data["temperature"],
-            "condition": weather_data["condition"],
-            "icon": weather_data["icon"],
-            "moon_phase": weather_data["moon_phase"]
-        }
+        if weather_data:
+            context = {
+                "eventos": json.dumps(eventos),
+                "terreno_atual": terreno_atual,
+                "terreno_anterior": terreno_anterior,
+                "terreno_proximo": terreno_proximo,
+                "terrenos": terrenos,
+                "current_page": "calendario",
+                "city": weather_data["city"],
+                "temperature": weather_data["temperature"],
+                "condition": weather_data["condition"],
+                "icon": weather_data["icon"],
+                "moon_phase": weather_data["moon_phase"]
+            }
+        else:
+            context = {
+                "eventos": json.dumps(eventos),
+                "terreno_atual": terreno_atual,
+                "terreno_anterior": terreno_anterior,
+                "terreno_proximo": terreno_proximo,
+                "terrenos": terrenos,
+                "current_page": "calendario",
+                "city": "N/A",
+                "temperature": "N/A",
+                "condition": "N/A",
+                "icon": "N/A",
+                "moon_phase": "N/A"
+            }
         return render(request, 'calendario.html', context)
 
 
@@ -457,4 +470,6 @@ from django.views import View
 #            context = {"error": "Não foi possível obter os dados de clima."}
 #        return render(request, 'calendario.html', context)
 
-    
+def pagatividades(request):
+    eventos = Evento.objects.all()  # Obtenha todos os eventos
+    return render(request, 'atividades.html', {'eventos': eventos})

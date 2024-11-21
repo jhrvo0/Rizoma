@@ -1,7 +1,7 @@
-<div class="py-8 mx-auto w-full px-5">
+<div class="py-4 mx-auto w-full px-5">
     {% if error %}
     <p class="text-red-500 font-bold">{{ error }}</p>
-{% else %}
+    {% else %}
     <div class="flex justify-center space-x-4 bg-gray-500 text-white p-4 rounded-lg shadow-lg">
         <div class="flex items-center space-x-1">
             <span class="text-lg font-bold">{{ temperature }}°C</span>
@@ -13,7 +13,5 @@
             <span class="text-lg font-semibold">{{ moon_phase }}</span>
         </div>
     </div>
-{% endif %}
+    {% endif %}
 </div>
-
-

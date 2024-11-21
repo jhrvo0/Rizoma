@@ -20,6 +20,10 @@ class Planta(models.Model):
     fim_de_temporada = models.DateField()
     icone = models.CharField(max_length=50, blank=True, null=True)
 
+    #Adicionado 21/11/24
+    tipo = models.CharField(max_length=50, blank=True, null=True)
+    descricao = models.CharField(max_length=500, blank=True, null=True)
+
     def __str__(self):
         return self.nome
 
@@ -33,12 +37,28 @@ class Planta(models.Model):
         return self.dias_de_cultivo
 
 class Campo(models.Model):
+    TIPO_DE_SOLO = [
+        ('Tipo 1', 'Tipo 1'), 
+        ('Tipo 2', 'Tipo 2'), 
+        ('Tipo 3', 'Tipo 3')
+        ]
+    
+    TIPO_DE_CAMPO = [
+        ('Tipo 1', 'Tipo 1'), 
+        ('Tipo 2', 'Tipo 2'), 
+        ('Tipo 3', 'Tipo 3')
+    ]
+
     nome = models.CharField(max_length=100)
     icon = models.CharField(max_length=50, default='bi-house-fill') 
     plantas_cultivadas = models.ManyToManyField('Planta', through='PlantaCultivada')
     eventos = models.ManyToManyField('Evento', related_name='campos')
     created_at = models.DateTimeField(auto_now_add=True)
-
+    
+    #Adicionado 21/11/24
+    tipo_campo = models.CharField(max_length=50, choices=TIPO_DE_CAMPO, blank=True, null=True)
+    tipo_solo = models.CharField(max_length=50, choices=TIPO_DE_SOLO, blank=True, null=True)
+    
 
     def __str__(self):
         return self.nome
@@ -55,6 +75,10 @@ class PlantaCultivada(models.Model):
     data_plantio = models.DateField(blank=True, null=True)
     quantidade_plantada = models.IntegerField(blank=True, null=True)
     percentual_perda = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+
+    #Adicionado 21/11/24
+    subcampo = models.IntegerField(blank=True, null=True)
+    posicao_subcampo = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.planta} plantada no {self.campo} em {self.data_plantio}"

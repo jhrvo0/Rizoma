@@ -1,6 +1,6 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Agricultor, Campo, PlantaCultivada, Planta
+from django.contrib.auth.forms import AuthenticationForm
+from .models import Agricultor, Campo, PlantaCultivada
 from app.models import Agricultor
 
 class CustomAuthenticationForm(AuthenticationForm):
@@ -76,10 +76,12 @@ class LoginForm(forms.Form):
 class CampoForm(forms.ModelForm):
     class Meta:
         model = Campo
-        fields = ['nome', 'icon']
+        fields = ['nome', 'icon', 'tipo_campo', 'tipo_solo']
         labels = {
             'nome': 'Nome do Campo',
             'icon': 'Escolha um Ícone',
+            'tipo_campo': 'Escolha um Tipo de Campo',
+            'tipo_solo': 'Escolha um Tipo de Solo',
         }
         widgets = {
             'nome': forms.TextInput(attrs={'placeholder': 'Nome do Campo', 'class': 'form-control'}),
@@ -89,7 +91,10 @@ class CampoForm(forms.ModelForm):
                 ('bi-cloud-fill', 'Nuvem'),
                 ('bi-flower1', 'Flor'),
             ], attrs={'class': 'form-control'}),
+            'tipo_campo': forms.Select(attrs={'class': 'form-control'}),
+            'tipo_solo': forms.Select(attrs={'class': 'form-control'}),
         }
+
 
 class PlantaCultivadaForm(forms.ModelForm):
     class Meta:
@@ -107,6 +112,7 @@ class PlantaCultivadaForm(forms.ModelForm):
             'data_plantio': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
             'quantidade_plantada': forms.NumberInput(attrs={'placeholder': 'Quantidade', 'class': 'form-control'}),
         }
+
     def clean_data_plantio(self):
         data_plantio = self.cleaned_data.get('data_plantio')
         if not data_plantio:

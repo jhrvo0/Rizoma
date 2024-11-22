@@ -22,7 +22,7 @@ urlpatterns = [
     path('campos/', VisualizarCampoView.as_view(), name='campos'),
     path('novo-campo/', CriarCampoView.as_view(), name='novo-campo'),
     path('campos/<int:campo_id>/', DetalhesCampoView.as_view(), name='detalhes-campo'),
-    path('adicionar-planta/<int:campo_id>/', AdicionarPlantaNoCampoView.as_view(), name='adicionar-planta'),
+
     path('campos/<int:id>/', DetalhesCampoView.as_view(), name='detalhes-campo'),
     
     path('calendario/<int:evento_id>/', CalendarioView.as_view(), name='calendario-delete'),
@@ -35,21 +35,22 @@ urlpatterns = [
     path('atividades/', pagatividades, name='atividades'),
 
     path('calendario/', CalendarioView.as_view(), name='calendario'),
-    
-    path('lista-plantas/', ListaPlantasView.as_view(), name='lista_plantas'),
+
     path('planta/<int:id>/', DetalhePlantaView.as_view(), name='detalhes-planta'),
     path('editar-planta/<int:campo_id>/<int:planta_cultivada_id>/', EditarPlantasNoCampoView.as_view(), name='editar-planta'),
-    path('adicionar-planta/', AdicionarPlantaNoCampoView.as_view(), name='adicionar-planta'),
-    path('adicionar-planta/<int:campo_id>/<int:planta_id>/<int:quantidade>/', AdicionarPlantaNoCampoView.as_view(), name='adicionar-planta'),
-    path('campo/<int:campo_id>/', DetalhesCampoView.as_view(), name='detalhes-campo'),
-    path('campo/<int:campo_id>/editar/', EditarCampoView.as_view(), name='edicao_campo'),
     
+    path('adicionar-planta/', AdicionarPlantaNoCampoView.as_view(), name='adicionar-planta'),
+    
+    path('adicionar-planta/<int:campo_id>/<int:planta_id>/<int:quantidade>/', AdicionarPlantaNoCampoView.as_view(), name='adicionar-planta'),
 
-
+    path('campo/<int:campo_id>/', DetalhesCampoView.as_view(), name='detalhes-campo'),
+    path('campo/<int:campo_id>/lista-plantas/', ListaPlantasView.as_view(), name='lista-plantas'),
+    path('campo/<int:campo_id>/lista-plantas/<int:planta_id>/', AdicionarPlantaNoCampoView.as_view(), name='adicionar-planta'),
+    path('campo/<int:campo_id>/lista-plantas/<int:planta_id>/adicionar-planta/<int:quantidade>/', AdicionarPlantaNoCampoView.as_view(), name='adicionar-planta'),
+    
+    path('campo/<int:campo_id>/editar/', EditarCampoView.as_view(), name='edicao_campo'),
 
     path('modal/', ModalView.as_view(), name='modal'),
-
-
 
     #path('weather/', WeatherView.as_view(), name='weather'),
 ]

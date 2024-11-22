@@ -37,13 +37,13 @@
         </div>
 
         {% if plantas_cultivadas %}
-        <div class="grid grid-cols-2 gap-4 mb-6">
-            {% for planta_cultivada in plantas_cultivadas %}
-            <div class="bg-gray-300 h-32 rounded-lg"></div>
-            {% endfor %}
-        </div>
+            <div class="grid grid-cols-2 gap-4 mb-6">
+                {% for planta_cultivada in plantas_cultivadas %}
+                <div class="bg-gray-300 h-32 rounded-lg"></div>
+                {% endfor %}
+            </div>
         {% else %}
-        <div class="bg-gray-300 h-32 rounded-lg mb-6"></div>
+            <div class="bg-gray-300 h-32 rounded-lg mb-6"></div>
         {% endif %}
 
         <div class=" p-4 rounded-lg bg-gray-300">
@@ -63,13 +63,10 @@
                 </div>
             </div>
         </div>
-        
     </main>
 
     {% include 'components/footer.html' %}
-    {% include 'components/fab_campos.html' with campos=campos current_page='campos' %}
-
-
+    {% include 'components/component_fab.html' with options=options %}
 
 </body>
 </html>

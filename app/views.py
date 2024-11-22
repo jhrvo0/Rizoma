@@ -156,25 +156,24 @@ class VisualizarCampoView(LoginRequiredMixin, View):
             return JsonResponse({"error": "Invalid request"}, status=400)
 
 
-class OverviewAdicionarPlantaNoCampoView(LoginRequiredMixin, View):
-    def get(self, request):
-        return render(request, 'detalhes_campo.html')
-
 # Adicionar Planta
 class AdicionarPlantaNoCampoView(LoginRequiredMixin, View):
     login_url = '/login/'
-    
-    def get(self, request, campo_id):
+
+    def get(self, request, campo_id, planta_id):
         campo = get_object_or_404(Campo, id=campo_id)
-        #planta = get_object_or_404(Planta, id=planta_id) 
+        planta = get_object_or_404(Planta, id=planta_id)
         form = PlantaCultivadaForm()
+        
         context = {
             'form': form,
             'campo': campo,
+            'planta': planta,
             'plantas': Planta.objects.all(),
-            #'planta': planta,
         }
-        return render(request, 'detalhes_campo.html', context)
+        
+        return render(request, 'adicionar_planta.html', context)
+
     
     def post(self, request, campo_id):
         campo = get_object_or_404(Campo, id=campo_id)
@@ -247,7 +246,7 @@ class EditarPlantasNoCampoView(LoginRequiredMixin, View):
 
             nova_quantidade = request.POST.get('quantidade_plantada')
             if nova_quantidade:
-                planta_cultivada.quantidade_plantada = int(nova_quantidade)
+                planta_cultivada.quantidade_plantada = nova_quantidade
 
             planta_cultivada.save()
 
@@ -274,8 +273,10 @@ class DetalhesCampoView(LoginRequiredMixin, View):
             'campo': campo,
             'plantas_cultivadas': plantas_cultivadas,
             'plantas': Planta.objects.all(),
+            'options': get_fab_content('detalhes-campo.html', campo_id=campo_id),
         }
         return render(request, 'detalhes_campo.html', context)
+
 
     
 class EditarCampoView(LoginRequiredMixin, View):
@@ -399,10 +400,6 @@ class CalendarioView(LoginRequiredMixin, View):
                 "moon_phase": "N/A"
             }
         return render(request, 'calendario.html', context)
-
-
-
-
 
     @method_decorator(csrf_exempt)
     def post(self, request):
@@ -541,11 +538,14 @@ def pagatividades(request):
 
 
 class ListaPlantasView(LoginRequiredMixin, View):
-    def get(self, request):
-        context={
+    def get(self, request, campo_id):
+        campo = get_object_or_404(Campo, id=campo_id)
+        context = {
+            'campo': campo,
             'plantas': Planta.objects.all(),
         }
         return render(request, 'lista_plantas.html', context)
+
 
 class DetalhePlantaView(LoginRequiredMixin, View):
     def get(self, request, id):
@@ -564,21 +564,27 @@ class BuscaPlantaView(LoginRequiredMixin, View):
         return render(request, 'lista_campos.html', context)
 
 
-def get_fab_content(location):
+def get_fab_content(location, campo_id=None):
 
     # Adicione uma location aqui e chame essa função na view da location. Veja home para um exemplo.
     # - icon é o ícone (bootstrap icons) que vai aparecer na opção.
-    # - page é o redirect.
+    # - link é o redirect.
     # - name é a opção que aparece escrita.
 
     options = []
     if location == 'home.html':
         options = [
-            {"icon": "bi-house-fill", "page": "home", "name": "Clientes"},
-            {"icon": "bi-house-fill", "page": "home", "name": "Novo plantio"},
-            {"icon": "bi-house-fill", "page": "home", "name": "Novo campo"}
+            {"icon": "bi-house-fill", "link": "home", "name": "Clientes"},
+            {"icon": "bi-house-fill", "link": "home", "name": "Novo plantio"},
+            {"icon": "bi-house-fill", "link": "home", "name": "Novo campo"}
         ]
-        return options
+    elif location == 'detalhes-campo.html' and campo_id is not None:
+        options = [
+            {"icon": "bi-house-fill", "link": 'lista-plantas', 'args': [campo_id], "name": "Adicionar Planta"},
+        ]
+    return options
+
+        
 
 
 class ModalView(View):
@@ -587,5 +593,3 @@ class ModalView(View):
             'message': 'test',
         }
         return render(request, "components/component_modal.html", context)
-
-

@@ -2,11 +2,11 @@
     <ul class="list-disc list-inside text-gray-700">
         {% for evento in atividades_hoje %}
             <li class="flex items-center gap-2">
-                <span class="inline-block w-2 h-2 rounded-full" style="background-color: {% if evento.cor %}{{ evento.cor }}{% else %}black{% endif %};"></span>
+                <span class="inline-block w-2 h-2 rounded-full"></span>
                 <span>{{ evento.campo.nome }} - {{ evento.descricao }}</span>
             </li>
         {% endfor %}
     </ul>
 {% else %}
-    <p class="text-gray-600">Nenhuma atividade agendada para hoje.</p>
+    <p class="text-gray-600 font-bold bg-gray-400 rounded-xl p-3 text-center">Nenhuma atividade agendada para hoje.</p>
 {% endif %}

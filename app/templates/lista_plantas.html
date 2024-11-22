@@ -35,9 +35,9 @@
                 <a href="{% url 'detalhes-planta' planta.id %}" class="absolute top-0 right-0 p-2 bg-gray-500/50 rounded-xl w-12 h-12 flex items-center justify-center">
                     <i class="bi bi-info-circle text-white text-lg"></i>
                 </a>
-
-                
-                <i class="bi bi-card-image text-4xl"></i>
+                <a href="{% url 'adicionar-planta' campo.id planta.id %}">
+                    <i class="bi bi-card-image text-4xl"></i>
+                </a>
                 <span class="mt-2 text-center font-bold">{{ planta.nome }}</span>
             </div>
             {% endfor %}

@@ -1,16 +1,33 @@
-<div id="date-container" class="p-4 rounded-lg">
-    <div class="flex mb-2">
-        <div class="text-center mx-auto">
-            <h2 id="currentDate" class="text-2xl font-bold text-center"></h2>
-        </div>
+<div id="date-container" class="p-4 bg-gray-100 rounded-lg shadow-md">
+  <div class="flex items-center justify-between mb-4">
+    <button
+      id="prevDay"
+      class="bg-slate-500 rounded-full px-2 text-lg font-bold text-white"
+    >
+      <i class="bi bi-chevron-left"></i>
+    </button>
+    <div class="text-center">
+      <h2 id="currentDate" class="text-xl font-semibold"></h2>
+      <h3 id="currentDayOfWeek" class="text-lg font-medium"></h3>
     </div>
-    <div id="date-range" class="space-y-2"></div>
+    <button
+      id="nextDay"
+      class="bg-slate-500 rounded-full px-2 text-lg font-bold text-white"
+    >
+      <i class="bi bi-chevron-right"></i>
+    </button>
+  </div>
+  <div class="flex justify-between" id="date-range">
+    <!-- As datas serão inseridas aqui via JavaScript -->
+  </div>
 </div>
-
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const currentDateElement = document.getElementById("currentDate");
+    const currentDayOfWeekElement = document.getElementById("currentDayOfWeek");
     const dateRangeContainer = document.getElementById("date-range");
+    const prevDayButton = document.getElementById("prevDay");
+    const nextDayButton = document.getElementById("nextDay");
     const selectedDateInput = document.getElementById("selectedDate");
     const atividadesContainer = document.getElementById("atividades-container");
 
@@ -23,12 +40,20 @@
     }
 
     function updateDateDisplay() {
-      const options = { month: "long" };
+      const options = { day: "numeric", month: "long" };
       let dateString = currentDate.toLocaleDateString("pt-BR", options);
-
       dateString = dateString.split(" ").map(capitalizeFirstLetter).join(" ");
-
+      if (isToday(currentDate)) {
+        dateString += " (Hoje)";
+      }
       currentDateElement.textContent = dateString;
+      const dayOfWeekOptions = { weekday: "long" };
+      let dayOfWeekString = currentDate.toLocaleDateString(
+        "pt-BR",
+        dayOfWeekOptions
+      );
+      dayOfWeekString = capitalizeFirstLetter(dayOfWeekString);
+      currentDayOfWeekElement.textContent = dayOfWeekString;
       selectedDateInput.value = currentDate.toISOString().split("T")[0];
       fetchAtividades();
       renderDateRange();
@@ -45,31 +70,14 @@
 
     function renderDateRange() {
       dateRangeContainer.innerHTML = "";
-
       const startDate = new Date(currentDate);
-      startDate.setDate(currentDate.getDate() - 3);
-
-      const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-
-      const weekRow = document.createElement("div");
-      const dateRow = document.createElement("div");
-      weekRow.className = "grid grid-cols-7 text-center gap-2 mb-2";
-      dateRow.className = "grid grid-cols-7 text-center gap-2";
-
-      for (let i = 0; i < 7; i++) {
+      startDate.setDate(currentDate.getDate() - 2);
+      for (let i = 0; i < 5; i++) {
         const date = new Date(startDate);
         date.setDate(startDate.getDate() + i);
-
-        // Weekday label
-        const dayLabel = document.createElement("div");
-        dayLabel.className = "font-semibold text-gray-500";
-        dayLabel.textContent = weekDays[date.getDay()]; // Get abbreviated weekday
-        weekRow.appendChild(dayLabel);
-
-        // Date number
         const dateElement = document.createElement("div");
         dateElement.className =
-          "bg-gray-300 font-bold p-2 rounded-xl cursor-pointer py-4 text-xl";
+          "text-center bg-gray-300 font-bold p-2 rounded-xl cursor-pointer";
         if (date.toDateString() === currentDate.toDateString()) {
           dateElement.classList.add("bg-gray-400");
         }
@@ -78,13 +86,19 @@
           currentDate = date;
           updateDateDisplay();
         });
-        dateRow.appendChild(dateElement);
+        dateRangeContainer.appendChild(dateElement);
       }
-
-      // Append rows to the container
-      dateRangeContainer.appendChild(weekRow);
-      dateRangeContainer.appendChild(dateRow);
     }
+
+    prevDayButton.addEventListener("click", () => {
+      currentDate.setDate(currentDate.getDate() - 1);
+      updateDateDisplay();
+    });
+
+    nextDayButton.addEventListener("click", () => {
+      currentDate.setDate(currentDate.getDate() + 1);
+      updateDateDisplay();
+    });
 
     function fetchAtividades() {
       const selectedDate = selectedDateInput.value;

@@ -13,18 +13,33 @@
     {% include "components/header.html" %}
 
     <main class="flex-1 w-full bg-white px-4 py-2 rounded-t-3xl overflow-y-auto">
+        <div class="flex items-center">
+            <input 
+                type="text" 
+                id="search-input" 
+                placeholder="Buscar campo..." 
+                class="flex-1 bg-gray-200 rounded-l-lg py-2 px-4 focus:outline-none"
+            />
+            <button id="search-button" class="ml-2text-white px-4 py-2 rounded-r-lg bg-gray-200">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+    </div>
+
+        
         <div class="flex items-center space-x-4 p-4">
-            <div class="flex items-center justify-center bg-gray-500 rounded-lg shadow-md p-4 w-1/2">
-                <div class="text-center items-center flex my-auto justify-evenly gap-2">
-                    <p class="text-md font-semibold text-white">Total de campos:</p>
+            <div class="flex items-center justify-center h-18 bg-gray-500 rounded-lg shadow-md p-4 w-1/2">
+                <div class="text-center items-center flex  my-auto justify-evenly gap-2">
+                    <p class="text-lg font-semibold text-white">Campos:</p>
                     <p class="text-2xl font-bold text-white">{{ campos|length }}</p>
                 </div>
             </div>
 
 
             <div class="relative w-1/2">
-                <button id="filter-button" class="flex items-center justify-center w-full bg-gray-500 rounded-lg shadow-md p-4 cursor-pointer">
-                    <span class="text-md font-semibold text-white mr-2">Ordenar Campos</span>
+                <button id="filter-button" class="flex items-center gap-3 justify-center w-full h-18 bg-gray-500 rounded-lg shadow-md p-4 cursor-pointer">
+                    <i class="bi bi-filter text-3xl text-white"></i>
+                    <span class="text-md font-semibold text-white text-lg">Filtrar por</span>
                     <i class="bi bi-chevron-down text-xl text-white"></i>
                 </button>
 
@@ -55,6 +70,87 @@
 
 
     <script>
+        document.addEventListener("DOMContentLoaded", () => {
+    const searchInput = document.getElementById("search-input");
+    const searchButton = document.getElementById("search-button");
+    const filterButton = document.getElementById("filter-button");
+    const filterOptions = document.getElementById("filter-options");
+    const listaCampos = document.getElementById("lista-campos");
+
+    function fetchFilteredData(params) {
+        fetch(`/filtrar-campos/?${params}`, {
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+            },
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Erro ao buscar campos");
+                }
+                return response.json();
+            })
+            .then((data) => {
+                listaCampos.innerHTML = data.html;
+            })
+            .catch((error) => {
+                console.error("Erro:", error);
+            });
+    }
+
+    searchButton.addEventListener("click", () => {
+        const nome = searchInput.value.trim();
+        const params = new URLSearchParams({ nome }).toString();
+        fetchFilteredData(params);
+    });
+
+    searchInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            const nome = searchInput.value.trim();
+            const params = new URLSearchParams({ nome }).toString();
+            fetchFilteredData(params);
+        }
+    });
+
+    filterButton.addEventListener("click", () => {
+        filterOptions.classList.toggle("hidden");
+    });
+
+    filterOptions.addEventListener("click", (event) => {
+        const sort = event.target.getAttribute("data-sort");
+        const nome = searchInput.value.trim();
+        const params = new URLSearchParams({ nome, sort }).toString();
+        fetchFilteredData(params);
+        filterOptions.classList.add("hidden");
+    });
+});
+
+const searchButton = document.getElementById("search-button");
+
+    searchButton.addEventListener("click", () => {
+
+        anime({
+            targets: searchButton,
+            scale: [1, 1.2, 1], 
+            duration: 300,
+            easing: "easeOutQuad",
+        });
+
+        const searchInput = document.getElementById("search-input").value.trim();
+        fetch(`/filtrar-campos/?nome=${searchInput}`, {
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            const listaCampos = document.getElementById("lista-campos");
+            listaCampos.innerHTML = data.html || '<p class="text-gray-600">Nenhum campo encontrado.</p>';
+        })
+        .catch(error => console.error("Erro na busca:", error));
+    });
+
+
+
         const filterButton = document.getElementById("filter-button");
         const filterDropdown = document.getElementById("filter-dropdown");
         
@@ -113,3 +209,5 @@
     </script>
 </body>
 </html>
+
+

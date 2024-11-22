@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <title>Modal Example</title>
+  </head>
+  <body>
+    <!-- Main Content -->
+    <div
+      id="popup-container"
+      class="hidden fixed inset-0 bg-black bg-opacity-50 z-50"
+    >
+      <div
+        id="popup-modal"
+        class="bg-white p-6 rounded-3xl w-10/12 md:w-1/2 lg:w-1/3 mx-auto my-32"
+      >
+        <div id="modal-content" class="text-center mb-6">
+          <div
+            class="w-36 h-36 bg-gray-500 rounded-lg mx-auto flex items-center justify-center mb-2 mt-20"
+          >
+            <i class="bi bi-card-image text-8xl text-gray-400"></i>
+          </div>
+        </div>
+        <div class="text-center text-3xl font-bold my-14">{{ message }}</div>
+        <div class="mt-4 w-full text-center">
+          {% if link %}
+          <a href="{% url link %}">
+            <button
+              id="confirm-button"
+              class="rounded-xl bg-gray-500 font-bold text-3xl w-full py-6 mx-auto"
+            >
+              Continuar
+            </button>
+          </a>
+          {% else %}
+          <button
+            id="confirm-button"
+            class="rounded-xl bg-gray-500 font-bold text-3xl w-10/12 py-6 mx-auto"
+          >
+            Continuar
+          </button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Function to show the modal
+      function showModal() {
+        const modalContainer = document.getElementById("popup-container");
+        modalContainer.classList.remove("hidden"); // Show the modal
+      }
+
+      // Function to hide the modal
+      function hideModal() {
+        const modalContainer = document.getElementById("popup-container");
+        modalContainer.classList.add("hidden"); // Hide the modal
+      }
+
+      // Close the modal when clicking outside of it
+      document.addEventListener("click", function (event) {
+        const modalContainer = document.getElementById("popup-container");
+        if (!modalContainer.contains(event.target)) {
+          hideModal(); // Close modal if clicked outside
+        }
+      });
+
+      // Prevent modal content from closing when clicked
+      document
+        .getElementById("popup-modal")
+        .addEventListener("click", function (event) {
+          event.stopPropagation();
+        });
+
+      // Close modal when clicking the confirm button
+      document
+        .getElementById("confirm-button")
+        .addEventListener("click", function (event) {
+          hideModal();
+        });
+    </script>
+  </body>
+</html>

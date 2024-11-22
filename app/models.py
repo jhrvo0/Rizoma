@@ -1,6 +1,8 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from decimal import Decimal
+from django.utils import timezone
+import datetime
 
 # O model de uma planta em nosso código.
 class Planta(models.Model):
@@ -72,7 +74,7 @@ class Campo(models.Model):
 class PlantaCultivada(models.Model):
     planta = models.ForeignKey(Planta, on_delete=models.CASCADE)
     campo = models.ForeignKey(Campo, on_delete=models.CASCADE)
-    data_plantio = models.DateField(blank=True, null=True)
+    data_plantio = models.DateField(default=timezone.now, blank=True, null=True)
     quantidade_plantada = models.IntegerField(blank=True, null=True)
     percentual_perda = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
 

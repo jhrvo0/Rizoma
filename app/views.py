@@ -15,8 +15,6 @@ from django.template.loader import render_to_string
 from .weather_api import get_weather_data
 
 
-
-
 """ LOGIN / REGISTER / LOGOUT """
 
 # Login
@@ -139,7 +137,7 @@ class VisualizarCampoView(LoginRequiredMixin, View):
         if request.method == "GET" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
             nome = request.GET.get("nome", "")
             sort = request.GET.get("sort", "az")  # Parâmetro de ordenação
-            campos = Campo.objects.all()
+            campos = campos.objects.all()
             if nome:
                 campos = campos.filter(nome__icontains=nome)
                     # Ordenação com base na opção selecionada
@@ -157,17 +155,24 @@ class VisualizarCampoView(LoginRequiredMixin, View):
         else:
             return JsonResponse({"error": "Invalid request"}, status=400)
 
+
+class OverviewAdicionarPlantaNoCampoView(LoginRequiredMixin, View):
+    def get(self, request):
+        return render(request, 'detalhes_campo.html')
+
 # Adicionar Planta
 class AdicionarPlantaNoCampoView(LoginRequiredMixin, View):
     login_url = '/login/'
     
     def get(self, request, campo_id):
         campo = get_object_or_404(Campo, id=campo_id)
+        #planta = get_object_or_404(Planta, id=planta_id) 
         form = PlantaCultivadaForm()
         context = {
             'form': form,
             'campo': campo,
             'plantas': Planta.objects.all(),
+            #'planta': planta,
         }
         return render(request, 'detalhes_campo.html', context)
     
@@ -176,8 +181,76 @@ class AdicionarPlantaNoCampoView(LoginRequiredMixin, View):
         form = PlantaCultivadaForm(request.POST)
         if form.is_valid():
             planta_cultivada = form.save(commit=False)
-            planta_cultivada.campo = campo
+            
+            plantas_inimigas = planta_cultivada.planta.get_plantas_inimigas()
+            campo_plantas = campo.plantas.all()
+            
+            if any(planta in plantas_inimigas for planta in campo_plantas):
+                # Se houver plantas inimigas, exibir mensagem de confirmação
+                response_data = {
+                    'status': 'confirm',
+                    'message': f'{planta_cultivada.planta.nome} é inimiga de outras plantas no campo. Deseja continuar?'
+                }
+                return JsonResponse(response_data)
+            else:
+                # Se não houver plantas inimigas, salvar normalmente
+                planta_cultivada.campo = campo
+                planta_cultivada.save()
+                response_data = {
+                    'status': 'success',
+                    'nome': planta_cultivada.planta.nome,
+                    'data_plantio': planta_cultivada.data_plantio,
+                    'quantidade_plantada': planta_cultivada.quantidade_plantada,
+                }
+                return JsonResponse(response_data)
+        else:
+            errors = form.errors.as_json()
+            return JsonResponse({'status': 'error', 'errors': errors})
+
+
+
+class DeletarPlantaView(LoginRequiredMixin, View):
+    def post(self, request, planta_id):
+        planta = get_object_or_404(PlantaCultivada, id=planta_id)
+        campo_id = planta.campo.id
+        planta.delete()
+        messages.success(request, 'Planta deletada com sucesso.')
+        return redirect('detalhes-campo', campo_id=campo_id)
+
+class EditarPlantasNoCampoView(LoginRequiredMixin, View):
+    login_url = '/login/'
+
+    def get(self, request, campo_id, planta_cultivada_id):
+        campo = get_object_or_404(Campo, id=campo_id)
+        planta_cultivada = get_object_or_404(PlantaCultivada, id=planta_cultivada_id, campo=campo)
+        form = PlantaCultivadaForm(instance=planta_cultivada)
+        context = {
+            'form': form,
+            'campo': campo,
+            'planta_cultivada': planta_cultivada,
+            'plantas': Planta.objects.all(),
+        }
+        return render(request, 'editar_planta.html', context)
+    
+    def post(self, request, campo_id, planta_cultivada_id):
+        campo = get_object_or_404(Campo, id=campo_id)
+        planta_cultivada = get_object_or_404(PlantaCultivada, id=planta_cultivada_id, campo=campo)
+
+        form = PlantaCultivadaForm(request.POST, instance=planta_cultivada)
+
+        if form.is_valid():
+            planta_cultivada = form.save(commit=False)
+
+            nova_planta = request.POST.get('nova_planta')
+            if nova_planta:
+                planta_cultivada.planta = get_object_or_404(Planta, id=nova_planta)
+
+            nova_quantidade = request.POST.get('quantidade_plantada')
+            if nova_quantidade:
+                planta_cultivada.quantidade_plantada = int(nova_quantidade)
+
             planta_cultivada.save()
+
             response_data = {
                 'status': 'success',
                 'nome': planta_cultivada.planta.nome,
@@ -188,14 +261,7 @@ class AdicionarPlantaNoCampoView(LoginRequiredMixin, View):
         else:
             errors = form.errors.as_json()
             return JsonResponse({'status': 'error', 'errors': errors})
-
-class DeletarPlantaView(LoginRequiredMixin, View):
-    def post(self, request, planta_id):
-        planta = get_object_or_404(PlantaCultivada, id=planta_id)
-        campo_id = planta.campo.id
-        planta.delete()
-        messages.success(request, 'Planta deletada com sucesso.')
-        return redirect('detalhes-campo', campo_id=campo_id)
+    
 
 # Dá detalhes sobre o campo
 class DetalhesCampoView(LoginRequiredMixin, View):
@@ -207,18 +273,35 @@ class DetalhesCampoView(LoginRequiredMixin, View):
         context = {
             'campo': campo,
             'plantas_cultivadas': plantas_cultivadas,
-            'plantas': Planta.objects.all(),  # Adicione as plantas ao contexto
+            'plantas': Planta.objects.all(),
         }
         return render(request, 'detalhes_campo.html', context)
 
+    
+class EditarCampoView(LoginRequiredMixin, View):
+    login_url = '/login/'
+
+    def get(self, request, campo_id):
+        campo = get_object_or_404(Campo, id=campo_id, agricultor=request.user)
+        context = {
+            'campo': campo
+        }
+        return render(request, 'edicao_campo.html', context)
+
     def post(self, request, campo_id):
-        campo = get_object_or_404(Campo, id=campo_id)
+        campo = get_object_or_404(Campo, id=campo_id, agricultor=request.user)
         nome = request.POST.get('nome')
+        descricao = request.POST.get('descricao') 
+
         if nome:
             campo.nome = nome
-            campo.save()
-            messages.success(request, 'Nome do campo atualizado com sucesso.')
-        return redirect('detalhes-campo', campo_id=campo_id)
+        if descricao:
+            campo.descricao = descricao
+
+        campo.save()
+        messages.success(request, 'O campo foi atualizado com sucesso.')
+        return redirect('detalhes-campo', campo_id=campo.id)
+
 
 
 """ Landing Route """
@@ -232,7 +315,9 @@ class LandingView(View):
 
 """ Home """
 
-class HomeView(View):
+class HomeView(LoginRequiredMixin, View):
+    login_url = '/login/'
+
     def get(self, request):
         current_date = date.today()
         atividades_hoje = self.get_atividades_por_data(request.user, current_date)
@@ -241,6 +326,7 @@ class HomeView(View):
             'atividades_hoje': atividades_hoje,
             'current_date': current_date.strftime('%Y-%m-%d'),  # Formatar a data corretamente
             'current_page': 'home',  # adiciona o clima ao contexto
+            'options': get_fab_content('home.html')
         }
         return render(request, 'home.html', context)
     
@@ -255,7 +341,9 @@ def atividades_por_data(request, data):
 
 """ Calendário """
 
-class CalendarioView(View):
+class CalendarioView(LoginRequiredMixin, View):
+    login_url = '/login/'
+
     def get(self, request):
         terrenos = list(request.user.campos.all())
         terreno_id = request.GET.get('terreno_id')
@@ -424,19 +512,19 @@ def Filtrar_campos(request):
     if request.method == "GET" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
         nome = request.GET.get("nome", "")
         tipo = request.GET.get("tipo", "")
-        sort = request.GET.get("sort", "az") 
+        sort = request.GET.get("sort", "az")
         
-        campos = Campo.objects.all()
+        campos = request.user.get_campos()
 
         if nome:
             campos = campos.filter(nome__icontains=nome)
         
         if sort == "az":
-            campos = campos.order_by("nome") 
+            campos = campos.order_by("nome")
         elif sort == "za":
-            campos = campos.order_by("-nome") 
+            campos = campos.order_by("-nome")
         elif sort == "recent":
-            campos = campos.order_by("-created_at")  
+            campos = campos.order_by("-created_at")
 
         if campos.exists():
             html = render_to_string("components/lista_campos.html", {"campos": campos}, request=request)
@@ -447,29 +535,57 @@ def Filtrar_campos(request):
     else:
         return JsonResponse({"error": "Invalid request"}, status=400)
 
-# Importando a função que faz a requisição
-from django.shortcuts import render
-from django.views import View
-
-#class WeatherView(View):
-#    def get(self, request, *args, **kwargs):
-#        #city = request.GET.get('city', 'Carpina')
-#        
-#        # Chama a função que faz a requisição à API e retorna os dados de clima
-#        weather_data = get_weather_data('Carpina')
-#        
-#        if weather_data:
-#            context = {
-#                "city": weather_data["city"],
-#                "temperature": weather_data["temperature"],
-#                "condition": weather_data["condition"],
-#                "icon": weather_data["icon"],
-#                "moon_phase": weather_data["moon_phase"]
-#            }
-#        else:
-#            context = {"error": "Não foi possível obter os dados de clima."}
-#        return render(request, 'calendario.html', context)
-
 def pagatividades(request):
     eventos = Evento.objects.all()  # Obtenha todos os eventos
     return render(request, 'atividades.html', {'eventos': eventos})
+
+
+class ListaPlantasView(LoginRequiredMixin, View):
+    def get(self, request):
+        context={
+            'plantas': Planta.objects.all(),
+        }
+        return render(request, 'lista_plantas.html', context)
+
+class DetalhePlantaView(LoginRequiredMixin, View):
+    def get(self, request, id):
+        context={
+            'planta': Planta.objects.get(id=id),
+        }
+        return render(request, 'perfil_planta.html', context)
+
+
+class BuscaPlantaView(LoginRequiredMixin, View):
+    def get(self, request, query):
+        plantas = Planta.objects.filter(nome__icontains=query)
+        context = {
+            'plantas': plantas
+        }
+        return render(request, 'lista_campos.html', context)
+
+
+def get_fab_content(location):
+
+    # Adicione uma location aqui e chame essa função na view da location. Veja home para um exemplo.
+    # - icon é o ícone (bootstrap icons) que vai aparecer na opção.
+    # - page é o redirect.
+    # - name é a opção que aparece escrita.
+
+    options = []
+    if location == 'home.html':
+        options = [
+            {"icon": "bi-house-fill", "page": "home", "name": "Clientes"},
+            {"icon": "bi-house-fill", "page": "home", "name": "Novo plantio"},
+            {"icon": "bi-house-fill", "page": "home", "name": "Novo campo"}
+        ]
+        return options
+
+
+class ModalView(View):
+    def get(self, request):
+        context = {
+            'message': 'test',
+        }
+        return render(request, "components/component_modal.html", context)
+
+

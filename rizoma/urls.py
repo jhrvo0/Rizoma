@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from app.views import HomeView, CalendarioView, LoginView, LogoutView, CadastrarView, VisualizarCampoView, CriarCampoView, EditarCampoView, AdicionarPlantaNoCampoView, DetalhesCampoView, LandingView, google_login, DeletarCampoView, DeletarPlantaView, ProfileView, CamposView, Filtrar_campos, atividades_por_data, pagatividades, ListaPlantasView, DetalhePlantaView, EditarPlantasNoCampoView
+from app.views import HomeView, CalendarioView, LoginView, LogoutView, CadastrarView, VisualizarCampoView, CriarCampoView, EditarCampoView, AdicionarPlantaNoCampoView, DetalhesCampoView, LandingView, google_login, DeletarCamposView, DeletarPlantaView, ProfileView, CamposView, Filtrar_campos, atividades_por_data, pagatividades, ListaPlantasView, DetalhePlantaView, EditarPlantasNoCampoView
 from app.views import ModalView
 
 #WeatherView
@@ -26,7 +26,6 @@ urlpatterns = [
     path('campos/<int:id>/', DetalhesCampoView.as_view(), name='detalhes-campo'),
     
     path('calendario/<int:evento_id>/', CalendarioView.as_view(), name='calendario-delete'),
-    path('deletar-campo/<int:campo_id>/', DeletarCampoView.as_view(), name='deletar-campo'),
     path('deletar-planta/<int:planta_id>/', DeletarPlantaView.as_view(), name='deletar-planta'),
     path('filtrar-campos/', Filtrar_campos, name='Filtrar-campos'),
     path('perfil/', ProfileView.as_view(), name='perfil'),
@@ -51,6 +50,8 @@ urlpatterns = [
     path('campo/<int:campo_id>/editar/', EditarCampoView.as_view(), name='edicao_campo'),
 
     path('modal/', ModalView.as_view(), name='modal'),
+    path('deletar-campos/', DeletarCamposView.as_view(), name='deletar-campos'),
+
 
     #path('weather/', WeatherView.as_view(), name='weather'),
 ]

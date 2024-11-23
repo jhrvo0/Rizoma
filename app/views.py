@@ -114,13 +114,19 @@ class CriarCampoView(LoginRequiredMixin, View):
             return JsonResponse({'status': 'error', 'errors': errors})
         
 # Deletar Campo
-class DeletarCampoView(LoginRequiredMixin, View):
-    login_url = '/login/'
-    
-    def post(self, request, campo_id):
-        campo = get_object_or_404(Campo, id=campo_id)
-        campo.delete()
-        return redirect('campos')
+class DeletarCamposView(LoginRequiredMixin, View):
+    def post(self, request):
+        data = json.loads(request.body)
+        campo_ids = data.get('campo_ids', [])
+        
+        if not campo_ids:
+            return JsonResponse({"status": "error", "message": "Nenhum campo selecionado."}, status=400)
+        
+        campos = Campo.objects.filter(id__in=campo_ids, agricultor=request.user)
+        deleted_count = campos.count()
+        campos.delete()
+        
+        return JsonResponse({"status": "success", "deleted_count": deleted_count})
     
 # Visualizar Campo
 class VisualizarCampoView(LoginRequiredMixin, View):

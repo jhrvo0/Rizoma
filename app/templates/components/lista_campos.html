@@ -1,11 +1,26 @@
-{% for campo in campos %}
+<div>
 
-    <div class="click-and-hold campo-item bg-gray-300 my-2 p-4 rounded-lg flex items-center gap-3" 
+    <!-- Botões para Apagar Campos -->
+    <div id="delete-mode-buttons" class="hidden flex items-center space-x-4 p-4">
+        <button id="cancel-selection" class="bg-gray-500 text-white p-3 rounded-lg shadow-lg flex items-center justify-center w-12 h-12">
+            <i class="bi bi-x text-5xl"></i>
+        </button>
+        <button id="delete-selected" class="bg-gray-500 p-3 rounded-lg shadow-lg flex items-center justify-between flex-1">
+            <i class="bi bi-trash3 text-2xl"></i>
+            <span class="mx-auto font-bold">Apagar campos (<span id="selected-count">0</span>)</span>
+        </button>
+    </div>
+
+    <!-- Lista de Campos -->
+    {% for campo in campos %}
+    <div class="field-item relative bg-gray-300 my-2 p-4 rounded-lg flex items-center gap-3" 
          data-id="{{ campo.id }}" 
-         data-name="{{ campo.nome }}">  
+         data-name="{{ campo.nome }}">
+        <!-- Ícone do Campo -->
         <div class="flex items-center justify-center bg-gray-200 rounded-lg w-24 h-24">
             <i class="bi {{ campo.icon }} text-3xl text-gray-600"></i>
         </div>
+        <!-- Detalhes do Campo -->
         <div class="flex-1">
             <h2 class="text-gray-800 font-bold">{{ campo.nome }}</h2>
             <div class="flex gap-4 items-center">
@@ -13,9 +28,156 @@
                 <p class="text-gray-600 text-md">{{ campo.plantas|length }}</p>
             </div>
         </div>
+        <!-- Link para Detalhes -->
         <a href="{% url 'detalhes-campo' campo.id %}">
             <i class="bi bi-caret-right-fill text-4xl"></i>
         </a>
     </div>
-    
-{% endfor %}
+    {% endfor %}
+</div>
+{% include 'components/component_modal.html' with message="Campo deletado com sucesso!" link="campos" %}
+
+<script>
+
+    const selectedItems = new Set();
+    const deleteButton = document.getElementById('delete-selected');
+    const cancelSelectionButton = document.getElementById('cancel-selection');
+    const selectedCount = document.getElementById('selected-count');
+    const deleteModeButtons = document.getElementById('delete-mode-buttons');
+    const infoContainers = document.getElementById('info-containers');
+
+    function setupHold(field) {
+        let holdTimeout;
+
+        function startHold() {
+            holdTimeout = setTimeout(() => {
+                toggleDeleteMode(true);
+                showDeleteIndicator(field);
+            }, 500);
+        }
+
+        function cancelHold() {
+            clearTimeout(holdTimeout);
+        }
+
+        field.addEventListener('mousedown', startHold);
+        field.addEventListener('mouseup', cancelHold);
+        field.addEventListener('mouseleave', cancelHold);
+        field.addEventListener('touchstart', startHold);
+        field.addEventListener('touchend', cancelHold);
+        field.addEventListener('touchcancel', cancelHold);
+    }
+
+    function toggleDeleteMode(active) {
+        if (active) {
+            infoContainers.classList.add('hidden');
+            deleteModeButtons.classList.remove('hidden');
+        } else {
+            infoContainers.classList.remove('hidden');
+            deleteModeButtons.classList.add('hidden');
+            clearSelections();
+        }
+    }
+
+    function showDeleteIndicator(field) {
+        if (field.querySelector('.delete-indicator')) return;
+
+        const indicator = document.createElement('div');
+        indicator.classList.add(
+            'delete-indicator',
+            'absolute',
+            'top-0',
+            'right-0',
+            'bg-gray-600',
+            'text-white',
+            'rounded-md',
+            'w-8',
+            'h-8',
+            'flex',
+            'items-center',
+            'justify-center',
+            'shadow-md',
+            'cursor-pointer'
+        );
+        indicator.innerHTML = '<i class="bi bi-x"></i>';
+
+        indicator.addEventListener('click', (event) => {
+            event.stopPropagation();
+            toggleSelection(field);
+        });
+
+        field.appendChild(indicator);
+        toggleSelection(field);
+    }
+
+    function toggleSelection(field) {
+        const fieldId = field.dataset.id;
+
+        if (selectedItems.has(fieldId)) {
+            selectedItems.delete(fieldId);
+            const indicator = field.querySelector('.delete-indicator');
+            if (indicator) indicator.remove();
+        } else {
+            selectedItems.add(fieldId);
+        }
+
+        selectedCount.textContent = selectedItems.size;
+        deleteButton.disabled = selectedItems.size === 0;
+    }
+
+    function clearSelections() {
+        document.querySelectorAll('.delete-indicator').forEach((indicator) => {
+            indicator.remove();
+        });
+        selectedItems.clear();
+        selectedCount.textContent = 0;
+        deleteButton.disabled = true;
+    }
+
+    deleteButton.addEventListener('click', () => {
+        const campoIds = Array.from(selectedItems);
+
+        fetch('/deletar-campos/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({ campo_ids: campoIds })
+        })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('Erro ao deletar campos.');
+            }
+            return response.json();
+        })
+        .then((data) => {
+            if (data.status === 'success') {
+                const fields = document.querySelectorAll('.field-item');
+                fields.forEach((field) => {
+                    const fieldId = field.dataset.id;
+                    if (selectedItems.has(fieldId)) {
+                        field.remove();
+                    }
+                });
+
+                clearSelections();
+                toggleDeleteMode(false);
+                showModal();
+            } else {
+                alert('Erro: ' + data.message);
+                window.location.reload(); // Recarregando a pagina para evitar inconsistências
+            }
+        })
+        .catch((error) => {
+            console.error(error);
+            alert('Ocorreu um erro ao tentar deletar os campos.');
+        });
+    });
+
+    cancelSelectionButton.addEventListener('click', () => {
+        toggleDeleteMode(false);
+    });
+
+    document.querySelectorAll('.field-item').forEach((field) => setupHold(field));
+</script>

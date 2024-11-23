@@ -35,16 +35,33 @@
     </div>
     {% endfor %}
 </div>
+
+<!-- modarl p confirmar exclusao eu epsero kkk -->
+<div id="confirm-modal" class="hidden fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg p-6 w-80">
+        <h2 class="text-lg mb-4 text-center font-bold">Confirmar Exclusão</h2>
+        <p class="text-gray-600 mb-4 font-semibold">Deseja realmente apagar os campos selecionados?</p>
+        <div class="space-y-4">
+            <button id="confirm-delete" class="bg-gray-500 px-4 py-4 font-bold rounded-lg w-full">Confirmar</button>
+            <button id="cancel-delete" class="bg-gray-200 px-4 py-4 font-bold rounded-lg w-full">Cancelar</button>
+        </div>
+            
+     
+    </div>
+</div>
+
 {% include 'components/component_modal.html' with message="Campo deletado com sucesso!" link="campos" %}
 
 <script>
-
     const selectedItems = new Set();
     const deleteButton = document.getElementById('delete-selected');
     const cancelSelectionButton = document.getElementById('cancel-selection');
     const selectedCount = document.getElementById('selected-count');
     const deleteModeButtons = document.getElementById('delete-mode-buttons');
     const infoContainers = document.getElementById('info-containers');
+    const confirmModal = document.getElementById('confirm-modal');
+    const confirmDeleteButton = document.getElementById('confirm-delete');
+    const cancelDeleteButton = document.getElementById('cancel-delete');
 
     function setupHold(field) {
         let holdTimeout;
@@ -135,6 +152,12 @@
     }
 
     deleteButton.addEventListener('click', () => {
+        confirmModal.classList.remove('hidden');
+    });
+
+    confirmDeleteButton.addEventListener('click', () => {
+        confirmModal.classList.add('hidden');
+
         const campoIds = Array.from(selectedItems);
 
         fetch('/deletar-campos/', {
@@ -166,13 +189,17 @@
                 showModal();
             } else {
                 alert('Erro: ' + data.message);
-                window.location.reload(); // Recarregando a pagina para evitar inconsistências
+                window.location.reload();
             }
         })
         .catch((error) => {
             console.error(error);
             alert('Ocorreu um erro ao tentar deletar os campos.');
         });
+    });
+
+    cancelDeleteButton.addEventListener('click', () => {
+        confirmModal.classList.add('hidden');
     });
 
     cancelSelectionButton.addEventListener('click', () => {

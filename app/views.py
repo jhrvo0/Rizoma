@@ -222,6 +222,7 @@ class DeletarPlantaView(LoginRequiredMixin, View):
         messages.success(request, 'Planta deletada com sucesso.')
         return redirect('detalhes-campo', campo_id=campo_id)
 
+
 class EditarPlantasNoCampoView(LoginRequiredMixin, View):
     login_url = '/login/'
 
@@ -284,33 +285,33 @@ class DetalhesCampoView(LoginRequiredMixin, View):
         return render(request, 'detalhes_campo.html', context)
 
 
-    
 class EditarCampoView(LoginRequiredMixin, View):
     login_url = '/login/'
 
     def get(self, request, campo_id):
         campo = get_object_or_404(Campo, id=campo_id, agricultor=request.user)
         context = {
-            'campo': campo
-        }
+            'campo': campo,
+            'Campo': Campo
+            }
         return render(request, 'edicao_campo.html', context)
 
     def post(self, request, campo_id):
         campo = get_object_or_404(Campo, id=campo_id, agricultor=request.user)
-        nome = request.POST.get('nome')
-        descricao = request.POST.get('descricao') 
+        print("REQUEST.POST:", request.POST)  
 
-        if nome:
-            campo.nome = nome
-        if descricao:
-            campo.descricao = descricao
-
-        campo.save()
-        messages.success(request, 'O campo foi atualizado com sucesso.')
-        return redirect('detalhes-campo', campo_id=campo.id)
-
-
-
+        try:
+            campo.nome = request.POST.get('nome')
+            campo.descricao = request.POST.get('descricao')
+            campo.tipo_campo = request.POST.get('tipo_campo') 
+            campo.tipo_solo = request.POST.get('tipo_solo')  
+            campo.save()
+            return JsonResponse({'success': True, 'message': 'Campo editado com sucesso'})
+        
+        except Exception as e: 
+            print(f"ERROR: {e}")  
+            return JsonResponse({'success': False, 'message': f'Erro ao editar o campo: {e}'})
+        
 """ Landing Route """
 
 class LandingView(View):

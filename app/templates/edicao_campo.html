@@ -20,10 +20,9 @@
 
         {% include 'components/component_modal.html' with message="Campo editado com sucesso!" link="campos" %}
 
-  
         <form id="edit-form" action="{% url 'edicao_campo' campo.id %}" method="post" data-redirect-url="{% url 'detalhes-campo' campo.id %}" class="space-y-6">
             {% csrf_token %}
-    
+
             <div class="space-y-2">
                 <label class="block font-medium">Nomear campo</label>
                 <input 
@@ -49,89 +48,85 @@
                 <i class="bi bi-card-image text-4xl text-gray-600"></i>
             </div>
 
+
             <div class="relative">
                 <select name="tipo_campo" class="w-full p-3 bg-gray-200 rounded-lg appearance-none pr-10">
                     <option value="" disabled selected>Tipo de campo</option>
-                    <option value="1" {% if campo.tipo == "1" %}selected{% endif %}>Horta</option>
-                    <option value="2" {% if campo.tipo == "2" %}selected{% endif %}>Jardim</option>
-                    <option value="3" {% if campo.tipo == "3" %}selected{% endif %}>Pomar</option>
+                    {% for tipo in Campo.TIPO_DE_CAMPO|default:"" %}
+                        <option value="{{ tipo.0 }}" {% if campo.tipo_campo == tipo.0 %}selected{% endif %}>{{ tipo.1 }}</option>
+                    {% endfor %}
                 </select>
                 <i class="bi bi-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
             </div>
-
+            
             <div class="relative">
                 <select name="tipo_solo" class="w-full p-3 bg-gray-200 rounded-lg appearance-none pr-10">
                     <option value="" disabled selected>Tipo de solo</option>
-                    <option value="1" {% if campo.tipo_solo == "1" %}selected{% endif %}>Arenoso</option>
-                    <option value="2" {% if campo.tipo_solo == "2" %}selected{% endif %}>Argiloso</option>
-                    <option value="3" {% if campo.tipo_solo == "3" %}selected{% endif %}>Humoso</option>
+                    {% for tipo in Campo.TIPO_DE_SOLO|default:"" %}
+                        <option value="{{ tipo.0 }}" {% if campo.tipo_solo == tipo.0 %}selected{% endif %}>{{ tipo.1 }}</option>
+                    {% endfor %}
                 </select>
                 <i class="bi bi-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
             </div>
 
-   
-            <button 
-                id="submit-button"
-                type="button" 
-                class="w-full p-3 bg-gray-300 rounded-lg font-medium"
-            >
-                Concluir
-            </button>
+            <button id="submit-button" type="button" class="w-full p-3 bg-gray-300 rounded-lg font-medium">Concluir</button>
         </form>
-    </div>
 
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const submitButton = document.getElementById("submit-button");
+                const editForm = document.getElementById("edit-form");
+                const modalContainer = document.getElementById("popup-container");
+                const modalContent = document.getElementById("popup-modal");
 
-    
+                submitButton.addEventListener("click", (event) => {
+                    event.preventDefault();
+                    console.log("Botão 'Concluir' clicado");
 
+                    fetch(editForm.action, {
+                        method: "POST",
+                        body: new FormData(editForm),
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest",
+                        },
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Dados recebidos:", data);
+                        if (data.success) {
+                            showModal();
+                            setTimeout(() => {
+                                window.location.href = editForm.dataset.redirectUrl;
+                            }, 1500);
 
-    <script>
-        const submitButton = document.getElementById("submit-button");
-        const editForm = document.getElementById("edit-form");
-        const modalContainer = document.getElementById("popup-container");
-        const modalContent = document.getElementById("popup-modal");
-        const confirmButton = document.getElementById("confirm-button");
-
-        submitButton.addEventListener("click", (event) => {
-            event.preventDefault();
-            const formData = new FormData(editForm);
-
-            fetch(editForm.action, {
-                method: "POST",
-                body: formData,
-                headers: {
-                    "X-Requested-With": "XMLHttpRequest",
-                },
-            })
-            .then((response) => {
-                if (response.ok) {
-                    // Show the modal
-                    showModal();
-
-                    // Optionally, animate the modal with Anime.js
-                    anime({
-                        targets: modalContent,
-                        scale: [0.8, 1],
-                        opacity: [0, 1],
-                        duration: 500,
-                        easing: "easeOutExpo",
+                            anime({
+                                targets: modalContent,
+                                scale: [0.8, 1],
+                                opacity: [0, 1],
+                                duration: 500,
+                                easing: "easeOutExpo",
+                            });
+                        } else {
+                            alert(`Erro ao editar o campo: ${data.message}`);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Erro ao enviar o formulário:", error);
+                        alert("Ocorreu um erro inesperado. Por favor, tente novamente.");
                     });
-                } else {
-                    alert("Erro ao editar o campo.");
+                });
+
+                function showModal() {
+                    console.log("Exibir modal");
+                    modalContainer.classList.remove("hidden");
                 }
-            })
-            .catch((error) => {
-                console.error("Erro ao enviar o formulário:", error);
             });
-        });
-
-        confirmButton.addEventListener("click", () => {
-            modalContainer.classList.remove("hidden");
-            // Optional: Redirect after confirmation
-            // window.location.href = editForm.dataset.redirectUrl;
-        });
-
-    </script>
-
-
+        </script>
+    </div>
 </body>
 </html>

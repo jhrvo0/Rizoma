@@ -40,15 +40,15 @@ class Planta(models.Model):
 
 class Campo(models.Model):
     TIPO_DE_SOLO = [
-        ('Tipo 1', 'Tipo 1'), 
-        ('Tipo 2', 'Tipo 2'), 
-        ('Tipo 3', 'Tipo 3')
-        ]
-    
+        ('Arenoso', 'Arenoso'),
+        ('Argiloso', 'Argiloso'),
+        ('Humoso', 'Humoso'),
+    ]
+
     TIPO_DE_CAMPO = [
-        ('Tipo 1', 'Tipo 1'), 
-        ('Tipo 2', 'Tipo 2'), 
-        ('Tipo 3', 'Tipo 3')
+        ('Horta', 'Horta'),
+        ('Jardim', 'Jardim'),
+        ('Pomar', 'Pomar'),
     ]
 
     nome = models.CharField(max_length=100)
@@ -60,7 +60,7 @@ class Campo(models.Model):
     #Adicionado 21/11/24
     tipo_campo = models.CharField(max_length=50, choices=TIPO_DE_CAMPO, blank=True, null=True)
     tipo_solo = models.CharField(max_length=50, choices=TIPO_DE_SOLO, blank=True, null=True)
-    
+
 
     def __str__(self):
         return self.nome
@@ -70,6 +70,7 @@ class Campo(models.Model):
     
     def get_eventos(self):
         return self.eventos.all()
+    
 
 class PlantaCultivada(models.Model):
     planta = models.ForeignKey(Planta, on_delete=models.CASCADE)

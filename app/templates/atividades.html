@@ -66,9 +66,7 @@
       <!-- Menu Suspenso -->
       <div class="mb-4">
         <select id="taskFilter" class="w-full p-2 border rounded-md">
-          <option value="today">Tarefas para hoje</option>
-          <option value="past">Tarefas que já passaram</option>
-          <option value="future">Futuras tarefas</option>
+          <!-- Opções de filtro -->
         </select>
       </div>
 
@@ -96,6 +94,10 @@
           <div>
             <label class="block text-sm font-medium text-gray-700">Nome da Atividade</label>
             <input type="text" id="eventName" class="w-full mt-1 p-2 border border-gray-300 rounded-md" required>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Descrição</label>
+            <textarea id="eventDescription" class="w-full mt-1 p-2 border border-gray-300 rounded-md" required></textarea>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700">Terreno</label>
@@ -144,6 +146,9 @@
     <!-- Modal de Confirmação de Adição -->
     <div id="confirmationModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
       <div class="bg-white p-6 rounded-lg w-80 opacity-0" id="confirmationModalContent">
+        <div class="flex justify-center mb-4">
+          <i class="bi bi-check-circle text-green-600 text-4xl"></i>
+        </div>
         <h2 class="text-lg font-semibold mb-4 text-center text-green-600">Atividade Adicionada!</h2>
         <p class="text-center text-gray-700">Sua atividade foi adicionada com sucesso ao calendário.</p>
       </div>
@@ -283,6 +288,7 @@
           event.preventDefault();
           
           const descricao = document.getElementById('eventName').value;
+          const descricaoDetalhada = document.getElementById('eventDescription').value;
           const data_inicio = new Date().toISOString().split('T')[0]; // Data de início como a data atual
           const data_fim = document.getElementById('eventEndDate').value || data_inicio; // Use data_inicio se data_fim estiver vazia
           const campo_ids = [document.getElementById('campoSelect').value];
@@ -290,6 +296,7 @@
 
           const data = {
             descricao: descricao,
+            descricao_detalhada: descricaoDetalhada,
             data_inicio: data_inicio,
             data_fim: data_fim,
             campos: campo_ids,

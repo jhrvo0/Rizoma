@@ -32,7 +32,8 @@ urlpatterns = [
 
     path('calendario/', CalendarioView.as_view(), name='calendario'),
 
-    path('planta/<int:id>/', DetalhePlantaView.as_view(), name='detalhes-planta'),
+    path('planta/<int:id>/', DetalhePlantaView.as_view(), name='detalhe-planta'),
+
     path('editar-planta/<int:campo_id>/<int:planta_cultivada_id>/', EditarPlantasNoCampoView.as_view(), name='editar-planta'),
     path('adicionar-planta/', AdicionarPlantaNoCampoView.as_view(), name='adicionar-planta'),
     

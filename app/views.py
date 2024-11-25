@@ -162,6 +162,77 @@ class VisualizarCampoView(LoginRequiredMixin, View):
             return JsonResponse({"error": "Invalid request"}, status=400)
 
 
+# Selecionar quantidade de planta para adicionar
+
+class SelecionarQuantidadeParaAdicionarPlantaView(LoginRequiredMixin, View):
+    def get(self, request, campo_id, planta_id):
+        campo = get_object_or_404(Campo, id=campo_id)
+        planta = get_object_or_404(Planta, id=planta_id)
+        context = {
+            'campo': campo,
+            'planta': planta,
+            'plantas': Planta.objects.all(),
+        }
+        return render(request, 'adicionar_planta.html', context)
+    
+    def post(self, request, campo_id, planta_id):
+        quantidade = request.POST.get('quantidade_plantada')
+        return redirect('selecionar-subcampo', campo_id=campo_id, planta_id=planta_id, quantidade=quantidade )
+
+
+class SelecionarSubcampoParaAdicionarPlantaView(LoginRequiredMixin, View):
+    def get(self, request, campo_id, planta_id, quantidade):
+        campo = get_object_or_404(Campo, id=campo_id)
+        subcampo_no = {
+            1: PlantaCultivada.objects.filter(campo_id=campo_id, subcampo=1),
+            2: PlantaCultivada.objects.filter(campo_id=campo_id, subcampo=2),
+            3: PlantaCultivada.objects.filter(campo_id=campo_id, subcampo=3),
+            4: PlantaCultivada.objects.filter(campo_id=campo_id, subcampo=4),
+        }
+        context = {
+            'subcampo_no': subcampo_no,
+            'campo': campo,
+            'planta_id': planta_id,
+            'quantidade': quantidade,
+        }
+        return render(request, 'selecionar_subcampo.html', context)
+
+    
+class SelecionarSubcampoParaAdicionarPlantaView(LoginRequiredMixin, View):
+    def get(self, request, campo_id, planta_id, quantidade):
+        campo = get_object_or_404(Campo, id=campo_id)
+        subcampo_no = {
+            1: PlantaCultivada.objects.filter(campo_id=campo_id, subcampo=1),
+            2: PlantaCultivada.objects.filter(campo_id=campo_id, subcampo=2),
+            3: PlantaCultivada.objects.filter(campo_id=campo_id, subcampo=3),
+            4: PlantaCultivada.objects.filter(campo_id=campo_id, subcampo=4),
+        }
+        context = {
+            'subcampo_no': subcampo_no,
+            'campo': campo,
+            'planta_id': planta_id,
+            'quantidade': quantidade,
+        }
+        return render(request, 'selecionar_subcampo.html', context)
+
+    def post(self, request, campo_id, planta_id, quantidade):
+        subcampo = request.POST.get("subcampo")
+        posicao = PlantaCultivada.objects.filter(campo_id=campo_id, subcampo=subcampo).count() + 1
+
+        nova_planta = PlantaCultivada(
+            planta=Planta.objects.get(id=planta_id),
+            campo=Campo.objects.get(id=campo_id),
+            quantidade_plantada=quantidade,
+            subcampo=subcampo,
+            posicao_subcampo=posicao,
+        )
+        nova_planta.save()
+        return redirect('adicionar-planta-campo', campo_id=campo_id, planta_id=planta_id, quantidade=quantidade)
+
+
+#class AdicionarPlantaView(LoginRequiredMixin, View):
+
+
 # Adicionar Planta
 class AdicionarPlantaNoCampoView(LoginRequiredMixin, View):
     login_url = '/login/'
@@ -590,13 +661,3 @@ def get_fab_content(location, campo_id=None):
             {"icon": "bi-house-fill", "link": 'lista-plantas', 'args': [campo_id], "name": "Adicionar Planta"},
         ]
     return options
-
-        
-
-
-class ModalView(View):
-    def get(self, request):
-        context = {
-            'message': 'test',
-        }
-        return render(request, "components/component_modal.html", context)

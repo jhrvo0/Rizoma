@@ -60,6 +60,9 @@ class Campo(models.Model):
     #Adicionado 21/11/24
     tipo_campo = models.CharField(max_length=50, choices=TIPO_DE_CAMPO, blank=True, null=True)
     tipo_solo = models.CharField(max_length=50, choices=TIPO_DE_SOLO, blank=True, null=True)
+    
+    #Adicionado 25/11/24
+    subcampos = models.IntegerField(default=4, blank=True, null=True)
 
 
     def __str__(self):
@@ -70,7 +73,7 @@ class Campo(models.Model):
     
     def get_eventos(self):
         return self.eventos.all()
-    
+
 
 class PlantaCultivada(models.Model):
     planta = models.ForeignKey(Planta, on_delete=models.CASCADE)

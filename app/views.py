@@ -541,8 +541,9 @@ def Filtrar_campos(request):
 
 def pagatividades(request):
     eventos = Evento.objects.all()  # Obtenha todos os eventos
-    return render(request, 'atividades.html', {'eventos': eventos})
-
+    num_tarefas = eventos.count()  # Conte o número de eventos
+    terrenos = Campo.objects.all()  # Obtenha todos os terrenos
+    return render(request, 'atividades.html', {'eventos': eventos, 'num_tarefas': num_tarefas, 'terrenos': terrenos})
 
 class ListaPlantasView(LoginRequiredMixin, View):
     def get(self, request, campo_id):

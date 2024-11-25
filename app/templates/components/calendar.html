@@ -6,8 +6,8 @@
     <title>Calendário</title>
     <style>
         select {
-            background-color: #475569; /* bg-slate-500 */
-            color: white;
+            background-color: white; /* bg-slate-500 */
+            color: black;
         }
         select option {
             background-color: white;
@@ -38,6 +38,19 @@
             background-color: #9393935d; /* Cor de fundo para o dia atual */
             color: #000; /* Cor do texto para o dia atual */
             font-weight: bold; /* Texto em negrito */
+        }
+        /* Estilo para o dropdown no modal de adicionar atividades */
+        .modal select {
+            background-color: #1e293b; /* bg-slate-800 */
+            color: white;
+        }
+        .modal select option {
+            background-color: white;
+            color: black;
+        }
+        .modal select option:checked {
+            background-color: #1e293b; /* bg-slate-800 */
+            color: white;
         }
     </style>
 </head>

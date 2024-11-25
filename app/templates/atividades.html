@@ -11,6 +11,7 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
     />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
     <style>   
       html,
       body {
@@ -45,7 +46,7 @@
         <a href="{% url 'calendario' %}">
           <i class="bi bi-arrow-left text-2xl cursor-pointer"></i>
         </a>
-        <h1 class="text-2xl font-bold">Tarefas ({{ eventos|length }})</h1>
+        <h1 class="text-2xl font-bold">Tarefas ({{ num_tarefas }})</h1>
       </div>
 
       <!-- Barra de Pesquisa -->
@@ -83,9 +84,70 @@
     </div>
 
     <!-- Botão de Adição -->
-    <button class="fixed right-4 bottom-24 bg-blue-500 text-white p-4 rounded-full shadow-lg focus:outline-none">
+    <button onclick="openAddEventModal()" class="fixed right-4 bottom-24 bg-blue-500 text-white p-4 rounded-full shadow-lg focus:outline-none">
       <i class="bi bi-plus-lg text-2xl"></i>
     </button>
+
+    <!-- Modal de Adição de Evento -->
+    <div id="addEventModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+      <div class="bg-white p-6 rounded-lg w-80">
+        <h2 class="text-lg font-semibold mb-4 text-center">Adicionar Nova Atividade</h2>
+        <form id="addEventForm" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Nome da Atividade</label>
+            <input type="text" id="eventName" class="w-full mt-1 p-2 border border-gray-300 rounded-md" required>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Terreno</label>
+            <select id="campoSelect" class="w-full mt-1 p-2 border border-gray-300 rounded-md" required>
+              <option value="" disabled selected>Selecione um terreno</option>
+              {% for terreno in terrenos %}
+                <option value="{{ terreno.id }}" {% if terreno == terreno_atual %}selected{% endif %}>{{ terreno.nome }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Data Final</label>
+            <div class="flex items-center mt-1 space-x-2">
+              <input type="date" id="eventEndDate" class="w-full p-2 border border-gray-300 rounded-md">
+              <label class="flex items-center space-x-2">
+                <input type="checkbox" id="singleDay" class="form-checkbox h-9 w-9 text-blue-600">
+                <span class="text-sm text-gray-700 font-medium">Dia Único</span>
+              </label>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Cor da Atividade</label>
+            <div id="colorOptions" class="flex space-x-2 mt-1">
+              <!-- Cores com quadrados clicáveis -->
+              <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#FF0000" style="background-color: #FF0000;"></div> <!-- Vermelho -->
+              <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#FD7E14" style="background-color: #FD7E14;"></div> <!-- Laranja -->
+              <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#FFC107" style="background-color: #FFC107;"></div> <!-- Amarelo -->
+              <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#28A745" style="background-color: #28A745;"></div> <!-- Verde -->
+              <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#007BFF" style="background-color: #007BFF;"></div> <!-- Azul -->
+              <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#8A2BE2" style="background-color: #8A2BE2;"></div> <!-- Violeta -->
+              <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#FF5733" style="background-color: #FF5733;"></div> <!-- Laranja Escuro -->
+              <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#17A2B8" style="background-color: #17A2B8;"></div> <!-- Azul Claro -->
+              <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#DA70D6" style="background-color: #DA70D6;"></div> <!-- Rosa -->
+              <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#FFFF00" style="background-color: #FFFF00;"></div> <!-- Amarelo Brilhante -->
+            </div>
+            <input type="hidden" id="eventColor" value="#FF5733">
+          </div>
+          <div class="flex justify-end space-x-2">
+            <button type="button" onclick="closeAddEventModal()" class="bg-gray-500 text-white py-2 px-4 rounded-md">Cancelar</button>
+            <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded-md">Adicionar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal de Confirmação de Adição -->
+    <div id="confirmationModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+      <div class="bg-white p-6 rounded-lg w-80 opacity-0" id="confirmationModalContent">
+        <h2 class="text-lg font-semibold mb-4 text-center text-green-600">Atividade Adicionada!</h2>
+        <p class="text-center text-gray-700">Sua atividade foi adicionada com sucesso ao calendário.</p>
+      </div>
+    </div>
 
     <!-- Barra de Navegação -->
     <div class="w-full bg-gray-300 p-4 flex justify-around items-center rounded-t-3xl fixed bottom-0 z-50">
@@ -104,13 +166,60 @@
     </div>
 
     <script>
+      function openAddEventModal() {
+        const addEventModal = document.getElementById('addEventModal');
+        if (addEventModal) {
+          addEventModal.classList.remove('hidden');
+        } else {
+          console.error('Modal de adição de evento não encontrado.');
+        }
+      }
+
+      function closeAddEventModal() {
+        const addEventModal = document.getElementById('addEventModal');
+        if (addEventModal) {
+          addEventModal.classList.add('hidden');
+        } else {
+          console.error('Modal de adição de evento não encontrado.');
+        }
+      }
+
+      function showConfirmationModal() {
+        const confirmationModal = document.getElementById('confirmationModal');
+        const confirmationModalContent = document.getElementById('confirmationModalContent');
+
+        confirmationModal.classList.remove('hidden');
+
+        anime({
+          targets: confirmationModalContent,
+          opacity: [0, 1],
+          scale: [0.5, 1],
+          duration: 500,
+          easing: 'easeOutExpo'
+        });
+
+        setTimeout(() => {
+          anime({
+            targets: confirmationModalContent,
+            opacity: [1, 0],
+            scale: [1, 0.5],
+            duration: 500,
+            easing: 'easeInExpo',
+            complete: function() {
+              confirmationModal.classList.add('hidden');
+              location.reload();
+            }
+          });
+        }, 800);
+      }
+
       document.addEventListener('DOMContentLoaded', function() {
         const taskFilter = document.getElementById('taskFilter');
         const taskList = document.getElementById('taskList');
         const today = new Date().toISOString().split('T')[0];
 
-        function fetchAtividades() {
-          fetch(`/atividades/${today}/`)
+        function fetchAtividades(date) {
+          fetch(`/atividades/${date}/`)
             .then((response) => {
               if (!response.ok) {
                 throw new Error("Network response was not ok");
@@ -120,7 +229,7 @@
             .then((data) => {
               taskList.innerHTML =
                 data.html ||
-                '<p class="text-gray-600">Nenhuma atividade atribuída ao dia de hoje.</p>';
+                '<p class="text-gray-600">Nenhuma atividade atribuída ao dia selecionado.</p>';
             })
             .catch((error) => {
               console.error("Erro ao buscar atividades:", error);
@@ -131,55 +240,108 @@
 
         taskFilter.addEventListener('change', function() {
           const filterValue = this.value;
-          const tasks = taskList.getElementsByClassName('task-item');
+          let date;
 
-          for (let task of tasks) {
-            const taskDate = task.getAttribute('data-date');
-
-            if (filterValue === 'today' && taskDate === today) {
-              task.style.display = 'flex';
-            } else if (filterValue === 'past' && taskDate < today) {
-              task.style.display = 'flex';
-            } else if (filterValue === 'future' && taskDate > today) {
-              task.style.display = 'flex';
-            } else {
-              task.style.display = 'none';
-            }
+          if (filterValue === 'today') {
+            date = today;
+          } else if (filterValue === 'past') {
+            date = new Date(new Date().setDate(new Date().getDate() - 1)).toISOString().split('T')[0];
+          } else if (filterValue === 'future') {
+            date = new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split('T')[0];
           }
+
+          fetchAtividades(date);
         });
 
         // Fetch atividades on page load
-        fetchAtividades();
-      });
+        fetchAtividades(today);
 
-      document.getElementById('activityFilter').addEventListener('change', function() {
-        const filter = this.value;
-        const today = new Date();
-        const activities = [
-          { id: 1, name: 'Atividade 1', date: '2023-10-01' },
-          { id: 2, name: 'Atividade 2', date: '2023-10-15' },
-          { id: 3, name: 'Atividade 3', date: '2023-10-20' },
-          // Adicione mais atividades conforme necessário
-        ];
+        const singleDayCheckbox = document.getElementById('singleDay');
+        const endDateInput = document.getElementById('eventEndDate');
+        const eventColorInput = document.getElementById('eventColor');
+        const colorOptions = document.querySelectorAll('.color-square');
 
-        const filteredActivities = activities.filter(activity => {
-          const activityDate = new Date(activity.date);
-          if (filter === 'past') {
-            return activityDate < today;
-          } else if (filter === 'today') {
-            return activityDate.toDateString() === today.toDateString();
-          } else if (filter === 'future') {
-            return activityDate > today;
+        singleDayCheckbox.addEventListener('change', () => {
+          if (singleDayCheckbox.checked) {
+            endDateInput.disabled = true;
+            endDateInput.classList.add('line-through', 'text-gray-400');
+          } else {
+            endDateInput.disabled = false;
+            endDateInput.classList.remove('line-through', 'text-gray-400');
           }
         });
 
-        const activityList = document.getElementById('activityList');
-        activityList.innerHTML = '';
-        filteredActivities.forEach(activity => {
-          const activityItem = document.createElement('div');
-          activityItem.textContent = activity.name + ' - ' + activity.date;
-          activityList.appendChild(activityItem);
+        colorOptions.forEach(option => {
+          option.addEventListener('click', () => {
+            colorOptions.forEach(opt => opt.classList.remove('ring-2', 'ring-offset-2', 'ring-blue-500'));
+            option.classList.add('ring-2', 'ring-offset-2', 'ring-blue-500');
+            eventColorInput.value = option.getAttribute('data-color');
+          });
         });
+
+        document.getElementById('addEventForm').addEventListener('submit', function(event) {
+          event.preventDefault();
+          
+          const descricao = document.getElementById('eventName').value;
+          const data_inicio = new Date().toISOString().split('T')[0]; // Data de início como a data atual
+          const data_fim = document.getElementById('eventEndDate').value || data_inicio; // Use data_inicio se data_fim estiver vazia
+          const campo_ids = [document.getElementById('campoSelect').value];
+          const cor = document.getElementById('eventColor').value;
+
+          const data = {
+            descricao: descricao,
+            data_inicio: data_inicio,
+            data_fim: data_fim,
+            campos: campo_ids,
+            cor: cor
+          };
+
+          console.log('Enviando dados:', data); // Adiciona log para verificar os dados enviados
+
+          fetch('/calendario/', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': getCookie('csrftoken') // Adicione o token CSRF se necessário
+            },
+            body: JSON.stringify(data)
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+            if (data.status === 'success') {
+              // Exibe o modal de confirmação
+              showConfirmationModal();
+              // Atualize a lista de atividades
+              fetchAtividades(new Date().toISOString().split('T')[0]);
+            } else {
+              alert('Erro: ' + data.message);
+            }
+          })
+          .catch(error => {
+            console.error('Erro na requisição:', error);
+            alert('Algo deu errado ao adicionar o evento. Verifique o console para mais detalhes.');
+          });
+        });
+
+        function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+              const cookie = cookies[i].trim();
+              if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+              }
+            }
+          }
+          return cookieValue;
+        }
       });
     </script>
   </body>

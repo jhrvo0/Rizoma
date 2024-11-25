@@ -32,7 +32,7 @@
         <div class="grid grid-cols-2 gap-4">
             {% for planta in plantas %}
             <div class="relative aspect-square bg-gray-200 rounded-lg flex flex-col items-center justify-center p-4">
-                <a href="{% url 'detalhes-planta' planta.id %}" class="absolute top-0 right-0 p-2 bg-gray-500/50 rounded-xl w-12 h-12 flex items-center justify-center">
+                <a href="{% url 'detalhe-planta' planta.id %}" class="absolute top-0 right-0 p-2 bg-gray-500/50 rounded-xl w-12 h-12 flex items-center justify-center">
                     <i class="bi bi-info-circle text-white text-lg"></i>
                 </a>
                 <a href="{% url 'adicionar-planta' campo.id planta.id %}">

@@ -418,6 +418,21 @@ def atividades_por_data(request, data):
     html = render_to_string('components/atividades_lista.html', {'atividades_hoje': atividades})
     return JsonResponse({'html': html})
 
+def buscaratividades(request):
+    range = request.GET.get('range', 'today')
+    today = datetime.today().date()
+
+    if range == 'today':
+        atividades = Evento.objects.filter(data_inicio=today)
+    elif range == 'week':
+        end_date = today + timedelta(days=7)
+        atividades = Evento.objects.filter(data_inicio__range=[today, end_date])
+    else:  # 'all'
+        atividades = Evento.objects.filter(data_inicio__gte=today)
+
+    html = render_to_string('components/atividades_lista.html', {'atividades_hoje': atividades})
+    return JsonResponse({'html': html})
+
 """ Calendário """
 
 class CalendarioView(LoginRequiredMixin, View):

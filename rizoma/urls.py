@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from app.views import HomeView, CalendarioView, LoginView, LogoutView, CadastrarView, VisualizarCampoView, CriarCampoView, EditarCampoView, AdicionarPlantaNoCampoView, DetalhesCampoView, LandingView, google_login, DeletarCamposView, DeletarPlantaView, ProfileView, CamposView, Filtrar_campos, atividades_por_data, pagatividades, ListaPlantasView, DetalhePlantaView, EditarPlantasNoCampoView
+from app.views import HomeView, CalendarioView, LoginView, LogoutView, CadastrarView, VisualizarCampoView, CriarCampoView, EditarCampoView, AdicionarPlantaNoCampoView, DetalhesCampoView, LandingView, google_login, DeletarCamposView, DeletarPlantaView, ProfileView, CamposView, Filtrar_campos, atividades_por_data, pagatividades, ListaPlantasView, DetalhePlantaView, EditarPlantasNoCampoView, buscaratividades
 from app.views import SelecionarQuantidadeParaAdicionarPlantaView, SelecionarSubcampoParaAdicionarPlantaView#, AdicionarPlantaView
 
 #WeatherView
@@ -29,6 +29,7 @@ urlpatterns = [
     
     path('atividades/<str:data>/', atividades_por_data, name='atividades_por_data'),
     path('atividades/', pagatividades, name='atividades'),
+    path('atividades/', buscaratividades, name='atividades'),
 
     path('calendario/', CalendarioView.as_view(), name='calendario'),
 

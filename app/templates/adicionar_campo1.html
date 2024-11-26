@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novo Campo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+</head>
+<body class="bg-white min-h-screen">
+    <div class="max-w-md mx-auto p-4">
+
+        <header class="flex items-center justify-around mb-8">
+            <a href="{% url 'campos' %}" id="back-button" class="p-2">
+                <i class="bi bi-arrow-left text-2xl"></i>
+            </a>
+            <h1 class="text-xl font-bold flex-1 text-right mr-2">Novo campo</h1>
+        </header>
+
+        <form id="add-form" action="{% url 'adicionar_campo' %}" method="post" data-redirect-url="{% url 'campos' %}" class="space-y-6">
+
+            <!-- Bloco único com imagem na metade superior e tipo de campo na metade inferior -->
+            <div class="bg-gray-300 rounded-lg flex flex-col h-48">
+                <!-- Imagem na metade superior -->
+                <div class="flex-1 flex items-center justify-center">
+                    <i class="bi bi-card-image text-4xl text-gray-600"></i>
+                </div>
+                <!-- Tipo de campo na metade inferior -->
+                <div class="relative flex-1">
+                    <select name="tipo_campo" class="w-full p-9 bg-gray-200 rounded-b-lg appearance-none pr-10">
+                        <option value="" disabled selected>Tipo de campo</option>
+                        {% for tipo in Campo.TIPO_DE_CAMPO|default:"" %}
+                            <option value="{{ tipo.0 }}">{{ tipo.1 }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="relative">
+                <select name="tipo_solo" class="w-full p-9 bg-gray-200 rounded-lg appearance-none pr-10">
+                    <option value="" disabled selected>Tipo de solo</option>
+                    {% for tipo in Campo.TIPO_DE_SOLO|default:"" %}
+                        <option value="{{ tipo.0 }}">{{ tipo.1 }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button id="submit-button" type="button" class="w-full p-3 bg-gray-500 rounded-lg font-medium">Continuar</button>
+        </form>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const submitButton = document.getElementById("submit-button");
+                const addForm = document.getElementById("add-form");
+                const modalContainer = document.getElementById("popup-container");
+                const modalContent = document.getElementById("popup-modal");
+
+                submitButton.addEventListener("click", (event) => {
+                    event.preventDefault();
+                    console.log("Botão 'Criar campo' clicado");
+
+                    fetch(addForm.action, {
+                        method: "POST",
+                        body: new FormData(addForm),
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest",
+                        },
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(HTTP error! status: ${response.status});
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Dados recebidos:", data);
+                        if (data.success) {
+                            showModal();
+                            setTimeout(() => {
+                                window.location.href = addForm.dataset.redirectUrl;
+                            }, 1500);
+
+                            anime({
+                                targets: modalContent,
+                                scale: [0.8, 1],
+                                opacity: [0, 1],
+                                duration: 500,
+                                easing: "easeOutExpo",
+                            });
+                        } else {
+                            alert(Erro ao adicionar o campo: ${data.message});
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Erro ao enviar o formulário:", error);
+                        alert("Ocorreu um erro inesperado. Por favor, tente novamente.");
+                    });
+                });
+
+                function showModal() {
+                    console.log("Exibir modal");
+                    modalContainer.classList.remove("hidden");
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>

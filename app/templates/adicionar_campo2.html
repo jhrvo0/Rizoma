@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adicionar Campo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+</head>
+<body class="bg-white min-h-screen">
+    <div class="max-w-md mx-auto p-4">
+
+        <header class="flex items-center justify-around mb-8">
+            <a href="{% url 'campos' %}" id="back-button" class="p-2">
+                <i class="bi bi-arrow-left text-2xl"></i>
+            </a>
+            <h1 class="text-xl font-bold flex-1 text-right mr-2">Novo campo</h1>
+        </header>
+
+        {% include 'components/component_modal.html' with message="Novo campo adicionado!" link="campos" %}
+
+        <form id="add-form" action="{% url 'adicionar_campo' %}" method="post" data-redirect-url="{% url 'campos' %}" class="space-y-6">
+            {% csrf_token %}
+
+            <div class="space-y-2">
+                <label class="block font-medium">Nomear campo</label>
+                <input 
+                    id="nome-campo"
+                    name="nome"
+                    type="text" 
+                    placeholder="Nome do campo"
+                    class="w-full p-3 bg-gray-200 rounded-lg"
+                >
+            </div>
+
+            <div class="space-y-2">
+                <label class="block font-medium">Adicionar descrição</label>
+                <textarea 
+                    name="descricao"
+                    placeholder="Adicionar descrição"
+                    class="w-full p-3 bg-gray-200 rounded-lg resize-none h-24"
+                ></textarea>
+            </div>
+
+            <!-- Bloco cinza com campos de entrada editáveis -->
+            <div class="bg-gray-300 rounded-lg p-4 space-y-4">
+                <h2 class="text-lg font-bold text-center">Informações</h2>
+                <div class="space-y-2">
+                    <label class="block font-medium">Tipo do campo 1</label>
+                    <input 
+                        name="tipo_campo_1"
+                        type="text" 
+                        placeholder="Tipo do campo: Tipo1"
+                        class="w-full p-3 bg-gray-200 rounded-lg"
+                    >
+                </div>
+                <div class="space-y-2">
+                    <label class="block font-medium">Tipo do campo 2</label>
+                    <input 
+                        name="tipo_campo_2"
+                        type="text" 
+                        placeholder="Tipo do campo: Tipo2"
+                        class="w-full p-3 bg-gray-200 rounded-lg"
+                    >
+                </div>
+            </div>
+
+            <button id="submit-button" type="button" class="w-full p-3 bg-gray-500 rounded-lg font-medium">Criar campo</button>
+        </form>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                const submitButton = document.getElementById("submit-button");
+                const addForm = document.getElementById("add-form");
+                const modalContainer = document.getElementById("popup-container");
+                const modalContent = document.getElementById("popup-modal");
+
+                submitButton.addEventListener("click", (event) => {
+                    event.preventDefault();
+                    console.log("Botão 'Criar campo' clicado");
+
+                    fetch(addForm.action, {
+                        method: "POST",
+                        body: new FormData(addForm),
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest",
+                        },
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(HTTP error! status: ${response.status});
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Dados recebidos:", data);
+                        if (data.success) {
+                            showModal();
+                            setTimeout(() => {
+                                window.location.href = addForm.dataset.redirectUrl;
+                            }, 1500);
+
+                            anime({
+                                targets: modalContent,
+                                scale: [0.8, 1],
+                                opacity: [0, 1],
+                                duration: 500,
+                                easing: "easeOutExpo",
+                            });
+                        } else {
+                            alert(Erro ao adicionar o campo: ${data.message});
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Erro ao enviar o formulário:", error);
+                        alert("Ocorreu um erro inesperado. Por favor, tente novamente.");
+                    });
+                });
+
+                function showModal() {
+                    console.log("Exibir modal");
+                    modalContainer.classList.remove("hidden");
+                }
+            });
+        </script>
+    </div>
+</body>
+</html>

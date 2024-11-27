@@ -17,11 +17,11 @@ def get_weather_data(city):
         response = requests.get(base_url, params=params)
         
         # Print status code and headers for debugging
-        print(f"Status Code: {response.status_code}")
-        print(f"Headers: {response.headers}")
+        #print(f"Status Code: {response.status_code}")
+        #print(f"Headers: {response.headers}")
         
         # Print the raw text response for better debugging
-        print(f"Response Text: {response.text}")
+        #print(f"Response Text: {response.text}")
 
         # Verificar o código de status da resposta
         if response.status_code == 200:
@@ -35,8 +35,8 @@ def get_weather_data(city):
             }
             return weather_info
         else:
-            print(f"Erro ao buscar dados da API. Status Code: {response.status_code}")
-            print(response.json())  # Imprimir a resposta JSON de erro da API
+            #print(f"Erro ao buscar dados da API. Status Code: {response.status_code}")
+            #print(response.json())  # Imprimir a resposta JSON de erro da API
             return None  # Retorna None em caso de erro na requisição
 
     except requests.exceptions.RequestException as e:

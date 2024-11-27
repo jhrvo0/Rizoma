@@ -13,6 +13,8 @@ import json
 from datetime import date, datetime, timedelta
 from django.template.loader import render_to_string
 from .weather_api import get_weather_data
+from django.db.models.functions import Lower
+from django.http import JsonResponse
 
 
 """ LOGIN / REGISTER / LOGOUT """
@@ -91,12 +93,10 @@ class LogoutView(View):
 
 # Criar Campo
 class CriarCampoView(LoginRequiredMixin, View):
-    template_name = 'campo.html'
-    login_url = '/login/'
 
     def get(self, request, *args, **kwargs):
         form = CampoForm()
-        return render(request, self.template_name, {'form': form})
+        return render(request, 'campo.html', {'form': form})
 
     def post(self, request, *args, **kwargs):
         form = CampoForm(request.POST)
@@ -118,48 +118,68 @@ class DeletarCamposView(LoginRequiredMixin, View):
     def post(self, request):
         data = json.loads(request.body)
         campo_ids = data.get('campo_ids', [])
-        
+
         if not campo_ids:
             return JsonResponse({"status": "error", "message": "Nenhum campo selecionado."}, status=400)
         
+        # Filtra os campos relacionados ao usuário logado
         campos = Campo.objects.filter(id__in=campo_ids, agricultor=request.user)
+
+        # Para cada campo selecionado, remove as atividades associadas
+        for campo in campos:
+            # Remove as atividades associadas ao terreno
+            campo.eventos.all().delete()
+
+        # Conta o número de campos deletados e os deleta
         deleted_count = campos.count()
         campos.delete()
         
         return JsonResponse({"status": "success", "deleted_count": deleted_count})
+
     
 # Visualizar Campo
 class VisualizarCampoView(LoginRequiredMixin, View):
-    login_url = '/login/' # Se o usuário não estiver autenticado, ele volta pro login.
-    
+    login_url = '/login/'  # Se o usuário não estiver autenticado, ele volta para o login.
+
     def get(self, request):
         context = {
             "campos": request.user.get_campos(),
-            "current_page" : "campos",
+            "current_page": "campos",
         }
         return render(request, "campos.html", context)
-    
+
     def Filtrar_campos(request):
         if request.method == "GET" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            nome = request.GET.get("nome", "")
+            nome = request.GET.get("nome", "").strip()
             sort = request.GET.get("sort", "az")  # Parâmetro de ordenação
-            campos = campos.objects.all()
+            
+            # Garante que os campos sejam relacionados ao usuário logado
+            campos = request.user.get_campos()
+
+            # Filtro por nome com case-insensitive usando `__icontains`
             if nome:
                 campos = campos.filter(nome__icontains=nome)
-                    # Ordenação com base na opção selecionada
+
+            # Ordenação com base na opção selecionada
             if sort == "az":
-                campos = campos.order_by("nome")  # A-Z
+                campos = campos.order_by("nome__lower")  # Ordenação case-insensitive
             elif sort == "za":
-                campos = campos.order_by("-nome")  # Z-A
+                campos = campos.order_by("-nome__lower")  # Ordenação reversa case-insensitive
             elif sort == "recent":
-                campos = campos.order_by("-created_at")  # Mais recente
+                campos = campos.order_by("-created_at")  # Ordenar por mais recente
+
+            # Renderiza os campos filtrados no componente de lista
             if campos.exists():
                 html = render(request, "components/lista_campos.html", {"campos": campos}).content.decode("utf-8")
             else:
                 html = '<div class="p-4 rounded-lg text-center"><p class="text-gray-600 font-semibold">Nenhum campo encontrado.</p></div>'
+
             return JsonResponse({"html": html})
         else:
             return JsonResponse({"error": "Invalid request"}, status=400)
+
+
+
 
 
 # Selecionar quantidade de planta para adicionar
@@ -347,14 +367,23 @@ class DetalhesCampoView(LoginRequiredMixin, View):
     def get(self, request, campo_id):
         campo = get_object_or_404(Campo, id=campo_id)
         plantas_cultivadas = PlantaCultivada.objects.filter(campo=campo)
+
+        subcampo_no = {
+            1: plantas_cultivadas.filter(subcampo=1),
+            2: plantas_cultivadas.filter(subcampo=2),
+            3: plantas_cultivadas.filter(subcampo=3),
+            4: plantas_cultivadas.filter(subcampo=4),
+        }
+
         context = {
             'campo': campo,
+            'subcampo_no': subcampo_no,
             'plantas_cultivadas': plantas_cultivadas,
             'plantas': Planta.objects.all(),
             'options': get_fab_content('detalhes-campo.html', campo_id=campo_id),
         }
         return render(request, 'detalhes_campo.html', context)
-
+        
 
 class EditarCampoView(LoginRequiredMixin, View):
     login_url = '/login/'
@@ -403,6 +432,7 @@ class HomeView(LoginRequiredMixin, View):
         
         context = {
             'atividades_hoje': atividades_hoje,
+            'qtd_atividades': atividades_hoje.count(),
             'current_date': current_date.strftime('%Y-%m-%d'),  # Formatar a data corretamente
             'current_page': 'home',  # adiciona o clima ao contexto
             'options': get_fab_content('home.html')
@@ -415,7 +445,7 @@ class HomeView(LoginRequiredMixin, View):
 def atividades_por_data(request, data):
     data = datetime.strptime(data, '%Y-%m-%d').date()
     atividades = HomeView().get_atividades_por_data(request.user, data)
-    html = render_to_string('components/atividades_lista.html', {'atividades_hoje': atividades})
+    html = render_to_string('components/component_atividades_home.html', {'atividades_hoje': atividades})
     return JsonResponse({'html': html})
 
 """ Calendário """
@@ -428,7 +458,7 @@ class CalendarioView(LoginRequiredMixin, View):
         terreno_id = request.GET.get('terreno_id')
 
         if terrenos:
-            if (terreno_id):
+            if terreno_id:
                 terreno_atual = get_object_or_404(Campo, id=terreno_id, agricultor=request.user)
             else:
                 terreno_atual = terrenos[0]
@@ -437,11 +467,14 @@ class CalendarioView(LoginRequiredMixin, View):
             terreno_anterior = terrenos[terreno_index - 1] if terreno_index > 0 else terrenos[-1]
             terreno_proximo = terrenos[terreno_index + 1] if terreno_index < len(terrenos) - 1 else terrenos[0]
             
-            eventos = list(terreno_atual.eventos.values())
-            for evento in eventos:
-                evento['data_inicio'] = evento['data_inicio'].strftime('%Y-%m-%d')
-                if evento['data_fim']:
-                    evento['data_fim'] = evento['data_fim'].strftime('%Y-%m-%d')
+            eventos = []
+            if hasattr(terreno_atual, 'eventos') and terreno_atual.eventos is not None:
+                eventos = list(terreno_atual.eventos.values())
+
+                for evento in eventos:
+                    evento['data_inicio'] = evento['data_inicio'].strftime('%Y-%m-%d')
+                    if evento['data_fim']:
+                        evento['data_fim'] = evento['data_fim'].strftime('%Y-%m-%d')
         else:
             terreno_atual = "Nenhum campo foi registrado ainda"
             terreno_anterior = None
@@ -479,72 +512,33 @@ class CalendarioView(LoginRequiredMixin, View):
             }
         return render(request, 'calendario.html', context)
 
-    @method_decorator(csrf_exempt)
-    def post(self, request):
-        try:
-            data = json.loads(request.body)
-            descricao = data.get('descricao')
-            data_inicio = data.get('data_inicio')
-            data_fim = data.get('data_fim')
-            campo_ids = data.get('campos', [])
-            cor = data.get('cor', '#FF5733')
 
+    @method_decorator(csrf_exempt, name='dispatch')
+    def post(self, request):
+        data = json.loads(request.body)
+        nome = data.get('nome', 'Tarefa')
+        descricao = data.get('descricao')
+        data_inicio = data.get('data_inicio')
+        data_fim = data.get('data_fim', data_inicio)
+        cor = data.get('cor', '#FF5733')
+        campo_id = data.get('campos')[0]
+        
+        try:
+            campo = Campo.objects.get(id=campo_id)
             evento = Evento.objects.create(
+                nome=nome,
                 descricao=descricao,
                 data_inicio=data_inicio,
                 data_fim=data_fim,
-                cor=cor
+                cor=cor,
+                campos=campo
             )
-
-            campos = Campo.objects.filter(id__in=campo_ids)
-            evento.campos.set(campos)
-            return JsonResponse({"status": "success", "evento_id": evento.id})
+            return JsonResponse({'status': 'success', 'evento_id': evento.id})
+        except Campo.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Campo não encontrado'})
         except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+            return JsonResponse({'status': 'error', 'message': str(e)})
 
-    @method_decorator(csrf_exempt)
-    def delete(self, request, evento_id):
-        try:
-            evento = get_object_or_404(Evento, id=evento_id)
-            single_day = request.GET.get('single_day') == 'true'
-            date = request.GET.get('date')
-            if single_day and date:
-                date_obj = datetime.strptime(date, '%Y-%m-%d').date()
-                
-                if evento.data_inicio == evento.data_fim:
-                    evento.delete()
-                elif evento.data_inicio == date_obj:
-                    evento.data_inicio = date_obj + timedelta(days=1)
-                    evento.save()
-                elif evento.data_fim == date_obj:
-                    evento.data_fim = date_obj - timedelta(days=1)
-                    evento.save()
-                else:
-                    # Criar um novo evento para os dias após o dia excluído
-                    novo_evento_apos = Evento.objects.create(
-                        descricao=evento.descricao,
-                        data_inicio=date_obj + timedelta(days=1),
-                        data_fim=evento.data_fim,
-                        cor=evento.cor
-                    )
-                    novo_evento_apos.campos.set(evento.campos.all())
-                    
-                    # Criar um novo evento para os dias antes do dia excluído
-                    novo_evento_antes = Evento.objects.create(
-                        descricao=evento.descricao,
-                        data_inicio=evento.data_inicio,
-                        data_fim=date_obj - timedelta(days=1),
-                        cor=evento.cor
-                    )
-                    novo_evento_antes.campos.set(evento.campos.all())
-                    
-                    # Excluir o evento original
-                    evento.delete()
-            else:
-                evento.delete()
-            return JsonResponse({"status": "success"})
-        except Exception as e:
-            return JsonResponse({"status": "error", "message": str(e)}, status=500)
         
 class ProfileView(LoginRequiredMixin, View):
     login_url = '/login/'
@@ -572,36 +566,25 @@ class ProfileView(LoginRequiredMixin, View):
         }
         return render(request, 'perfil.html', context)
     
-
-class CamposView(LoginRequiredMixin, View):
-    login_url = '/login/'
-    def get(self, request):
-
-        campos = []  
-        context = {
-            'campos': campos,
-        }
-        return render(request, 'campos.html', context)
-    
 def Filtrar_campos(request):
     if request.method == "GET" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
-        nome = request.GET.get("nome", "")
-        tipo = request.GET.get("tipo", "")
-        sort = request.GET.get("sort", "az")
+        nome = request.GET.get("nome", "").strip().upper()  # Converter o nome para maiúsculas
+        sort = request.GET.get("sort", "az")  # Parâmetro de ordenação
         
         campos = request.user.get_campos()
 
         if nome:
+      
             campos = campos.filter(nome__icontains=nome)
-        
-        if sort == "az":
-            campos = campos.order_by("nome")
-        elif sort == "za":
-            campos = campos.order_by("-nome")
-        elif sort == "recent":
-            campos = campos.order_by("-created_at")
 
-        if campos.exists():
+        if sort == "az":
+            campos = sorted(campos, key=lambda campo: campo.nome.upper())  
+        elif sort == "za":
+            campos = sorted(campos, key=lambda campo: campo.nome.upper(), reverse=True)  
+        elif sort == "recent":
+            campos = campos.order_by("-created_at") 
+
+        if campos:
             html = render_to_string("components/lista_campos.html", {"campos": campos}, request=request)
         else:
             html = '<div class="p-4 rounded-lg text-center"><p class="text-gray-600 font-semibold">Nenhum campo encontrado.</p></div>'
@@ -609,6 +592,7 @@ def Filtrar_campos(request):
         return JsonResponse({"html": html})
     else:
         return JsonResponse({"error": "Invalid request"}, status=400)
+
 
 def pagatividades(request):
     eventos = Evento.objects.all()  # Obtenha todos os eventos

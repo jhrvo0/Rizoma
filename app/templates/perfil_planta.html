@@ -42,18 +42,18 @@
 
       <div class="mt-6">
         <h3 class="font-bold mb-2">Plantas amigas</h3>
-        <div class="bg-gray-200 p-4 rounded-lg">
-            <div class="flex mt-2 space-x-2">
-                {% for amiga in planta.get_plantas_amigas %}
-                <div class="flex flex-col items-center">
-                    <div class="w-12 h-12 bg-gray-300 rounded flex items-center justify-center">
-                        <i class="bi bi-card-image text-xl text-gray-500"></i>
-                    </div>
-                    <span class="mt-2 text-center">{{ amiga.nome }}</span>
-                </div>
-                {% endfor %}
-            </div>            
-        </div>
+        <div class="bg-gray-400 p-4 rounded-lg">
+          <div class="grid grid-cols-4 gap-4 mt-2">
+              {% for amiga in planta.get_plantas_amigas %}
+              <div class="flex flex-col items-center">
+                  <div class="w-12 h-12 bg-gray-500 rounded flex items-center justify-center">
+                      <i class="bi bi-card-image text-xl text-gray-600"></i>
+                  </div>
+                  <span class="flex-wrap mt-2 text-center">{{ amiga.nome }}</span>
+              </div>
+              {% endfor %}
+          </div>
+      </div>
       </div>
     </div>
   </body>

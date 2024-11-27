@@ -1,5 +1,6 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,19 +9,20 @@
 
     <title>Selecionar Subcampo</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="{% static 'scripts/caralho.js' %}"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
 </head>
 <body class="min-h-screen bg-gray-50 p-6">
     <div class="flex items-center mb-6">
-        <a href="{% url 'home' %}" class="text-gray-700 hover:text-gray-900">
-            <i class="bi bi-arrow-left text-2xl"></i>
-        </a>
+        <button class="p-2" onclick="history.back()">
+            <i class="bi bi-arrow-left text-2xl text-gray-700"></i>
+        </button>
         <h1 class="text-3xl font-bold flex-1 text-right">Nova planta</h1>
     </div>
     <div class="mt-14 mb-8">
         <h1 class="text-2xl font-bold flex-1 text-center">Toque onde deseja plantar</h1>
     </div>
-    <div id="columns-view" class="grid grid-cols-4 gap-1" style="opacity: 1; transform: scale(1);">
+    <div id="columns-view" class="grid grid-cols-4 gap-1">
         {% for key, plantas in subcampo_no.items %}
             <div class="bg-gray-400 p-1 space-y-2 rounded-md">
                 <form method="POST" action="{% url 'adicionar-planta-campo' campo.id planta_id quantidade %}">
@@ -29,9 +31,14 @@
                     <button type="submit" class="w-full h-full">
                         {% if plantas %}
                             {% for planta in plantas %}
-                                {{ planta.planta.nome }} <!-- Debug Output -->
-                                {% include 'components/component_grid_adicionar.html' with planta=planta %}
+                                {% if planta %}
+                                    <div class="relative aspect-square bg-gray-200 rounded-lg flex flex-col items-center justify-center p-2 mx-1 mt-3">
+                                        <i class="bi bi-card-image text-4xl"></i>
+                                        <span class="text-center text-sm">{{ planta.planta.nome }}</span>
+                                    </div>
+                                {% endif %}
                             {% endfor %}
+                            <div class="mb-3"></div>
                         {% else %}
                             <div class="bg-gray-300 p-4 rounded-md flex justify-center items-center">
                                 <i class="bi bi-plus-lg text-gray-600 text-4xl"></i>
@@ -42,5 +49,9 @@
             </div>
         {% endfor %}
     </div>
+    {% include 'components/component_modal.html' with message="Planta adicionada com sucesso!" %}
+    <button id="btn-aleatorio" class="px-4 w-full mt-4 py-5 bg-gray-200 font-semibold rounded-lg mx-auto text-2xl text-center">
+        <h1 class="ml-2">Concluir</h1>
+    </button>
 </body>
 </html>

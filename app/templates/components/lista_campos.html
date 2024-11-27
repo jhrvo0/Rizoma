@@ -24,7 +24,7 @@
             <h2 class="text-gray-800 font-bold">{{ campo.nome }}</h2>
             <div class="flex gap-4 items-center">
                 <p class="text-gray-600 font-bold text-sm">Quantidade de plantas:</p>
-                <p class="text-gray-600 text-md">{{ campo.plantas|length }}</p>
+                <p class="text-gray-600 text-md">{{ campo.get_plantas_cultivadas_count }}</p>
             </div>
         </div>
         <!-- Link para Detalhes -->

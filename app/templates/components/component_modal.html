@@ -54,39 +54,7 @@
     </div>
 
     <script>
-      // Function to show the modal
-      function showModal() {
-        const modalContainer = document.getElementById("popup-container");
-        modalContainer.classList.remove("hidden"); // Show the modal
-      }
-
-      // Function to hide the modal
-      function hideModal() {
-        const modalContainer = document.getElementById("popup-container");
-        modalContainer.classList.add("hidden"); // Hide the modal
-      }
-
-      // Close the modal when clicking outside of it
-      document.addEventListener("click", function (event) {
-        const modalContainer = document.getElementById("popup-container");
-        if (!modalContainer.contains(event.target)) {
-          hideModal(); // Close modal if clicked outside
-        }
-      });
-
-      // Prevent modal content from closing when clicked
-      document
-        .getElementById("popup-modal")
-        .addEventListener("click", function (event) {
-          event.stopPropagation();
-        });
-
-      // Close modal when clicking the confirm button
-      document
-        .getElementById("confirm-button")
-        .addEventListener("click", function (event) {
-          hideModal();
-        });
+      
     </script>
   </body>
 </html>

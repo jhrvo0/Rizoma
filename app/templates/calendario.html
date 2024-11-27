@@ -16,13 +16,13 @@
     <!-- Conteúdo Principal -->
     <div class="flex-1">
       <!-- Importar weather.html-->
-      <div class="mb-4 w-3/4 mx-auto">
+      <div class="mb-4 w-11/12 mx-auto">
         {% include 'components/weather.html' with temperature=temperature %}
       </div>
 
       <!-- Calendário -->
-      <div class="mb-4 w-3/4 mx-auto">
-        {% include 'components/calendar.html' with eventos=eventos %}
+      <div class="mb-4 w-5/6 mx-auto">
+        {% include 'components/component_calendario.html' with eventos=eventos cores=cores %}
       </div>
 
       <!-- Botão Ver Tarefas -->

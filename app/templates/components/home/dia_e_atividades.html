@@ -1,0 +1,134 @@
+<div class="flex-1 w-full p-4 space-y-4 overflow-y-auto">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+      <div id="date-container" class="p-4 rounded-lg">
+          <div class="flex mb-2">
+              <div class="text-center mx-auto">
+                  <h2 id="currentDate" class="text-2xl font-bold text-center"></h2>
+              </div>
+          </div>
+          <div id="date-range" class="space-y-2"></div>
+      </div>
+      <div class="p-4 rounded-lg bg-gray-200 w-11/12 mx-auto">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-gray-800 text-2xl font-bold">Atividades para hoje</h2>
+          <span class="text-gray-800 text-2xl font-bold">({{ qtd_atividades }})</span>
+      </div>
+          {% include 'components/home/tarefas_do_dia.html' %}
+      </div>
+  </div>
+  <input type="hidden" id="selectedDate" class="bg-gray-200 font-bold" value="{{ current_date }}">
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const currentDateElement = document.getElementById("currentDate");
+    const dateRangeContainer = document.getElementById("date-range");
+    const selectedDateInput = document.getElementById("selectedDate");
+    const atividadesContainer = document.getElementById("atividades-container");
+
+
+    function setDateToGMTMinus3(dateString) {
+    const [year, month, day] = dateString.split("-").map(Number);
+    return new Date(Date.UTC(year, month - 1, day, 3));
+    }
+
+
+    let currentDate = setDateToGMTMinus3(selectedDateInput.value);
+    selectedDateInput.value = currentDate.toISOString().split("T")[0];
+
+      function capitalizeFirstLetter(string) {
+          return string.charAt(0).toUpperCase() + string.slice(1);
+      }
+
+      function updateDateDisplay() {
+          const options = { month: "long" };
+          let dateString = currentDate.toLocaleDateString("pt-BR", options);
+
+          dateString = dateString.split(" ").map(capitalizeFirstLetter).join(" ");
+
+          currentDateElement.textContent = dateString;
+          selectedDateInput.value = currentDate.toISOString().split("T")[0];
+          fetchAtividades();
+          renderDateRange();
+          highlightCurrentDay();
+      }
+
+      function renderDateRange() {
+          dateRangeContainer.innerHTML = "";
+
+          const startDate = new Date(currentDate);
+          startDate.setDate(currentDate.getDate() - 3);
+
+          const weekDays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+
+          const weekRow = document.createElement("div");
+          const dateRow = document.createElement("div");
+          weekRow.className = "grid grid-cols-7 text-center gap-2 mb-2";
+          dateRow.className = "grid grid-cols-7 text-center gap-2";
+
+          for (let i = 0; i < 7; i++) {
+              const date = new Date(startDate);
+              date.setDate(startDate.getDate() + i);
+
+              // Weekday label
+              const dayLabel = document.createElement("div");
+              dayLabel.className = "font-semibold text-gray-500";
+              dayLabel.textContent = weekDays[date.getDay()];
+              weekRow.appendChild(dayLabel);
+
+              // Date number
+              const dateElement = document.createElement("div");
+              dateElement.className =
+                  "days bg-gray-300 font-bold p-2 rounded-xl cursor-pointer py-4 text-xl";
+              if (date.toDateString() === currentDate.toDateString()) {
+                  dateElement.classList.add("bg-gray-500", "text-black");
+              }
+              dateElement.textContent = date.getDate();
+              dateElement.addEventListener("click", () => {
+                  currentDate = date;
+                  updateDateDisplay();
+              });
+              dateRow.appendChild(dateElement);
+          }
+
+          dateRangeContainer.appendChild(weekRow);
+          dateRangeContainer.appendChild(dateRow);
+      }
+
+      function fetchAtividades() {
+          const selectedDate = selectedDateInput.value;
+          fetch(`/atividades/${selectedDate}/`)
+              .then((response) => {
+                  if (!response.ok) {
+                      throw new Error("Network response was not ok");
+                  }
+                  return response.json();
+              })
+              .then((data) => {
+                  atividadesContainer.innerHTML = data.html || '<p class="text-gray-600">Nenhuma atividade atribuída ao dia de hoje.</p>';
+              })
+              .catch((error) => {
+                  console.error("Erro ao buscar atividades:", error);
+                  atividadesContainer.innerHTML = '<p class="text-gray-600">Erro ao carregar atividades.</p>';
+              });
+      }
+
+      function highlightCurrentDay() {
+          const calendarDays = document.querySelectorAll('.days');
+          const selectedDate = new Date(selectedDateInput.value);
+
+          calendarDays.forEach((day, index) => {
+              const startDate = new Date(currentDate);
+              const dayDate = new Date(startDate.setDate(startDate.getDate() - 4 + index));
+
+              day.classList.remove("bg-gray-500", "text-black");
+
+              if (dayDate.toDateString() === selectedDate.toDateString()) {
+                  day.classList.add("bg-gray-500", "text-black");
+              }
+          });
+      }
+      
+      updateDateDisplay();
+  });
+</script>

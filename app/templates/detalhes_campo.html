@@ -23,36 +23,36 @@
     </header>
 
     <main class="p-4 h-screen">
-<!-- Bloco para exibir nome ou barra de exclusão -->
-<div id="name-or-delete-bar" class="bg-gray-300 p-4 rounded-lg mb-6 flex items-center justify-between">
-    <h1 id="campo-nome-text" class="text-xl font-bold text-center w-full">{{ campo.nome }}</h1>
-    <div
-        id="delete-bar"
-        class="hidden w-full flex items-center gap-3"
-    >
-        <button id="cancel-selection" class="text-white bg-gray-500 px-4 py-2 rounded-lg">
-            <i class="text-xl bi bi-x"></i>
-        </button>
-        <button id="delete-plants" class="bg-gray-500 hover:bg-gray-600 px-4 font-bold py-2 rounded-lg w-full">
-            <i class="bi bi-trash"></i>
-        </button>
-    </div>
-</div>
+        <!-- Bloco para exibir nome ou barra de exclusão -->
+        <div id="name-or-delete-bar" class="bg-gray-300 p-4 rounded-lg mb-6 flex items-center justify-between">
+            <h1 id="campo-nome-text" class="text-xl font-bold text-center w-full">{{ campo.nome }}</h1>
+            <div
+                id="delete-bar"
+                class="hidden w-full flex items-center gap-3"
+            >
+                <button id="cancel-selection" class="text-white bg-gray-500 px-4 py-2 rounded-lg">
+                    <i class="text-xl bi bi-x"></i>
+                </button>
+                <button id="delete-plants" class="bg-gray-500 hover:bg-gray-600 px-4 font-bold py-2 rounded-lg w-full">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        </div>
 
         <div id="columns-view" class="grid grid-cols-4 gap-1">
             {% for key, plantas in subcampo_no.items %}
-                <div class="bg-gray-400 p-1 space-y-2 rounded-md column">
-                    {% if plantas %}
+                {% if plantas %}
+                    <div class="bg-gray-400 p-1 space-y-2 rounded-md column">
                         {% for planta_cultivada in plantas %}
-                            <div 
-                                class="plant relative aspect-square bg-gray-200 rounded-lg flex flex-col items-center justify-center p-2 mx-1 mt-1"
-                                data-id="{{ planta_cultivada.id }}">
+                            <div class="plant relative aspect-square bg-gray-200 rounded-lg flex flex-col items-center justify-center p-2 mx-1 mt-1" data-id="{{ planta_cultivada.id }}">
                                 <i class="bi bi-card-image text-4xl"></i>
                                 <span class="text-center text-sm">{{ planta_cultivada.planta.nome }}</span>
                             </div>
                         {% endfor %}
-                    {% endif %}
-                </div>
+                        <div class="mb-1"></div>
+                    </div>
+                {% else %}
+                {% endif %}
             {% endfor %}
         </div>
         <div class="p-4 rounded-lg bg-gray-300 mt-6">
@@ -70,28 +70,42 @@
                         <span class="ml-2 font-semibold">{{ campo.tipo_solo }}</span>
                     </div>
                 </div>
+                <div class="bg-white p-3 rounded-lg flex justify-between items-center">
+                    <div class="mx-auto">
+                        <span class="text-gray-600 font-semibold">Quantidade de plantas:</span>
+                        <span class="ml-2 font-semibold">{{ qtd_plantas }}</span>
+                    </div>
+                </div>
+                <div class="bg-white p-3 rounded-lg flex justify-between items-center">
+                    <div class="mx-auto">
+                        <span class="text-gray-600 font-semibold">Tipos de plantas:</span>
+                        <span class="ml-2 font-semibold">{{ tipos_plantas }}</span>
+                    </div>
+                </div>
             </div>
         </div>
 
 
         <!-- Modal para confirmar exclusão -->
-<div id="confirm-delete-modal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-    <div class="bg-white p-6 rounded-lg w-80">
-        <h2 class="text-xl font-bold py-6 text-center mb-6">Apagar as plantas selecionadas?</h2>
-        <div class="gap-4 space-y-4">
-            <button id="confirm-delete-button" class="text-xl bg-gray-500 font-bold w-full p-4 rounded-xl">Continuar</button>
-            <button id="cancel-delete-button" class="text-xl font-bold border-black border-2 w-full p-4 rounded-xl">Cancelar</button>
-        </div>
-    </div>
-</div>
 
-<!-- Modal para confirmar sucesso -->
-<div id="success-modal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-    <div class="bg-white p-6 rounded-lg w-80">
-        <h2 class="text-xl font-bold mb-4 text-center">Plantas removidas com sucesso!</h2>
-        <button id="close-success-modal" class="bg-gray-500 text-white px-4 py-2 rounded-lg w-full">Continuar</button>
-    </div>
-</div>
+        <div id="confirm-delete-modal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            <div class="bg-white p-6 rounded-lg w-80">
+                <h2 class="text-xl font-bold py-6 text-center mb-6">Apagar as plantas selecionadas?</h2>
+                <div class="gap-4 space-y-4">
+                    <button id="confirm-delete-button" class="text-xl bg-gray-500 font-bold w-full p-4 rounded-xl">Continuar</button>
+                    <button id="cancel-delete-button" class="text-xl font-bold border-black border-2 w-full p-4 rounded-xl">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal para confirmar sucesso -->
+        <div id="success-modal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div class="bg-white p-6 rounded-lg w-80">
+                <h2 class="text-xl font-bold mb-4 text-center">Plantas removidas com sucesso!</h2>
+                <button id="close-success-modal" class="bg-gray-500 text-white px-4 py-2 rounded-lg w-full">Continuar</button>
+            </div>
+        </div>
 
 
         

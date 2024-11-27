@@ -8,6 +8,7 @@ from django.views import View
 from .models import Agricultor, Campo, PlantaCultivada, Planta, Evento
 from .forms import LoginForm, RegistrationForm, CampoForm, PlantaCultivadaForm, ProfileForm
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 import json
 from datetime import date, datetime, timedelta
@@ -15,6 +16,7 @@ from django.template.loader import render_to_string
 from .weather_api import get_weather_data
 from django.db.models.functions import Lower
 from django.http import JsonResponse
+from django.db.models import Sum
 
 
 """ LOGIN / REGISTER / LOGOUT """
@@ -94,10 +96,18 @@ class LogoutView(View):
 # Criar Campo
 class CriarCampoView(LoginRequiredMixin, View):
 
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+
+        return super().dispatch(*args, **kwargs)
     def get(self, request, *args, **kwargs):
         form = CampoForm()
-        return render(request, 'campo.html', {'form': form})
+        return render(request, 'adicao_campo.html', {'form': form})
 
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+    
     def post(self, request, *args, **kwargs):
         form = CampoForm(request.POST)
         if form.is_valid():
@@ -112,31 +122,35 @@ class CriarCampoView(LoginRequiredMixin, View):
         else:
             errors = form.errors.as_json()
             return JsonResponse({'status': 'error', 'errors': errors})
+
         
 # Deletar Campo
 class DeletarCamposView(LoginRequiredMixin, View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
     def post(self, request):
+        # Carrega os dados da requisição
         data = json.loads(request.body)
         campo_ids = data.get('campo_ids', [])
-
+        
         if not campo_ids:
             return JsonResponse({"status": "error", "message": "Nenhum campo selecionado."}, status=400)
         
-        # Filtra os campos relacionados ao usuário logado
+        # Filtra os campos para garantir que sejam do agricultor logado
         campos = Campo.objects.filter(id__in=campo_ids, agricultor=request.user)
 
-        # Para cada campo selecionado, remove as atividades associadas
+        # Exclui os eventos associados a cada campo
         for campo in campos:
-            # Remove as atividades associadas ao terreno
-            campo.eventos.all().delete()
+            campo.eventos_relacionados.all().delete()  # Use the correct related_name
 
-        # Conta o número de campos deletados e os deleta
+        # Conta os campos que foram excluídos
         deleted_count = campos.count()
         campos.delete()
         
         return JsonResponse({"status": "success", "deleted_count": deleted_count})
 
-    
 # Visualizar Campo
 class VisualizarCampoView(LoginRequiredMixin, View):
     login_url = '/login/'  # Se o usuário não estiver autenticado, ele volta para o login.
@@ -144,7 +158,8 @@ class VisualizarCampoView(LoginRequiredMixin, View):
     def get(self, request):
         context = {
             "campos": request.user.get_campos(),
-            "current_page": "campos",
+            "current_page": "campos",   
+            'options': get_fab_content('campos.html'),
         }
         return render(request, "campos.html", context)
 
@@ -361,12 +376,14 @@ class EditarPlantasNoCampoView(LoginRequiredMixin, View):
     
 
 # Dá detalhes sobre o campo
+
 class DetalhesCampoView(LoginRequiredMixin, View):
     login_url = '/login/'
 
     def get(self, request, campo_id):
         campo = get_object_or_404(Campo, id=campo_id)
         plantas_cultivadas = PlantaCultivada.objects.filter(campo=campo)
+        total_quantidade_plantada = plantas_cultivadas.aggregate(total=Sum('quantidade_plantada'))['total'] or 0
 
         subcampo_no = {
             1: plantas_cultivadas.filter(subcampo=1),
@@ -375,14 +392,19 @@ class DetalhesCampoView(LoginRequiredMixin, View):
             4: plantas_cultivadas.filter(subcampo=4),
         }
 
+        tipos_plantas = plantas_cultivadas.values('planta').distinct().count()
+
         context = {
             'campo': campo,
             'subcampo_no': subcampo_no,
             'plantas_cultivadas': plantas_cultivadas,
             'plantas': Planta.objects.all(),
             'options': get_fab_content('detalhes-campo.html', campo_id=campo_id),
+            'tipos_plantas': tipos_plantas,
+            'qtd_plantas': total_quantidade_plantada
         }
         return render(request, 'detalhes_campo.html', context)
+
         
 
 class EditarCampoView(LoginRequiredMixin, View):
@@ -427,35 +449,45 @@ class HomeView(LoginRequiredMixin, View):
     login_url = '/login/'
 
     def get(self, request):
-        current_date = date.today()
-        atividades_hoje = self.get_atividades_por_data(request.user, current_date)
-        
+        current_date = timezone.now().date()
+        atividades = HomeView.get_atividades_por_data(request.user, current_date)
         context = {
-            'atividades_hoje': atividades_hoje,
-            'qtd_atividades': atividades_hoje.count(),
-            'current_date': current_date.strftime('%Y-%m-%d'),  # Formatar a data corretamente
-            'current_page': 'home',  # adiciona o clima ao contexto
-            'options': get_fab_content('home.html')
+            'current_date': current_date.strftime('%Y-%m-%d'),
+            'current_page': 'home',
+            'options': get_fab_content('home.html'),
+            'qtd_atividades': atividades.count(),
+            'hoje': current_date  # Add today's date to the context
         }
         return render(request, 'home.html', context)
-    
-    def get_atividades_por_data(self, user, data):
-        return Evento.objects.filter(data_inicio__lte=data, data_fim__gte=data, campos__agricultor=user)
 
-def atividades_por_data(request, data):
+    @staticmethod
+    def get_atividades_por_data(user, data):
+        return Evento.objects.filter(
+            data_inicio__lte=data,
+            data_fim__gte=data,
+            campos__agricultor=user
+        )
+
+def get_atividades_por_data(request, data):
     data = datetime.strptime(data, '%Y-%m-%d').date()
-    atividades = HomeView().get_atividades_por_data(request.user, data)
-    html = render_to_string('components/component_atividades_home.html', {'atividades_hoje': atividades})
+    atividades = HomeView.get_atividades_por_data(request.user, data)
+    context = {
+        'atividades_hoje': atividades, 
+        'qtd_atividades': atividades.count(),
+        'hoje': timezone.now().date()
+    }
+    html = render_to_string('components/home/tarefas_do_dia.html', context)
     return JsonResponse({'html': html})
+
 
 """ Calendário """
 
 class CalendarioView(LoginRequiredMixin, View):
-    login_url = '/login/'
 
     def get(self, request):
         terrenos = list(request.user.campos.all())
         terreno_id = request.GET.get('terreno_id')
+        cores = ["#FF0000", "#FD7E14", "#FFC107", "#28A745", "#007BFF", "#8A2BE2", "#FF5733", "#17A2B8", "#DA70D6", "#FFFF00"]
 
         if terrenos:
             if terreno_id:
@@ -481,37 +513,16 @@ class CalendarioView(LoginRequiredMixin, View):
             terreno_proximo = None
             eventos = []
 
-        weather_data = get_weather_data('Carpina')
-        if weather_data:
-            context = {
-                "eventos": json.dumps(eventos),
-                "terreno_atual": terreno_atual,
-                "terreno_anterior": terreno_anterior,
-                "terreno_proximo": terreno_proximo,
-                "terrenos": terrenos,
-                "current_page": "calendario",
-                "city": weather_data["city"],
-                "temperature": weather_data["temperature"],
-                "condition": weather_data["condition"],
-                "icon": weather_data["icon"],
-                "moon_phase": weather_data["moon_phase"]
-            }
-        else:
-            context = {
-                "eventos": json.dumps(eventos),
-                "terreno_atual": terreno_atual,
-                "terreno_anterior": terreno_anterior,
-                "terreno_proximo": terreno_proximo,
-                "terrenos": terrenos,
-                "current_page": "calendario",
-                "city": "N/A",
-                "temperature": "N/A",
-                "condition": "N/A",
-                "icon": "N/A",
-                "moon_phase": "N/A"
-            }
+        context = {
+            "eventos": json.dumps(eventos),
+            "terreno_atual": terreno_atual,
+            "terreno_anterior": terreno_anterior,
+            "terreno_proximo": terreno_proximo,
+            "terrenos": terrenos,
+            "current_page": "calendario",
+            "cores": cores
+        }
         return render(request, 'calendario.html', context)
-
 
     @method_decorator(csrf_exempt, name='dispatch')
     def post(self, request):
@@ -531,14 +542,40 @@ class CalendarioView(LoginRequiredMixin, View):
                 data_inicio=data_inicio,
                 data_fim=data_fim,
                 cor=cor,
-                campos=campo
+                campos=campo,
+                completa=False
             )
             return JsonResponse({'status': 'success', 'evento_id': evento.id})
+        
         except Campo.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Campo não encontrado'})
+        
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)})
 
+
+class WeatherView(View):
+    def get(self, request):
+        weather_data = get_weather_data('Carpina')
+        
+        if weather_data:
+            context = {
+                "city": weather_data["city"],
+                "temperature": weather_data["temperature"],
+                "condition": weather_data["condition"],
+                "icon": weather_data["icon"],
+                "moon_phase": weather_data["moon_phase"]
+            }
+        else:
+            context = {
+                "city": "N/A",
+                "temperature": "N/A",
+                "condition": "N/A",
+                "icon": "N/A",
+                "moon_phase": "N/A"
+            }
+        return render(request, 'weather.html', context)
+    
         
 class ProfileView(LoginRequiredMixin, View):
     login_url = '/login/'
@@ -628,7 +665,8 @@ class BuscaPlantaView(LoginRequiredMixin, View):
 
 def get_fab_content(location, campo_id=None):
 
-    # Adicione uma location aqui e chame essa função na view da location. Veja home para um exemplo.
+    # Adicione uma location aqui e chame essa função na view da location. 
+    # Veja a view de home para um exemplo.
     # - icon é o ícone (bootstrap icons) que vai aparecer na opção.
     # - link é o redirect.
     # - name é a opção que aparece escrita.
@@ -636,12 +674,23 @@ def get_fab_content(location, campo_id=None):
     options = []
     if location == 'home.html':
         options = [
-            {"icon": "bi-house-fill", "link": "home", "name": "Clientes"},
-            {"icon": "bi-house-fill", "link": "home", "name": "Novo plantio"},
-            {"icon": "bi-house-fill", "link": "home", "name": "Novo campo"}
+            {"icon": "/app/images/clientes.svg", "link": "home", "name": "Clientes"},
+            {"icon": "/app/images/plantio.svg", "link": "home", "name": "Novo plantio"},
+            {"icon": "/app/images/campo.svg", "link": "home", "name": "Novo campo"},
+            {"icon": "/app/images/tarefa.svg", "link": "home", "name": "Nova tarefa"},
         ]
     elif location == 'detalhes-campo.html' and campo_id is not None:
         options = [
-            {"icon": "bi-house-fill", "link": 'lista-plantas', 'args': [campo_id], "name": "Adicionar Planta"},
+            {"icon": "/app/images/plantio.svg", "link": 'lista-plantas', 'args': [campo_id], "name": "Adicionar Planta"},
+        ]
+    elif location == 'campos.html':
+        options = [
+            {"icon": "/app/images/campo.svg", "link": "criar-campo", "name": "Criar Campo"},
+        ]
+    else:
+        options= [ 
+            {"icon": "bi-house-fill", "link": "", "name": "DEBUG: PASSOU NOME ERRADO PARA get_fab_content"},
         ]
     return options
+
+

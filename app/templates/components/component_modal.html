@@ -1,3 +1,5 @@
+<!--Se "showModal()" não funcionar, declare um botão com id de "show-modal-after-click" e teste-->
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -54,6 +56,46 @@
     </div>
 
     <script>
+      document.addEventListener("DOMContentLoaded", function () {
+      // Function to show the modal
+      function showModal() {
+          const modalContainer = document.getElementById("popup-container");
+          modalContainer.classList.remove("hidden"); // Show the modal
+      }
+
+      // Function to hide the modal
+      function hideModal() {
+          const modalContainer = document.getElementById("popup-container");
+          modalContainer.classList.add("hidden"); // Hide the modal
+      }
+
+      // Close the modal when clicking outside of it
+      document.addEventListener("click", function (event) {
+          const modalContainer = document.getElementById("popup-container");
+          if (event.target === modalContainer) {
+              hideModal(); // Close modal if clicked outside
+          }
+      });
+
+      // Prevent modal content from closing when clicked
+      const modalContent = document.getElementById("popup-modal");
+      modalContent.addEventListener("click", function (event) {
+          event.stopPropagation();
+      });
+
+      // Close modal when clicking the confirm button
+      const confirmButton = document.getElementById("confirm-button");
+      confirmButton.addEventListener("click", function (event) {
+          hideModal();
+      });
+
+      if (document.getElementById("show-modal-after-click")) {
+        const btn = document.getElementById("show-modal-after-click");
+        btn.addEventListener("click", function (event) {
+            showModal();
+        });
+      }
+  });
       
     </script>
   </body>

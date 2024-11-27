@@ -73,27 +73,31 @@ class LoginForm(forms.Form):
         widget=forms.PasswordInput(attrs={'placeholder': 'Digite sua senha', 'class': 'form-control'})
     )
 
+from django import forms
+from .models import Campo
+
 class CampoForm(forms.ModelForm):
     class Meta:
         model = Campo
-        fields = ['nome', 'icon', 'tipo_campo', 'tipo_solo']
+        fields = ['nome', 'tipo_campo', 'tipo_solo']
         labels = {
             'nome': 'Nome do Campo',
-            'icon': 'Escolha um Ícone',
             'tipo_campo': 'Escolha um Tipo de Campo',
             'tipo_solo': 'Escolha um Tipo de Solo',
         }
         widgets = {
-            'nome': forms.TextInput(attrs={'placeholder': 'Nome do Campo', 'class': 'form-control'}),
-            'icon': forms.Select(choices=[
-                ('bi-house-fill', 'Casa'),
-                ('bi-tree-fill', 'Árvore'),
-                ('bi-cloud-fill', 'Nuvem'),
-                ('bi-flower1', 'Flor'),
-            ], attrs={'class': 'form-control'}),
-            'tipo_campo': forms.Select(attrs={'class': 'form-control'}),
-            'tipo_solo': forms.Select(attrs={'class': 'form-control'}),
+            'nome': forms.TextInput(attrs={
+                'placeholder': 'Nome do campo',
+                'class': 'w-full p-3 bg-gray-200 rounded-lg'
+            }),
+            'tipo_campo': forms.Select(attrs={
+                'class': 'w-full px-3 py-6 bg-gray-200 rounded-b-lg font-bold appearance-none pr-10'
+            }),
+            'tipo_solo': forms.Select(attrs={
+                'class': 'w-full px-3 py-6 bg-gray-200 rounded-lg font-bold appearance-none pr-10'
+            }),
         }
+
 
 
 class PlantaCultivadaForm(forms.ModelForm):

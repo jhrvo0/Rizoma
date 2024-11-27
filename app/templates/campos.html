@@ -21,14 +21,12 @@
     {% include "components/header.html" %}
 
     <main
-      class="flex-1 w-full bg-white px-4 py-2 rounded-t-3xl overflow-y-auto"
+      class="flex-1 w-full bg-white px-4 py-2 rounded-t-3xl overflow-y-auto h-full"
     >
 
       <!--BUSCAR-->
       <div class="flex items-center">
-        <input
-          type="text"
-          id="search-input"
+        <input type="text" id="search-input"
           placeholder="Buscar campo..."
           class="flex-1 bg-gray-200 rounded-l-lg py-4 px-4 focus:outline-none"
         />
@@ -92,7 +90,7 @@
         </div>
       </div>
 
-      <div id="lista-campos">
+      <div id="lista-campos" class="h-full">
         {% if campos %} {% include "components/lista_campos.html" %} {% else %}
         <div class="p-4 rounded-lg">
           <h2 class="text-center font-bold">
@@ -104,15 +102,13 @@
     </main>
 
     {% include 'components/footer.html' with current_page=current_page %} 
-    {% include 'components/fab_campos.html' with campos=campos current_page=current_page %}
-
+    {% include 'components/component_fab.html' with options=options %}
 
     <script>
       document.addEventListener("DOMContentLoaded", () => {
         const searchInput = document.getElementById("search-input");
         const searchButton = document.getElementById("search-button");
         const filterButton = document.getElementById("filter-button");
-        const filterOptions = document.getElementById("filter-options");
         const listaCampos = document.getElementById("lista-campos");
 
         function fetchFilteredData(params) {
@@ -147,18 +143,6 @@
             const params = new URLSearchParams({ nome }).toString();
             fetchFilteredData(params);
           }
-        });
-
-        filterButton.addEventListener("click", () => {
-          filterOptions.classList.toggle("hidden");
-        });
-
-        filterOptions.addEventListener("click", (event) => {
-          const sort = event.target.getAttribute("data-sort");
-          const nome = searchInput.value.trim();
-          const params = new URLSearchParams({ nome, sort }).toString();
-          fetchFilteredData(params);
-          filterOptions.classList.add("hidden");
         });
       });
 

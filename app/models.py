@@ -54,7 +54,6 @@ class Campo(models.Model):
     nome = models.CharField(max_length=100)
     icon = models.CharField(max_length=50, default='bi-house-fill')
     plantas_cultivadas = models.ManyToManyField('Planta', through='PlantaCultivada')
-    eventos = models.ForeignKey('Evento', on_delete=models.CASCADE, related_name="eventos_associados", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     tipo_campo = models.CharField(max_length=50, choices=TIPO_DE_CAMPO, blank=True, null=True)
@@ -69,10 +68,6 @@ class Campo(models.Model):
     
     def get_plantas_cultivadas_count(self):
         return self.plantas_cultivadas.all().count()
-
-    def get_eventos(self):
-        return self.eventos_associados.all()  # Atualizado para usar o related_name ajustado
-
 
 
 class PlantaCultivada(models.Model):
@@ -145,8 +140,9 @@ class Evento(models.Model):
     descricao = models.CharField(max_length=255)
     data_inicio = models.DateField()
     data_fim = models.DateField(null=True, blank=True)
-    cor = models.CharField(max_length=7, default='#FF5733')  # Cor padrão
+    cor = models.CharField(max_length=7, default='#FF5733')
     campos = models.ForeignKey(Campo, on_delete=models.CASCADE, related_name="eventos_relacionados", blank=True, null=True)  # Corrigido o related_name
+    completa = models.BooleanField(default=False, blank=True, null=True)
 
     def __str__(self):
         return self.descricao

@@ -1,51 +1,50 @@
+{% load static %}
 <!-- Botão para abrir o sidebar -->
-<div class="flex items-center space-x-4 pr-4">
+<div class="flex items-center space-x-4">
     <i id="open-sidebar" class="bi bi-person-circle text-5xl text-gray-600"></i>
 </div>
 
 <aside id="sidebar" class="fixed top-0 right-0 w-64 h-full bg-white shadow-lg transform translate-x-full transition-transform duration-300 z-50 flex flex-col justify-between">
 
     <div>
-        <div class="p-6 flex my-auto justify-between items-center space-x-3">
+        <div class="m-6 p-6 flex justify-between items-center space-x-1 bg-gray-400 rounded-lg">
 
-            <div class="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center">
+            <div class="w-12 h-12 flex items-center justify-center">
                 {% if user.profile_picture %}
-                    <img src="{{ user.profile_picture.url }}" alt="Foto de Perfil" class="w-12 h-12 rounded-full">
+                    <img src="{{ user.profile_picture.url }}" alt="Foto de Perfil" class="w-18 h-18 rounded-full">
                 {% else %}
-                    <i class="bi bi-person-circle text-3xl text-gray-700"></i>
+                    <i class="bi bi-person-circle text-5xl text-gray-700"></i>
                 {% endif %}
             </div>
 
             <div>
-                <h2 id="user-name" class="text-lg font-semibold">
+                <h2 id="user-name" class="text-center mx-auto text-lg font-bold">
                     {% if user.is_authenticated %}
                         {{ user.username }}
                     {% else %}
                         Visitante
                     {% endif %}
                 </h2>
+                <span class="text-sm">Lorem ipsum</span>
             </div>
 
-            <button id="close-sidebar" class=" text-gray-800">
-                <i class="bi bi-x-lg text-2xl"></i>
-            </button>
         </div>
 
         <ul class="p-6 space-y-6">
-            <li class="flex items-center space-x-4">
-                <i class="bi bi-gear-fill text-xl text-gray-700"></i>
+            <li class="flex items-center space-x-4 py-4 border-b border-gray-600">
+                <img class="h-6 w-6" src="{% static '/app/images/configuracoes.svg' %}" alt="" srcset="">
                 <a href="#" class="text-gray-800 font-medium">Configurações</a>
             </li>
-            <li class="flex items-center space-x-4">
-                <i class="bi bi-bell-fill text-xl text-gray-700"></i>
-                <a href="#" class="text-gray-800 font-medium">Notificações</a>
-            </li>
-            <li class="flex items-center space-x-4">
-                <i class="bi bi-shield-lock-fill text-xl text-gray-700"></i>
+            <li class="flex items-center space-x-4 py-4 border-b border-gray-600">
+                <img class="h-6 w-6" src="{% static '/app/images/privacidade.svg' %}" alt="" srcset="">
                 <a href="#" class="text-gray-800 font-medium">Privacidade</a>
             </li>
-            <li class="flex items-center space-x-4">
-                <i class="bi bi-box-arrow-left text-xl text-gray-700"></i>
+            <li class="flex items-center space-x-4 py-4 border-b border-gray-600">
+                <img class="h-6 w-6" src="{% static '/app/images/notificacoes.svg' %}" alt="" srcset="">
+                <a href="#" class="text-gray-800 font-medium">Notificações</a>
+            </li>
+            <li class="flex items-center space-x-4 py-4 border-b border-gray-600">
+                <img class="h-6 w-6" src="{% static '/app/images/logout.svg' %}" alt="" srcset="">
                 <a href="{% url 'logout' %}" class="text-gray-800 font-medium">Sair da conta</a>
             </li>
         </ul>
@@ -58,11 +57,20 @@
     const closeSidebarBtn = document.getElementById('close-sidebar');
     const sidebar = document.getElementById('sidebar');
 
+    // Função para fechar o sidebar
+    function closeSidebar() {
+        sidebar.classList.add('translate-x-full');
+    }
+
+    // Abrir sidebar ao clicar no botão
     openSidebarBtn.addEventListener('click', () => {
-        sidebar.classList.remove('translate-x-full'); 
+        sidebar.classList.remove('translate-x-full');
     });
 
-    closeSidebarBtn.addEventListener('click', () => {
-        sidebar.classList.add('translate-x-full'); 
+    // Fechar sidebar ao clicar fora dela
+    document.addEventListener('click', (event) => {
+        if (!sidebar.contains(event.target) && !openSidebarBtn.contains(event.target)) {
+            closeSidebar();
+        }
     });
 </script>

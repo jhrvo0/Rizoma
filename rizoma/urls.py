@@ -1,7 +1,10 @@
 from django.contrib import admin
 from django.urls import path, include
-from app.views import HomeView, CalendarioView, LoginView, LogoutView, CadastrarView, VisualizarCampoView, CriarCampoView, EditarCampoView, AdicionarPlantaNoCampoView, DetalhesCampoView, LandingView, google_login, DeletarCamposView, DeletarPlantaView, ProfileView, Filtrar_campos, atividades_por_data, pagatividades, ListaPlantasView, DetalhePlantaView, EditarPlantasNoCampoView
+from app.views import HomeView, CalendarioView, LoginView, LogoutView, CadastrarView, VisualizarCampoView, CriarCampoView, EditarCampoView, AdicionarPlantaNoCampoView, DetalhesCampoView, LandingView, google_login, DeletarCamposView, DeletarPlantaView, ProfileView, Filtrar_campos, pagatividades, ListaPlantasView, DetalhePlantaView, EditarPlantasNoCampoView
 from app.views import SelecionarQuantidadeParaAdicionarPlantaView, SelecionarSubcampoParaAdicionarPlantaView#, AdicionarPlantaView
+
+# Funções
+from app.views import get_atividades_por_data
 
 urlpatterns = [
     path('', LandingView.as_view(), name='landing'),
@@ -16,6 +19,8 @@ urlpatterns = [
     path('home/', HomeView.as_view(), name="home"),
 
     # Campo URLs
+    path('home/', HomeView.as_view(), name='home'),
+    path('atividades/<str:data>/', get_atividades_por_data, name='atividades_do_dia'),
 
     #path('adicionar_campo/', CriarCampoView.as_view(), name='adicionar_campo'),
     path('novo-campo/', CriarCampoView.as_view(), name='novo-campo'),
@@ -25,7 +30,7 @@ urlpatterns = [
     path('filtrar-campos/', Filtrar_campos, name='Filtrar-campos'),
     path('perfil/', ProfileView.as_view(), name='perfil'),
     
-    path('atividades/<str:data>/', atividades_por_data, name='atividades_por_data'),
+
     path('atividades/', pagatividades, name='atividades'),
 
     path('calendario/', CalendarioView.as_view(), name='calendario'),
@@ -43,6 +48,7 @@ urlpatterns = [
     path('campo/<int:campo_id>/lista-plantas/<int:planta_id>/adicionar-planta/<int:quantidade>/', SelecionarSubcampoParaAdicionarPlantaView.as_view(), name='selecionar-subcampo'),
     path('campo/<int:campo_id>/lista-plantas/<int:planta_id>/adicionar-planta/<int:quantidade>/', SelecionarSubcampoParaAdicionarPlantaView.as_view(), name='adicionar-planta-campo'),    
     path('campo/<int:campo_id>/editar/', EditarCampoView.as_view(), name='edicao_campo'),
+    path('criar-campo/', CriarCampoView.as_view(), name='criar-campo'),
 
     path('deletar-campos/', DeletarCamposView.as_view(), name='deletar-campos'),
     #path('weather/', WeatherView.as_view(), name='weather'),

@@ -12,97 +12,93 @@
     <div class="px-6 mx-auto p-4">
 
         <!-- Header -->
-        <header class="flex items-center justify-between mb-8">
+        <header class="flex items-center justify-between my-12">
             <a href="{% url 'detalhes-campo' campo.id %}" id="back-button" class="p-2">
-                <i class="bi bi-arrow-left text-2xl"></i>
+                <i class="bi bi-arrow-left text-5xl text-gray-700"></i>
             </a>
-            <h1 class="text-xl font-bold flex-1 text-center">Editar campo</h1>
+            <h1 class="text-2xl font-bold flex-1 text-right">Editar campo</h1>
         </header>
 
         {% include 'components/component_modal.html' with message="Campo editado com sucesso!" link="campos" %}
 
         <!-- Formulário -->
-        <form id="edit-form" action="{% url 'edicao_campo' campo.id %}" method="post" data-redirect-url="{% url 'detalhes-campo' campo.id %}" class="space-y-4">
+        <form id="edit-form" action="{% url 'edicao_campo' campo.id %}" method="post" class="space-y-4">
             {% csrf_token %}
-
-            <!-- Nome do campo -->
-            <div class="space-y-2">
-                <label for="nome-campo" class="block font-medium">Nomear campo</label>
-                <input 
-                    id="nome-campo"
-                    name="nome"
-                    type="text" 
-                    placeholder="Nome do campo"
-                    value="{{ campo.nome }}"
-                    class="w-full p-3 bg-gray-200 rounded-lg"
-                >
+            
+            <!-- Field: Nome -->
+            <div class="field">
+                <label for="{{ form.nome.id_for_label }}" class="block font-semibold text-lg">{{ form.nome.label }}</label>
+                {{ form.nome }}
             </div>
 
-            <!-- Descrição do campo -->
-            <div class="space-y-2">
-                <label for="descricao" class="block font-medium">Adicionar descrição (opcional)</label>
-                <textarea 
-                    id="descricao"
-                    name="descricao"
-                    placeholder="Descrição"
-                    class="w-full p-3 bg-gray-200 rounded-lg resize-none h-24"
-                >{{ campo.descricao }}</textarea>
+            <!-- Field: Descrição -->
+            <div class="space-y-2 pt-2">
+                <label for="id_descricao" class="block font-medium">Adicionar descrição (opcional)</label>
+                <textarea id="id_descricao" name="descricao" placeholder="Adicionar descrição" class="w-full p-3 bg-gray-200 rounded-lg resize-none h-24">{{ campo.descricao }}</textarea>
             </div>
-
-            <div>
-<!-- Template de foto -->
-<div class="bg-gray-300 h-24 rounded-t-xl flex items-center justify-center">
-    <i class="bi bi-card-image text-4xl text-gray-600"></i>
-</div>
-
-<!-- Dropdown - Tipo de campo -->
-<div class="relative">
-    <select name="tipo_campo" class="w-full px-3 py-6 bg-gray-200 rounded-b-lg font-bold appearance-none pr-10 -mt-2">
-        <option value="" selected>Tipo de campo</option>
-        {% for tipo in Campo.TIPO_DE_CAMPO|default:"" %}
-            <option value="{{ tipo.0 }}" {% if campo.tipo_campo == tipo.0 %}selected{% endif %}>{{ tipo.1 }}</option>
-        {% endfor %}
-    </select>
-    <i class="bi bi-caret-down-fill absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
-</div>
-            </div>
-
-
-
-            <!-- Dropdown - Tipo de solo -->
-                <div class="relative">
-                    <select name="tipo_solo" class="w-full px-3 py-6 bg-gray-200 rounded-lg font-bold appearance-none pr-10">
-                        <option value="" disabled selected>Tipo de solo</option>
-                        {% for tipo in Campo.TIPO_DE_SOLO|default:"" %}
-                            <option value="{{ tipo.0 }}" {% if campo.tipo_solo == tipo.0 %}selected{% endif %}>{{ tipo.1 }}</option>
-                        {% endfor %}
-                    </select>
-                    <i class="bi bi-caret-down-fill absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
+            
+            <!-- Field: Tipo Campo -->
+            <div class="pt-2">
+                <!-- Template de foto -->
+                <div class="bg-gray-300 h-24 rounded-t-xl flex items-center justify-center">
+                    <i class="bi bi-card-image text-4xl text-gray-600"></i>
                 </div>
 
-
-           
+                <!-- Dropdown - Tipo de campo -->
+                <div class="relative">
+                    {{ form.tipo_campo }}
+                    <i class="bi bi-caret-down-fill absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
+                </div>
+            </div>
+        
+            <!-- Field: Tipo Solo -->
+            <div class="field">
+                <label for="{{ form.tipo_solo.id_for_label }}" class="block font-semibold text-lg">{{ form.tipo_solo.label }}</label>
+                {{ form.tipo_solo }}
+            </div>
+        
+            <!-- Submit Button -->
+            <div class="field mt-6">
+                <button id="submit-button" type="button" class="w-full px-3 py-6 bg-gray-300 rounded-lg font-bold text-xl mt-6">Concluir</button>
+            </div>
         </form>
+        
+        
+        {% if form.errors %}
+            <div class="error-messages">
+                <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
 
          <!-- Botão de envio -->
-         <button id="submit-button" type="button" class="w-full px-3 py-6 bg-gray-300 rounded-lg font-bold text-xl mt-24">Concluir</button>
 
-        <script>
+
+         <script>
             document.addEventListener("DOMContentLoaded", function () {
                 const submitButton = document.getElementById("submit-button");
                 const editForm = document.getElementById("edit-form");
                 const modalContainer = document.getElementById("popup-container");
                 const modalContent = document.getElementById("popup-modal");
-
+        
                 submitButton.addEventListener("click", (event) => {
                     event.preventDefault();
                     console.log("Botão 'Concluir' clicado");
-
+        
+                    // Ensure the CSRF token is present in the request
+                    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
                     fetch(editForm.action, {
                         method: "POST",
                         body: new FormData(editForm),
                         headers: {
                             "X-Requested-With": "XMLHttpRequest",
+                            "X-CSRFToken": csrfToken,  // Include CSRF token here for security
                         },
                     })
                     .then(response => {
@@ -114,11 +110,13 @@
                     .then(data => {
                         console.log("Dados recebidos:", data);
                         if (data.success) {
-                            showModal();
+                            showModal(); // Show modal on success
+                            // Wait for the modal animation to finish before redirecting
                             setTimeout(() => {
                                 window.location.href = editForm.dataset.redirectUrl;
-                            }, 1500);
-
+                            }, 2000);  // Delay to match modal display duration
+        
+                            // Animate the modal content smoothly
                             anime({
                                 targets: modalContent,
                                 scale: [0.8, 1],
@@ -135,13 +133,14 @@
                         alert("Ocorreu um erro inesperado. Por favor, tente novamente.");
                     });
                 });
-
+        
                 function showModal() {
                     console.log("Exibir modal");
-                    modalContainer.classList.remove("hidden");
+                    modalContainer.classList.remove("hidden"); // Make the modal visible
                 }
             });
         </script>
+        
     </div>
 </body>
 </html>

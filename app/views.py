@@ -403,10 +403,10 @@ class DetalhesCampoView(LoginRequiredMixin, View):
             'options': get_fab_content('detalhes-campo.html', campo_id=campo_id),
             'tipos_plantas': tipos_plantas,
             'qtd_plantas': total_quantidade_plantada,
-            "current_page": "campos",
+            'current_page': "campos",
+            'campo_id': campo_id,
         }
         return render(request, 'detalhes_campo.html', context)
-
         
 
 class EditarCampoView(LoginRequiredMixin, View):
@@ -414,27 +414,22 @@ class EditarCampoView(LoginRequiredMixin, View):
 
     def get(self, request, campo_id):
         campo = get_object_or_404(Campo, id=campo_id, agricultor=request.user)
+        form = CampoForm(instance=campo)  # Create form with the existing campo data
         context = {
             'campo': campo,
-            'Campo': Campo
-            }
+            'form': form,  # Pass the form to the template
+        }
         return render(request, 'edicao_campo.html', context)
 
     def post(self, request, campo_id):
         campo = get_object_or_404(Campo, id=campo_id, agricultor=request.user)
-        print("REQUEST.POST:", request.POST)  
+        form = CampoForm(request.POST, instance=campo)  # Bind form with POST data
 
-        try:
-            campo.nome = request.POST.get('nome')
-            campo.descricao = request.POST.get('descricao')
-            campo.tipo_campo = request.POST.get('tipo_campo') 
-            campo.tipo_solo = request.POST.get('tipo_solo')  
-            campo.save()
+        if form.is_valid():  # Validate the form
+            form.save()  # Save the updated campo
             return JsonResponse({'success': True, 'message': 'Campo editado com sucesso'})
-        
-        except Exception as e: 
-            print(f"ERROR: {e}")  
-            return JsonResponse({'success': False, 'message': f'Erro ao editar o campo: {e}'})
+        else:
+            return JsonResponse({'success': False, 'message': 'Erro ao editar o campo', 'errors': form.errors})
         
 """ Landing Route """
 

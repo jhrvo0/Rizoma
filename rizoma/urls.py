@@ -51,4 +51,5 @@ urlpatterns = [
     path('criar-campo/', CriarCampoView.as_view(), name='criar-campo'),
 
     path('deletar-campos/', DeletarCamposView.as_view(), name='deletar-campos'),
+    path('editar-campo/<int:campo_id>/', EditarCampoView.as_view(), name='editar-campo'),
 ]

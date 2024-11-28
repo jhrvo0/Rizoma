@@ -48,9 +48,11 @@
             </div>
         {% endfor %}
     </div>
-    {% include 'components/component_modal.html' with message="Planta adicionada com sucesso!" link="campos" %}
+    
     <button id="show-modal-after-click" class="px-4 w-full mt-4 py-5 bg-gray-200 font-semibold rounded-lg mx-auto text-2xl text-center">
         <h1 class="ml-2">Concluir</h1>
     </button>
+
+    {% include 'components/component_modal.html' with message="Planta adicionada com sucesso!" link="campos" element_id="show-modal-after-click" %}
 </body>
 </html>

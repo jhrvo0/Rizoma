@@ -81,13 +81,12 @@ class CampoForm(forms.ModelForm):
         model = Campo
         fields = ['nome', 'tipo_campo', 'tipo_solo']
         labels = {
-            'nome': 'Nome do Campo',
-            'tipo_campo': 'Escolha um Tipo de Campo',
-            'tipo_solo': 'Escolha um Tipo de Solo',
+            'nome': 'Nomear Campo',
+            'tipo_campo': 'Adicionar descrição (opcional)',
         }
         widgets = {
             'nome': forms.TextInput(attrs={
-                'placeholder': 'Nome do campo',
+                'placeholder': 'Nomear campo',
                 'class': 'w-full p-3 bg-gray-200 rounded-lg'
             }),
             'tipo_campo': forms.Select(attrs={

@@ -1,3 +1,5 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -9,8 +11,8 @@
     <script src="https://unpkg.com/interactjs/dist/interact.min.js"></script>
     <style>
         .selected {
-            background-color: rgba(75, 85, 99, 0.8); /* bg-gray-700 */
-            border: 2px solid rgba(31, 41, 55, 1); /* border-gray-800 */
+            background-color: rgba(75, 85, 99, 0.8);
+            border: 2px solid rgba(31, 41, 55, 1);
         }
     </style>
 </head>
@@ -18,11 +20,31 @@
     <header class="p-4 flex items-center justify-between">
         <a href="{% url 'campos' %}" id="back-button" class="p-2">
             <i class="bi bi-arrow-left text-2xl"></i>
-            <span>teste</span>
         </a>
+
+        {# INICIO BOTÕES DE TOGGLE DE VISUALIZAÇÃO #}
+        <div class="flex rounded-md space-x-3 h-10">
+            <div class="grid grid-cols-[49%,2%,49%] divide-black rounded-lg">
+                <button id="ver_colunas" class="pr-2 pl-3 rounded-l-md bg-gray-400">
+                    <img src="{% static '/app/images/iconcoluna.svg' %}" class="h-6">
+                </button>
+                <div class="bg-gray-800"></div>
+                <button id="ver_grids" class="pr-3 pl-2 rounded-r-md bg-gray-200">
+                    <img src="{% static '/app/images/iconblocks.svg' %}" class="h-6">
+                </button>
+            </div>
+
+            <button type="button" class="flex items-center justify-center bg-gray-200 px-2 rounded-lg" onclick="window.location.href='{% url 'editar-campo' campo_id=campo_id %}'">
+                <img src="{% static '/app/images/iconeditar.svg' %}" class="h-6">
+            </button>
+            
+        </div>
+        {# FIM BOTÕES DE TOGGLE DE VISUALIZAÇÃO #}
+
+
     </header>
 
-    <main class="p-4 h-screen">
+    <main class="p-4 min-h-screen">
         <!-- Bloco para exibir nome ou barra de exclusão -->
         <div id="name-or-delete-bar" class="bg-gray-300 p-4 rounded-lg mb-6 flex items-center justify-between">
             <h1 id="campo-nome-text" class="text-xl font-bold text-center w-full">{{ campo.nome }}</h1>
@@ -36,6 +58,7 @@
             </div>
         </div>
 
+        {# INICIO VISUALIZAÇÃO COLUNAS #}
         <div id="columns-view" class="grid grid-cols-4 gap-1">
             {% for key, plantas in subcampo_no.items %}
                 {% if plantas %}
@@ -52,6 +75,25 @@
                 {% endif %}
             {% endfor %}
         </div>
+        {# FIM VISUALIZAÇÃO COLUNAS #}
+
+        {# INICIO VISUALIZAÇÃO GRID #}
+        <div id="grid-view" class="grid grid-cols-3 gap-1 hidden">
+            {% for key, plantas in subcampo_no.items %}
+                {% if plantas %}
+                        {% for planta_cultivada in plantas %}
+                            <div class="plant relative aspect-square bg-gray-200 rounded-lg flex flex-col items-center justify-center p-2 mx-1 mt-1" data-id="{{ planta_cultivada.id }}">
+                                <i class="bi bi-card-image text-4xl"></i>
+                                <span class="text-center text-sm">{{ planta_cultivada.planta.nome }}</span>
+                            </div>
+                        {% endfor %}
+                {% else %}
+                {% endif %}
+            {% endfor %}
+        </div>
+        {# FIM VISUALIZAÇÃO GRID #}
+
+        {# INICIO INFORMAÇÕES #}
         <div class="p-4 rounded-lg bg-gray-300 mt-6">
             <h2 class="text-lg font-bold mb-4 text-center">Informações</h2>
             <div class="space-y-2">
@@ -81,10 +123,10 @@
                 </div>
             </div>
         </div>
+        {# FIM INFORMAÇÕES #}
 
 
         <!-- Modal para confirmar exclusão -->
-
         <div id="confirm-delete-modal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
             <div class="bg-white p-6 rounded-lg w-80">
@@ -104,12 +146,43 @@
             </div>
         </div>
 
-
-        
     </main>
 
     {% include 'components/footer.html' %}
     {% include 'components/component_fab.html' with options=options %}
+
+    {# INICIO SCRIPT BOTÕES DE TOGGLE DE VISUALIZAÇÃO #}
+    <script>
+        document.addEventListener("DOMContentLoaded", (event) => {
+
+            toggle_one = document.getElementById("ver_colunas");
+            toggle_two = document.getElementById("ver_grids");
+            column_view = document.getElementById("columns-view");
+            grid_view = document.getElementById("grid-view");
+
+            toggle_one.addEventListener("click", () => {
+                toggle_one.classList.remove('bg-gray-200');
+                toggle_one.classList.add('bg-gray-400');
+                toggle_two.classList.remove('bg-gray-400');
+                toggle_two.classList.add('bg-gray-200');
+
+                grid_view.classList.add("hidden");
+                column_view.classList.remove("hidden");
+            });
+
+            toggle_two.addEventListener("click", () => {
+                toggle_two.classList.remove('bg-gray-200');
+                toggle_two.classList.add('bg-gray-400');
+                toggle_one.classList.remove('bg-gray-400');
+                toggle_one.classList.add('bg-gray-200');
+
+                grid_view.classList.remove("hidden");
+                column_view.classList.add("hidden");
+            });
+            
+        })
+    </script>
+    {# FIM SCRIPT BOTÕES DE TOGGLE DE VISUALIZAÇÃO #}
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
@@ -242,8 +315,5 @@
             });
         });
     </script>
-    
-    
-    
 </body>
 </html>

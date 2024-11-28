@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Homepage - Rizoma</title>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+		<script src="https://cdn.tailwindcss.com"></script>
+		<!-- Tailwind -->
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" />
+		<!-- Bootstrap icons -->
+	</head>
+	<body class="bg-gray-200 flex flex-col min-h-screen">
+		<!-- Barra de navegação -->
+		{% include "components/header.html" %}
+
+		<!-- Conteúdo Principal com Scroll -->
+		<main class="flex-1 w-full bg-white p-4 space-y-4 overflow-y-auto min-h-screen">
+			<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+				<!-- Mudança para grid -->
+
+				<!-- Novo contêiner de datas -->
+				{% include 'components/home_calendar.html' %}
+
+				<!-- Conteúdo repetido -->
+				<div class="bg-gray-100 flex items-center p-4 rounded-lg shadow-md hover:bg-gray-400">
+					<i class="bi bi-flower1 text-2xl text-gray-600"></i>
+					<div class="ml-4 flex-1">
+						<h2 class="text-gray-800 font-semibold">Quinta</h2>
+						<p class="text-gray-600 text-sm">...</p>
+					</div>
+				</div>
+			</div>
+
+			<!-- Novo contêiner 1 -->
+			<div class="bg-gray-100 p-4 rounded-lg shadow-md hover:bg-gray-400">
+				<div class="flex gap-3">
+					<i class="bi bi-list-check text-2xl text-gray-600"></i>
+					<h2 class="text-gray-800 font-semibold my-auto">Atividades de hoje</h2>
+				</div>
+				<div class="ml-4 flex-1">
+					<ul class="list-disc list-inside text-gray-700">
+						<li>lorem ipsum</li>
+						<li>lorem ipsum</li>
+						<li>lorem ipsum</li>
+					</ul>
+				</div>
+			</div>
+
+			<!-- Novo contêiner 2 -->
+			<div class="bg-gray-100 p-4 rounded-lg shadow-md hover:bg-gray-400">
+				<div class="flex gap-3">
+					<i class="bi bi-list-check text-2xl text-gray-600"></i>
+					<h2 class="text-gray-800 font-semibold my-auto">Entrega dos produtos</h2>
+				</div>
+
+				<div class="ml-4 flex-1">
+					<ul class="list-disc list-inside text-gray-700">
+						<li>lorem ipsum</li>
+						<li>lorem ipsum</li>
+						<li>lorem ipsum</li>
+					</ul>
+				</div>
+			</div>
+		</main>
+
+		<!-- Sidebar -->
+		{% include 'components/sidebar.html' %}
+
+		<!-- Footer -->
+		{% include 'components/footer.html' with current_page=current_page %}
+
+		<!-- FAB -->
+		{% include 'components/fab_home.html' %}
+	</body>
+</html>

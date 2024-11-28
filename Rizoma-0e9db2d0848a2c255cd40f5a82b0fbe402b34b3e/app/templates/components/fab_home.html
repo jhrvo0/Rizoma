@@ -1,0 +1,47 @@
+<!-- Botão FAB -->
+<button id="fab-btn" class="fixed right-8 bottom-24 bg-gray-500 text-white p-4 rounded-full shadow-lg focus:outline-none">
+	<i id="fab-icon" class="bi bi-plus-lg text-2xl"></i>
+</button>
+
+<!-- Popup para menu perto do FAB -->
+<div id="popup-menu" class="fixed right-4 bottom-40 w-64 bg- p-4 hidden">
+	<!-- Elementos do popup próximo ao FAB-->
+	<button id="close-popup" class="absolute top-2 right-2 text-gray-800"></button>
+	<div class="flex justify-end">
+		<ul class="space-y-3">
+			<li class="bg-slate-600 rounded-xl px-8 py-1 flex items-center gap-4">
+				<i class="bi bi-house-fill text-gray-800 text-2xl"></i>
+				<a href="#" class="text-white gray-800 text-md hover:underline">Clientes</a>
+			</li>
+			<li class="bg-slate-600 rounded-xl px-8 py-1 flex items-center gap-4">
+				<i class="bi bi-house-fill text-gray-800 text-2xl"></i>
+				<a href="#" class="text-white gray-800 text-md hover:underline">Clientes</a>
+			</li>
+			<li class="bg-slate-600 rounded-xl px-8 py-1 flex items-center gap-4">
+				<i class="bi bi-house-fill text-gray-800 text-2xl"></i>
+				<a href="#" class="text-white gray-800 text-md hover:underline">Clientes</a>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<!-- Script para controlar o popup -->
+<script>
+	const fabBtn = document.getElementById("fab-btn");
+	const popupMenu = document.getElementById("popup-menu");
+	const closePopup = document.getElementById("close-popup");
+	const fabIcon = document.getElementById("fab-icon");
+
+	fabBtn.addEventListener("click", () => {
+		popupMenu.classList.toggle("hidden");
+
+		// Alterna o ícone entre "+" e "x"
+		if (popupMenu.classList.contains("hidden")) {
+			fabIcon.classList.remove("bi-x-lg");
+			fabIcon.classList.add("bi-plus-lg");
+		} else {
+			fabIcon.classList.remove("bi-plus-lg");
+			fabIcon.classList.add("bi-x-lg");
+		}
+	});
+</script>

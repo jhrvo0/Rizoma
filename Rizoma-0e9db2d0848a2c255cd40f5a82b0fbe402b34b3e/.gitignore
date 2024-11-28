@@ -1,0 +1,14 @@
+# Ignorar a venv que o usuário criar
+venv/
+
+# Ignorar bancos de dados locais 
+*.sqlite3
+
+# Ignorar o diretorio migrations
+migrations/
+
+# Ignorar arquivo environment
+*.env
+
+# Ignorar Pycache
+__pycache__/

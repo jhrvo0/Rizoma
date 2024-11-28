@@ -1,0 +1,12 @@
+{% for campo in campos %}
+<a href="{% url 'detalhes-campo' campo.id %}">
+	<div class="bg-gray-300 my-2 p-4 rounded-lg shadow-md grid grid-cols-[100px_1fr] grid-rows-[100px_1fr]">
+		<div class="flex items-center justify-center bg-gray-200 rounded-lg w-full h-full">
+			<i class="bi {{ campo.icon }} text-4xl text-gray-600"></i>
+		</div>
+		<div class="flex items-center my-auto p-4">
+			<h2 class="text-gray-800 font-semibold">{{ campo.nome }}</h2>
+		</div>
+	</div>
+</a>
+{% endfor %}

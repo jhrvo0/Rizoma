@@ -19,6 +19,7 @@ if NOT_PROD:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+    WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
 else:
     WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
     SECRET_KEY = os.getenv('SECRET_KEY')

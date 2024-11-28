@@ -89,8 +89,8 @@
           hideModal();
       });
 
-      if (document.getElementById("show-modal-after-click")) {
-        const btn = document.getElementById("show-modal-after-click");
+      if (document.getElementById("{{ element_id }}")) {
+        const btn = document.getElementById("{{ element_id }}");
         btn.addEventListener("click", function (event) {
             showModal();
         });

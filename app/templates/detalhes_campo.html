@@ -18,18 +18,15 @@
     <header class="p-4 flex items-center justify-between">
         <a href="{% url 'campos' %}" id="back-button" class="p-2">
             <i class="bi bi-arrow-left text-2xl"></i>
+            <span>teste</span>
         </a>
-
     </header>
 
     <main class="p-4 h-screen">
         <!-- Bloco para exibir nome ou barra de exclusão -->
         <div id="name-or-delete-bar" class="bg-gray-300 p-4 rounded-lg mb-6 flex items-center justify-between">
             <h1 id="campo-nome-text" class="text-xl font-bold text-center w-full">{{ campo.nome }}</h1>
-            <div
-                id="delete-bar"
-                class="hidden w-full flex items-center gap-3"
-            >
+            <div id="delete-bar" class="hidden w-full flex items-center gap-3">
                 <button id="cancel-selection" class="text-white bg-gray-500 px-4 py-2 rounded-lg">
                     <i class="text-xl bi bi-x"></i>
                 </button>

@@ -59,7 +59,7 @@
     </div>
 </div>
 
-{% include 'components/component_modal.html' with message="Campo deletado com sucesso!" link="campos" %}
+{% include 'components/component_modal.html' with message="Campo deletado com sucesso!" link="campos" element_id='confirm-delete' %}
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
@@ -195,11 +195,14 @@
 
                     clearSelections();
                     toggleDeleteMode(false);
-                    showModal();
+
                 } else {
                     alert('Erro: ' + data.message);
                     window.location.reload();
                 }
+            })
+            .then(() => {
+                try {showModal();}catch{}
             })
             .catch((error) => {
                 console.error(error);

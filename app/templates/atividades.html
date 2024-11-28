@@ -48,7 +48,7 @@
         <a href="{% url 'calendario' %}">
           <i class="bi bi-arrow-left text-2xl cursor-pointer"></i>
         </a>
-        <h1 class="text-2xl font-bold">Tarefas ({{ num_tarefas }})</h1>
+        <h1 class="text-2xl font-bold">Tarefas ({{ count }})</h1>
       </div>
 
       <!-- Barra de Pesquisa -->
@@ -105,10 +105,10 @@
           </div>
           <div>
             <select id="campoSelect" class="w-full mt-1 p-2 border border-gray-300 rounded-md" required>
-              <option value="" disabled selected>Selecionar campo</option>
-              {% for terreno in terrenos %}
-                  <option value="{{ terreno.id }}" {% if terreno.id == terreno_atual.id %}selected{% endif %}>{{ terreno.nome }}</option>
-              {% endfor %}
+                <option value="" disabled selected>Selecionar campo</option>
+                {% for terreno in terrenos %}
+                    <option value="{{ terreno.id }}" {% if terreno.id == terreno_atual.id %}selected{% endif %}>{{ terreno.nome }}</option>
+                {% endfor %}
           </select>
           </div>
           <div class="flex space-x-2">
@@ -175,22 +175,10 @@
     </div>
 
     <!-- Barra de Navegação -->
-    <div class="w-full bg-gray-300 p-4 flex justify-around items-center rounded-t-3xl sticky fixed bottom-0 z-50">
-      <a href="{% url 'home' %}" class="flex items-center justify-center h-12 w-12 {% if current_page == 'home' %}bg-white ring-2 ring-gray-700{% else %}bg-gray-400{% endif %} rounded-full shadow-lg">
-        <i class="bi bi-house"></i>
-      </a>
-      <a href="{% url 'campos' %}" class="flex items-center justify-center h-12 w-12 {% if current_page == 'campos' %}bg-white ring-2 ring-gray-700{% else %}bg-gray-400{% endif %} rounded-full shadow-lg">
-        <i class="bi bi-tree"></i>
-      </a>
-      <a href="{% url 'calendario' %}" class="flex items-center justify-center h-12 w-12 {% if current_page == 'calendario' %}bg-white ring-2 ring-gray-700{% else %}bg-gray-400{% endif %} rounded-full shadow-lg">
-        <i class="bi bi-calendar"></i>
-      </a>
-      <a href="{% url 'perfil' %}" class="flex items-center justify-center h-12 w-12 {% if current_page == 'perfil' %}bg-white ring-2 ring-gray-700{% else %}bg-gray-400{% endif %} rounded-full shadow-lg">
-        <i class="bi bi-person"></i>
-      </a>
-    </div>
+    {% include 'components/footer.html' with current_page='calendario' %}
 
     <script>
+      
       function openAddEventModal() {
         const addEventModal = document.getElementById('addEventModal');
         if (addEventModal) {
@@ -236,7 +224,7 @@
         const today = new Date().toISOString().split('T')[0];
 
         function fetchAtividades(dateRange) {
-          fetch(`/atividades/${dateRange}/`)
+          fetch(`/atividades-do-dia/${dateRange}/`)
             .then((response) => {
               if (!response.ok) {
                 throw new Error("Network response was not ok");
@@ -302,7 +290,7 @@
           event.preventDefault();
           
           const nome = document.getElementById('eventName').value;
-          const descricao = document.getElementById('eventDescription').value;
+          const descricao = document.getElementById('eventDesc').value;
           const data_inicio = startDateInput.value;
           const data_fim = endDateInput.value;
           const campo_ids = [document.getElementById('campoSelect').value];
@@ -324,7 +312,7 @@
 
           console.log('Enviando dados:', data); // Adiciona log para verificar os dados enviados
 
-          fetch('/calendario/', {
+          fetch('/atividades/', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

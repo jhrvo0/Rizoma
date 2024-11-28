@@ -1,10 +1,10 @@
-<div class="flex-1" id="atividades-container">
+<div id="atividades-container" class=" space-y-4 align-center justify-center">
   {% if atividades_hoje %}
     <ul class="text-gray-700">
       {% for evento in atividades_hoje %}
       <li class="flex items-center gap-4 bg-gray-300 rounded-xl my-4">
         <div style="background-color: {{ evento.cor }};" class="w-2 h-20 rounded-l-lg"></div>
-                <div class="flex flex-col">
+          <div class="flex flex-col">
           <span class="text-2xl font-bold mt-2">{{ evento.nome }}</span>
           <span class="mb-2 text-l">{{ evento.campos.nome }}</span>
         </div>
@@ -12,6 +12,9 @@
       {% endfor %}
     </ul>
   {% else %}
-    <p class="text-gray-600 font-bold bg-gray-400 rounded-xl p-3 text-center">Nenhuma atividade agendada para hoje.</p>
+    <p class="text-gray-600 font-bold bg-gray-400 rounded-xl p-3 text-center w-full mb-4">Nenhuma atividade agendada para hoje.</p>
   {% endif %}
+  <a class="mx-auto text-center" href="{% url 'lista_de_atividades' %}">
+    <button class="bg-gray-600 text-white px-8 py-4 rounded-lg font-bold text-xl w-full">Ver todas as atividades</button>
+  </a>
 </div>

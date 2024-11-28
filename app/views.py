@@ -190,6 +190,7 @@ class VisualizarCampoView(LoginRequiredMixin, View):
                 html = '<div class="p-4 rounded-lg text-center"><p class="text-gray-600 font-semibold">Nenhum campo encontrado.</p></div>'
 
             return JsonResponse({"html": html})
+        
         else:
             return JsonResponse({"error": "Invalid request"}, status=400)
 
@@ -401,7 +402,8 @@ class DetalhesCampoView(LoginRequiredMixin, View):
             'plantas': Planta.objects.all(),
             'options': get_fab_content('detalhes-campo.html', campo_id=campo_id),
             'tipos_plantas': tipos_plantas,
-            'qtd_plantas': total_quantidade_plantada
+            'qtd_plantas': total_quantidade_plantada,
+            "current_page": "campos",
         }
         return render(request, 'detalhes_campo.html', context)
 
@@ -483,6 +485,7 @@ def get_atividades_por_data(request, data):
 """ Calendário """
 
 class CalendarioView(LoginRequiredMixin, View):
+    login_url = '/login/'
 
     def get(self, request):
         terrenos = list(request.user.campos.all())
@@ -513,6 +516,47 @@ class CalendarioView(LoginRequiredMixin, View):
             terreno_proximo = None
             eventos = []
 
+        weather_data = get_weather_data('Carpina')
+
+        moon = weather_data["moon_phase"]
+        translated_moon = "moon"
+
+        if moon == "New Moon":
+            translated_moon = "Lua Nova"
+        elif moon == "Waxing Crescent":
+            translated_moon = "Crescente"
+        elif moon == "First Quarter":
+            translated_moon = "Quarto Crescente"
+        elif moon == "Waxing Gibbous":
+            translated_moon = "Gibosa Crescente"
+        elif moon == "Full Moon":
+            translated_moon = "Lua Cheia"
+        elif moon == "Waning Gibbous":
+            translated_moon = "Gibosa Minguante"
+        elif moon == "Last Quarter" or moon == "Third Quarter":
+            translated_moon = "Quarto Minguante"
+        elif moon == "Waning Crescent":
+            translated_moon = "Minguante"
+        else:
+            translated_moon = "Fase lunar desconhecida"
+        
+        if weather_data:
+            weather_context = {
+                "city": weather_data["city"],
+                "temperature": weather_data["temperature"],
+                "condition": weather_data["condition"],
+                "icon": weather_data["icon"],
+                "moon_phase": translated_moon
+            }
+        else:
+            weather_context = {
+                "city": "N/A",
+                "temperature": "N/A",
+                "condition": "N/A",
+                "icon": "N/A",
+                "moon_phase": "N/A"
+            }
+
         context = {
             "eventos": json.dumps(eventos),
             "terreno_atual": terreno_atual,
@@ -520,8 +564,10 @@ class CalendarioView(LoginRequiredMixin, View):
             "terreno_proximo": terreno_proximo,
             "terrenos": terrenos,
             "current_page": "calendario",
-            "cores": cores
+            "cores": cores,
+            **weather_context
         }
+
         return render(request, 'calendario.html', context)
 
     @method_decorator(csrf_exempt, name='dispatch')
@@ -543,7 +589,6 @@ class CalendarioView(LoginRequiredMixin, View):
                 data_fim=data_fim,
                 cor=cor,
                 campos=campo,
-                completa=False
             )
             return JsonResponse({'status': 'success', 'evento_id': evento.id})
         
@@ -553,28 +598,6 @@ class CalendarioView(LoginRequiredMixin, View):
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)})
 
-
-class WeatherView(View):
-    def get(self, request):
-        weather_data = get_weather_data('Carpina')
-        
-        if weather_data:
-            context = {
-                "city": weather_data["city"],
-                "temperature": weather_data["temperature"],
-                "condition": weather_data["condition"],
-                "icon": weather_data["icon"],
-                "moon_phase": weather_data["moon_phase"]
-            }
-        else:
-            context = {
-                "city": "N/A",
-                "temperature": "N/A",
-                "condition": "N/A",
-                "icon": "N/A",
-                "moon_phase": "N/A"
-            }
-        return render(request, 'weather.html', context)
     
         
 class ProfileView(LoginRequiredMixin, View):
@@ -631,12 +654,8 @@ def Filtrar_campos(request):
         return JsonResponse({"error": "Invalid request"}, status=400)
 
 
-def pagatividades(request):
-    eventos = Evento.objects.all()  # Obtenha todos os eventos
-    return render(request, 'atividades.html', {'eventos': eventos})
-
-
 class ListaPlantasView(LoginRequiredMixin, View):
+    login_url = '/login/'
     def get(self, request, campo_id):
         campo = get_object_or_404(Campo, id=campo_id)
         context = {
@@ -693,4 +712,37 @@ def get_fab_content(location, campo_id=None):
         ]
     return options
 
+class AtividadesView(LoginRequiredMixin, View):    
+    def get(self, request):
+        campos = request.user.campos.all()
+        eventos = Evento.objects.filter(campos__in=campos)
+        context = {
+            'atividades': eventos,
+            'count': eventos.count()
+        }
+        return render(request, "atividades.html", context)
 
+    @staticmethod
+    def get_atividades_do_dia(user, data):
+        return Evento.objects.filter(
+            data_inicio__lte=data,
+            data_fim__gte=data,
+            campos__agricultor=user
+        )
+
+def get_atividades_do_dia(request, data):
+    data = datetime.strptime(data, '%Y-%m-%d').date()
+    atividades = AtividadesView.get_atividades_do_dia(request.user, data)
+    context = {
+        'atividades_hoje': atividades, 
+        'qtd_atividades': atividades.count(),
+        'hoje': timezone.now().date()
+    }
+    html = render_to_string('components/atividades_lista.html', context)
+    return JsonResponse({'html': html})
+
+
+#def pagatividades(request):
+#    eventos = Evento.objects.all()  # Obtenha todos os eventos
+#    terrenos = Campo.objects.all()  # Obtenha todos os terrenos
+#    return render(request, 'atividades.html', {'eventos': eventos, 'terrenos': terrenos})

@@ -19,7 +19,9 @@ if NOT_PROD:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
+    WEATHER_API_KEY = '8fcd5222873b4123acd194947241211'
 else:
+    WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
     SECRET_KEY = os.getenv('SECRET_KEY')
     DEBUG = os.getenv('DEBUG', '0').lower() in ['true', 't', '1']
     ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(' ')
@@ -141,7 +143,7 @@ ACCOUNT_EMAIL_VERIFICATION = False
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
-WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
+
 
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',

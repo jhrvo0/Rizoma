@@ -37,13 +37,10 @@
 </style>
 
 <!-- Form -->
-<form method="get" action="{% url 'calendario' %}" id="terrenoForm" class="mb-8 py-4 mx-auto w-full px-5 container">
-    <select name="terreno_id" class="w-full p-2 border rounded-md bg-gray-500 text-white hover:bg-slate-400 focus:bg-slate-600 focus:text-white" onchange="document.getElementById('terrenoForm').submit();">
+<form method="get" action="{% url 'calendario' %}" id="terrenoForm" class="mb-8 py-4 mx-auto w-full container">
+    <select name="terreno_id" class="text-3xl w-full px-4 py-2 border rounded-md bg-gray-300 text-gray-700 hover:bg-slate-400 focus:bg-slate-600 focus:text-white" onchange="document.getElementById('terrenoForm').submit();">
         {% for terreno in terrenos %}
-            <option value="{{ terreno.id }}" 
-                {% if terreno.id == terreno_atual.id %} 
-                    selected 
-                {% endif %}>
+            <option value="{{ terreno.id }}" {% if terreno.id == terreno_atual.id %} selected {% endif %}>
                 {{ terreno.nome }}
             </option>
         {% endfor %}
@@ -54,11 +51,11 @@
 <!-- Calendario -->
 <div class="calendar-container bg-gray-300 rounded-lg py-4 mx-auto w-full px-5 container">
     <div class="flex items-center justify-between mb-4">
-        <button id="prevMonth" class="bg-slate-500 rounded-full px-2 text-lg font-bold text-white">
+        <button id="prevMonth" class="bg-slate-500 rounded-xl py-2 px-4 text-lg font-bold text-white">
             <i class="mx-auto bi bi-chevron-left"></i>
         </button>
         <h2 id="monthYear" class="text-xl font-semibold"></h2>
-        <button id="nextMonth" class="bg-slate-500 rounded-full px-2 text-lg font-bold text-white">
+        <button id="nextMonth" class="bg-slate-500 rounded-xl py-2 px-4 text-lg font-bold text-white">
             <i class="mx-auto bi bi-chevron-right"></i>
         </button>
     </div>
@@ -84,65 +81,62 @@
     </div>
 </div>
 
-    <!-- Modal de Adição de Evento -->
-    <div id="addEventModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-        <div class="bg-white p-6 rounded-lg w-80">
-          <h2 class="text-lg font-semibold mb-4 text-center"><strong>Nova tarefa</strong></h2>
-          <form id="addEventForm" class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Nome</label>
-              <input type="text" id="eventName" class="w-full mt-1 p-2 border border-gray-300 rounded-md bg-gray-200" placeholder="Nome da atividade" required>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Descrição</label>
-              <textarea id="eventDesc" class="w-full mt-1 p-2 border border-gray-300 rounded-md bg-gray-200" placeholder="Descreva sobre a atividade" rows="4" required></textarea>
-            </div>
-            <div>
-              <select id="campoSelect" class="w-full mt-1 p-2 border border-gray-300 rounded-md" required>
-                <option value="" disabled selected>Selecionar campo</option>
+<!-- Modal de Adição de Evento -->
+<div id="addEventModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white p-6 rounded-lg w-80">
+        <h2 class="text-lg font-semibold mb-4 text-center"><strong>Nova tarefa</strong></h2>
+        <form id="addEventForm" class="space-y-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Nome</label>
+            <input type="text" id="eventName" class="w-full mt-1 p-2 border border-gray-300 rounded-md bg-gray-200" placeholder="Nome da atividade" required>
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700">Descrição</label>
+            <textarea id="eventDesc" class="w-full mt-1 p-2 border border-gray-300 rounded-md bg-gray-200" placeholder="Descreva sobre a atividade" rows="4" required></textarea>
+        </div>
+
+        <div>
+            <select id="campoSelect" class="w-full mt-1 p-2 border border-gray-300 rounded-md" required>
+            <option value="" disabled selected>Selecionar campo</option>
                 {% for terreno in terrenos %}
                     <option value="{{ terreno.id }}" {% if terreno.id == terreno_atual.id %}selected{% endif %}>{{ terreno.nome }}</option>
                 {% endfor %}
             </select>
-            </div>
-            <div class="flex space-x-2">
-    <div class="w-1/2">
-        <label class="block text-sm font-medium text-gray-700 font-bold">Data de Início</label>
-        <div class="flex items-center mt-1 space-x-2">
-            <input type="date" id="eventStartDate" class="w-full p-1 border border-gray-300 rounded-md bg-gray-200" required>
         </div>
-    </div>
-    <div class="w-1/2">
-        <label class="block text-sm font-medium text-gray-700 font-bold">Data Final</label>
-        <div class="flex items-center mt-1 space-x-2">
-            <input type="date" id="eventEndDate" class="w-full p-1 border border-gray-300 rounded-md bg-gray-200" required>
+
+        <div class="flex space-x-2">
+            <div class="w-1/2">
+                <label class="block text-sm text-gray-700 font-bold">Data de Início</label>
+                <div class="flex items-center mt-1 space-x-2">
+                    <input type="date" id="eventStartDate" class="w-full p-1 border border-gray-300 rounded-md bg-gray-200" required>
+                </div>
+            </div>
+            <div class="w-1/2">
+                <label class="block text-sm text-gray-700 font-bold">Data Final</label>
+                <div class="flex items-center mt-1 space-x-2">
+                    <input type="date" id="eventEndDate" class="w-full p-1 border border-gray-300 rounded-md bg-gray-200" required>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-sm text-gray-700 font-bold">Cor da atividade</label>
+            <div id="colorOptions" class="flex space-x-2 mt-1">
+                <!-- Cores com quadrados clicáveis -->
+                {% for cor in cores %}
+                    <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="{{cor}}" style="background-color: {{cor}};"></div> <!-- Isso funciona, a IDE que tá surtando, não é pra corrigir -->
+                {% endfor %}
+            </div>
+            <input type="hidden" id="eventColor" value="#FF5733">
+        </div>
+
+        <div class="flex justify-center mt-4 space-x-4">
+            <button type="button" onclick="closeAddEventModal()" class="bg-white border-2 border-gray-500 text-gray-500 py-2 px-8 rounded-md font-bold">Cancelar</button>
+            <button type="submit" class="bg-gray-500 text-white py-2 px-8 rounded-md font-bold">Concluir</button>
         </div>
     </div>
 </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 text-lg font-bold">Cor da atividade</label>
-              <div id="colorOptions" class="flex space-x-2 mt-1">
-                <!-- Cores com quadrados clicáveis -->
-                <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#FF0000" style="background-color: #FF0000;"></div>
-                <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#FD7E14" style="background-color: #FD7E14;"></div>
-                <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#FFC107" style="background-color: #FFC107;"></div>
-                <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#28A745" style="background-color: #28A745;"></div>
-                <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#007BFF" style="background-color: #007BFF;"></div>
-                <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#8A2BE2" style="background-color: #8A2BE2;"></div>
-                <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#FF5733" style="background-color: #FF5733;"></div>
-                <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#17A2B8" style="background-color: #17A2B8;"></div>
-                <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#DA70D6" style="background-color: #DA70D6;"></div>
-                <div class="color-square p-1 w-6 h-6 cursor-pointer rounded" data-color="#FFFF00" style="background-color: #FFFF00;"></div>
-              </div>
-              <input type="hidden" id="eventColor" value="#FF5733">
-            </div>
-            <div class="flex justify-center mt-4 space-x-4">
-              <button type="button" onclick="closeAddEventModal()" class="bg-white border-2 border-gray-500 text-gray-500 py-2 px-8 rounded-md font-bold">Cancelar</button>
-              <button type="submit" class="bg-gray-500 text-white py-2 px-8 rounded-md font-bold">Concluir</button>
-            </div>
-          </form>
-        </div>
-      </div>
 
 <!-- Confirmar remoção -->
 <div id="confirmRemoveModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
@@ -166,7 +160,6 @@
 </div>
 
 <!-- JS -->
-
 <script>
     const addEventForm = document.getElementById('addEventForm');
     const eventModal = document.getElementById('eventModal');
@@ -395,7 +388,7 @@
         const nome = document.getElementById('eventName').value;
         const descricao = document.getElementById('eventDesc').value;
         const data_inicio = selectedDate;
-        const data_fim = document.getElementById('singleDay').checked ? data_inicio : document.getElementById('eventEndDate').value;
+        const data_fim = document.getElementById('eventEndDate');
         const cor = document.getElementById('eventColor').value;
         const campoId = document.getElementById('campoSelect').value;
 
@@ -450,15 +443,18 @@
         const eventColorInput = document.getElementById('eventColor');
         const colorOptions = document.getElementById('colorOptions');
         const eventStartDateInput = document.getElementById('eventStartDate');
+        const eventEndDateInput = document.getElementById('eventEndDate');
 
-        colorOptions.addEventListener('click', (event) => {
-            const option = event.target.closest('.color-square');
-            if (option) {
-                colorOptions.querySelectorAll('.color-square').forEach(opt => opt.classList.remove('ring-2', 'ring-offset-2', 'ring-blue-500'));
-                option.classList.add('ring-2', 'ring-offset-2', 'ring-blue-500');
-                eventColorInput.value = option.getAttribute('data-color');
-            }
-        });
+        if (colorOptions) {
+            colorOptions.addEventListener('click', (event) => {
+                const option = event.target.closest('.color-square');
+                if (option) {
+                    colorOptions.querySelectorAll('.color-square').forEach(opt => opt.classList.remove('ring-2', 'ring-offset-2', 'ring-blue-500'));
+                    option.classList.add('ring-2', 'ring-offset-2', 'ring-blue-500');
+                    eventColorInput.value = option.getAttribute('data-color');
+                }
+            });
+        }
 
         // Adiciona evento de clique aos dias do calendário
         document.querySelectorAll('.calendar-day').forEach(day => {
@@ -468,6 +464,64 @@
                     eventStartDateInput.value = clickedDate;
                     openAddEventModal();
                 }
+            });
+        });
+
+        // Adiciona evento de envio ao formulário de adição de evento
+        document.getElementById('addEventForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const eventName = document.getElementById('eventName').value;
+            const eventDesc = document.getElementById('eventDesc').value;
+            const campoSelect = document.getElementById('campoSelect').value;
+            const eventStartDate = eventStartDateInput.value;
+            const eventEndDate = eventEndDateInput.value;
+            const eventColor = eventColorInput.value;
+
+            // Verifique se todas as variáveis estão definidas
+            if (!eventName || !eventDesc || !campoSelect || !eventStartDate || !eventEndDate || !eventColor) {
+                alert('Por favor, preencha todos os campos.');
+                return;
+            }
+
+            const event = {
+                nome: eventName,
+                descricao: eventDesc,
+                terreno_id: campoSelect,
+                data_inicio: eventStartDate,
+                data_fim: eventEndDate,
+                cor: eventColor
+            };
+
+            // Enviar o evento para o servidor
+            fetch('/adicionar_evento/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify(event)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    event.id = data.evento_id;
+                    events.push(event);
+                    closeAddEventModal();
+                    loadCalendar();
+                    displayEvents(selectedDate);
+                    showConfirmationModal(); // Exibe o modal de confirmação
+                } else {
+                    console.error('Erro ao adicionar evento:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erro na requisição:', error);
+                alert('Algo deu errado ao adicionar o evento. Verifique o console para mais detalhes.');
             });
         });
     });

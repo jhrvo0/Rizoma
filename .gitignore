@@ -1,0 +1,15 @@
+# Ignorar a venv que o usuário criar
+venv/
+.venv
+
+# Ignorar o diretorio migrations
+migrations/
+
+# Ignorar arquivo environment
+*.env
+
+# Ignorar Pycache
+__pycache__/
+
+node_modules/
+.github/

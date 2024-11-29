@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Campos - Rizoma</title>
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+		<script src="https://cdn.tailwindcss.com"></script>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" />
+	</head>
+	<body class="flex flex-col min-h-screen">
+		<!-- Barra de Navegação Sticky usando Tailwind -->
+		{% include "components/header.html" %}
+
+		<!-- Conteúdo Principal com Scroll -->
+		<main class="flex-1 w-full bg-white px-4 py-2 space-y-16 rounded-t-3xl overflow-y-auto">
+			<!-- Lista de Campos -->
+			<div id="lista-campos" class="">
+				{% if campos %} {% include "components/lista_campos.html" %} {% else %}
+				<div class="p-4 rounded-lg shadow-md">
+					<h2 class="text-center font-bold">Clique no "+" e adicione um campo para continuar</h2>
+				</div>
+				{% endif %}
+			</div>
+		</main>
+
+		<!-- Sidebar -->
+		{% include "components/sidebar.html" %}
+
+		<!-- Menu opções rodapé Sticky usando Tailwind -->
+		{% include 'components/footer.html' with current_page=current_page %}
+
+		<!-- Modal Popup Adicionar Campo -->
+		{% include 'components/fab_campos.html' with campos=campos current_page=current_page %}
+	</body>
+</html>

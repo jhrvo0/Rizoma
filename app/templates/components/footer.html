@@ -1,0 +1,23 @@
+{% load static %}
+
+<div class="w-full bg-gray-300 p-4 flex justify-around items-center rounded-t-3xl sticky fixed bottom-0 z-50">
+	<a href="{% url 'home' %}" class="flex items-center justify-center h-12 w-12 {% if current_page == 'home' %}bg-white ring-2 ring-gray-700{% else %}bg-gray-400{% endif %} rounded-full shadow-lg">
+		<i class="bi bi-circle"></i>
+		<!-- <img src="{% static 'app/images/home_filled.svg' %}" alt="Home Icon" class="h-6 w-6" /> -->
+	</a>
+
+	<a href="{% url 'campos' %}" class="flex items-center justify-center h-12 w-12 {% if current_page == 'campos' %}bg-white ring-2 ring-gray-700{% else %}bg-gray-400{% endif %} rounded-full shadow-lg">
+		<i class="bi bi-circle"></i>
+		<!-- <img src="{% static 'app/images/sign_filled.svg' %}" alt="Home Icon" class="h-6 w-6" /> -->
+	</a>
+
+	<a href="{% url 'home' %}" class="flex items-center justify-center h-12 w-12 {% if current_page == 'agenda' %}bg-white ring-2 ring-gray-700{% else %}bg-gray-400{% endif %} rounded-full shadow-lg">
+		<i class="bi bi-circle"></i>
+		<!-- <img src="{% static 'app/images/calendar_filled.svg' %}" alt="Home Icon" class="h-6 w-6" /> -->
+	</a>
+
+	<a href="{% url 'home' %}" class="flex items-center justify-center h-12 w-12 {% if current_page == 'clientes' %}bg-white ring-2 ring-gray-700{% else %}bg-gray-400{% endif %} rounded-full shadow-lg">
+		<i class="bi bi-circle"></i>
+		<!-- <img src="{% static 'app/images/box_filled.svg' %}" alt="Home Icon" class="h-6 w-6" /> -->
+	</a>
+</div>

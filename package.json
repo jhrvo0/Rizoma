@@ -1,0 +1,14 @@
+{
+  "name": "rizoma",
+  "version": "1.0.0",
+  "description": "Rizoma é um projeto desenvolvido para auxiliar pequenos agricultores a gerenciar suas atividades de plantio, colheita e manejo de forma simples e eficiente.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cypress": "^13.16.0"
+  }
+}

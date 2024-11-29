@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
 from django.views import View
 from .models import Agricultor, Campo, PlantaCultivada, Planta
-from .forms import LoginForm, RegistrationForm, CampoForm, PlantaCultivadaForm, ProfileForm
+from .forms import LoginForm, RegistrationForm, CampoForm, PlantaCultivadaForm
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -446,34 +446,7 @@ class HomeView(LoginRequiredMixin, View):
             'options': get_fab_content('home.html'),
         }
         return render(request, 'home.html', context)
-    
-        
-class ProfileView(LoginRequiredMixin, View):
-    login_url = '/login/'
-    def get(self, request):
-        user = request.user
-        form = ProfileForm(instance=user)
-        context = {
-            'form': form,
-            'nome': user.username,
-            'email': user.email,
-            'quantidade_campos': user.campos.count(),
-        }
-        return render(request, 'perfil.html', context)
-    def post(self, request):
-        user = request.user
-        form = ProfileForm(request.POST, request.FILES, instance=user)
-        if form.is_valid():
-            form.save()
-            return redirect('perfil')
-        context = {
-            'form': form,
-            'nome': user.username,
-            'email': user.email,
-            'quantidade_campos': user.campos.count(),
-        }
-        return render(request, 'perfil.html', context)
-    
+            
 def Filtrar_campos(request):
     if request.method == "GET" and request.headers.get("X-Requested-With") == "XMLHttpRequest":
         nome = request.GET.get("nome", "").strip().upper()  # Converter o nome para maiúsculas

@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from app.views import HomeView, LoginView, LogoutView, CadastrarView, VisualizarCampoView, CriarCampoView, EditarCampoView, AdicionarPlantaNoCampoView, DetalhesCampoView, LandingView, google_login, DeletarCamposView, DeletarPlantaView, ProfileView, Filtrar_campos, ListaPlantasView, DetalhePlantaView, EditarPlantasNoCampoView
+from app.views import HomeView, LoginView, LogoutView, CadastrarView, VisualizarCampoView, CriarCampoView, EditarCampoView, AdicionarPlantaNoCampoView, DetalhesCampoView, LandingView, google_login, DeletarCamposView, DeletarPlantaView, Filtrar_campos, ListaPlantasView, DetalhePlantaView, EditarPlantasNoCampoView
 from app.views import SelecionarQuantidadeParaAdicionarPlantaView, SelecionarSubcampoParaAdicionarPlantaView
 
 urlpatterns = [
@@ -19,7 +19,6 @@ urlpatterns = [
 
     path('deletar-planta/<int:planta_id>/', DeletarPlantaView.as_view(), name='deletar-planta'),
     path('filtrar-campos/', Filtrar_campos, name='Filtrar-campos'),
-    path('perfil/', ProfileView.as_view(), name='perfil'),
 
     path('planta/<int:id>/', DetalhePlantaView.as_view(), name='detalhe-planta'),
 

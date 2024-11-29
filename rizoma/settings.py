@@ -19,9 +19,7 @@ if NOT_PROD:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-    WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
 else:
-    WEATHER_API_KEY = os.getenv('WEATHER_API_KEY')
     SECRET_KEY = os.getenv('SECRET_KEY')
     DEBUG = os.getenv('DEBUG', '0').lower() in ['true', 't', '1']
     ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(' ')
@@ -54,7 +52,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'clearcache',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',

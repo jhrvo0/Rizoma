@@ -128,13 +128,3 @@ class PlantaCultivadaForm(forms.ModelForm):
             raise forms.ValidationError('A quantidade plantada deve ser maior que 0.')
         return quantidade
     
-class ProfileForm(forms.ModelForm):
-    class Meta:
-        model = Agricultor
-        fields = ['username']
-        labels = {
-            'username': 'Nome',
-        }
-        widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-control'}),
-            }

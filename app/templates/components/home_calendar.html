@@ -1,0 +1,43 @@
+<div id="date-container" class="p-4 bg-gray-100 rounded-lg shadow-md">
+	<div id="current-date" class="text-lg text-center font-semibold mb-4"></div>
+	<div class="flex justify-between" id="date-range">
+		<!-- As datas serão inseridas aqui via JavaScript -->
+	</div>
+</div>
+
+<script>
+	// Script para exibir o intervalo de datas
+	document.addEventListener("DOMContentLoaded", function () {
+		const currentDate = new Date();
+		const dateRange = [];
+		for (let i = -2; i <= 2; i++) {
+			const date = new Date(currentDate);
+			date.setDate(currentDate.getDate() + i);
+			dateRange.push(date);
+		}
+
+		const formatDate = (date) => date.getDate();
+		const formatDay = (date) => date.toLocaleString("pt-BR", { weekday: "short" }).slice(0, 3);
+		const formatMonthYear = (date) => date.toLocaleString("pt-BR", { month: "long", day: "numeric" });
+
+		document.getElementById("current-date").textContent = `Hoje, ${formatMonthYear(currentDate)}`;
+
+		const dateContainer = document.getElementById("date-range");
+		dateRange.forEach((date) => {
+			const dateElement = document.createElement("div");
+			dateElement.className = `flex flex-col items-center`;
+
+			const dayElement = document.createElement("div");
+			dayElement.className = "text-xs text-gray-500 mb-1";
+			dayElement.textContent = formatDay(date);
+
+			const dateNumberElement = document.createElement("div");
+			dateNumberElement.className = `w-10 h-10 flex items-center justify-center rounded-full ${date.getDate() === currentDate.getDate() ? "bg-gray-500 text-white" : "text-gray-700"}`;
+			dateNumberElement.textContent = formatDate(date);
+
+			dateElement.appendChild(dayElement);
+			dateElement.appendChild(dateNumberElement);
+			dateContainer.appendChild(dateElement);
+		});
+	});
+</script>

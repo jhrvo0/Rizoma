@@ -50,6 +50,25 @@ O objetivo do Rizoma é fornecer uma solução digital que auxilie os agricultor
 
 <br>
 
+# 📝 Status Report 2 (SR2)
+
+## [Screencast Atualizado do Protótipo](https://studio.youtube.com/video/fk9GVSEP7UY/edit)
+
+Neste vídeo, apresentamos as atualizações feitas no protótipo do sistema Rizoma, destacando as melhorias implementadas com base no feedback recebido.
+
+## [Screencast de Configuração de CI/CD](https://youtu.be/2TvaxQGfyNc)
+
+O screencast demonstra a configuração do pipeline de CI/CD utilizando o GitHub Actions, incluindo deploy automatizado no Azure App Service, garantindo agilidade no processo de desenvolvimento.
+
+## [Testes E2E](https://www.youtube.com/watch?v=MN8Z5-igNTU)
+
+Apresentamos a execução de testes End-to-End (E2E) no sistema, validando funcionalidades críticas e garantindo a confiabilidade do sistema em diferentes cenários.
+
+## [Pipeline no GitHub Actions](https://youtu.be/cIDXNMTYtvE)
+
+Este vídeo explora em detalhes a configuração do pipeline no GitHub Actions, incluindo a integração contínua e as etapas de build, testes e deploy automatizado.
+
+
 ## 💻 Tecnologias Utilizadas
 |   |  |
 | :---: | :---: |

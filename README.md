@@ -52,7 +52,7 @@ O objetivo do Rizoma é fornecer uma solução digital que auxilie os agricultor
 
 # 📝 Status Report 2 (SR2)
 
-## [Screencast Atualizado do Protótipo](https://studio.youtube.com/video/fk9GVSEP7UY/edit)
+## [Screencast Atualizado do Protótipo](https://youtu.be/fk9GVSEP7UY)
 
 Neste vídeo, apresentamos as atualizações feitas no protótipo do sistema Rizoma, destacando as melhorias implementadas com base no feedback recebido.
 

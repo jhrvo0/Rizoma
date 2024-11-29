@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adicionar Campo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+</head>
+<body class="bg-white min-h-screen">
+    <div class="max-w-md mx-auto p-4">
+
+        <header class="flex items-center justify-around mb-8">
+            <a href="{% url 'campos' %}" id="back-button" class="p-2">
+                <i class="bi bi-arrow-left text-2xl"></i>
+            </a>
+            <h1 class="text-xl font-bold flex-1 text-right mr-2">Novo campo</h1>
+        </header>
+
+        <form id="add-form" action="{% url 'adicionar_campo' %}" method="post" class="space-y-6">
+            {% csrf_token %}
+
+            <div class="space-y-2">
+                <label class="block font-medium">Nomear campo</label>
+                <input
+                    id="nome-campo"
+                    name="nome"
+                    type="text" 
+                    placeholder="Nome do campo"
+                    class="w-full p-3 bg-gray-200 rounded-lg"
+                >
+            </div>
+
+            <div class="space-y-2">
+                <label class="block font-medium">Adicionar descrição</label>
+                <textarea 
+                    name="descricao"
+                    placeholder="Adicionar descrição"
+                    class="w-full p-3 bg-gray-200 rounded-lg resize-none h-24"
+                ></textarea>
+            </div>
+
+            <div class="bg-gray-400 rounded-lg flex flex-col">
+                <div class="flex-1 flex items-center justify-center py-6">
+                    <i class="bi bi-card-image text-5xl text-gray-600"></i>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="relative">
+                        <label class="block font-medium">Tipo de Campo</label>
+                        <select name="tipo_campo" class="w-full p-3 bg-gray-200 rounded-lg appearance-none pr-10">
+                            <option value="" disabled selected>Selecione o tipo de campo</option>
+                            {% for tipo in TIPO_DE_CAMPO %}
+                                <option value="{{ tipo.0 }}">{{ tipo.1 }}</option>
+                            {% endfor %}
+                        </select>
+                        <i class="bi bi-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                    </div>
+                
+                    <div class="relative">
+                        <label class="block font-medium">Tipo de Solo</label>
+                        <select name="tipo_solo" class="w-full p-3 bg-gray-200 rounded-lg appearance-none pr-10">
+                            <option value="" disabled selected>Selecione o tipo de solo</option>
+                            {% for tipo in TIPO_DE_SOLO %}
+                                <option value="{{ tipo.0 }}">{{ tipo.1 }}</option>
+                            {% endfor %}
+                        </select>
+                        <i class="bi bi-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                    </div>
+                </div>
+                
+
+            <button id="submit-button" type="submit" class="w-full p-3 bg-gray-500 rounded-lg font-medium">Criar campo</button>
+        </form>
+
+        <div id="popup-container" class="hidden fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
+            <div id="popup-modal" class="bg-white p-6 rounded-lg shadow-lg max-w-xs w-full text-center">
+                <h2 class="text-lg font-bold">Sucesso</h2>
+                <p id="popup-message">Campo adicionado com sucesso!</p>
+                <button class="mt-4 px-4 py-2 bg-green-500 text-white rounded-full" onclick="window.location.href='{% url 'campos' %}'">Ir para Campos</button>
+            </div>
+        </div>
+    </div>
+    

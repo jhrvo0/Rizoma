@@ -1,0 +1,186 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rizoma - Tarefas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+    />
+    <style>   
+      html,
+      body {
+        height: 100%;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+      }
+      .content {
+        flex: 1;
+      }
+      .custom-button {
+        max-width: 350px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #475569; /* bg-slate-500 */
+      }
+      .header-placeholder {
+        background-color: #e5e7eb; /* bg-gray-200 */
+        height: 4rem; /* Altura do espaço do header */
+      }
+    </style>
+  </head>
+  <body class="bg-gray-200 flex flex-col min-h-screen">
+
+    <!-- Espaço do Header -->
+    <div class="header-placeholder"></div>
+
+    <!-- Conteúdo Principal -->
+    <div class="content p-4">
+      <!-- Título e Ícone de Voltar -->
+      <div class="flex items-center justify-between mb-4">
+        <a href="{% url 'calendario' %}">
+          <i class="bi bi-arrow-left text-2xl cursor-pointer"></i>
+        </a>
+        <h1 class="text-2xl font-bold">Tarefas ({{ eventos|length }})</h1>
+      </div>
+
+      <!-- Barra de Pesquisa -->
+      <div class="flex items-center mb-4">
+        <input type="text" placeholder="Pesquisar" class="w-full p-2 border rounded-l-md">
+        <button class="bg-gray-300 p-2 rounded-r-md">
+          <i class="bi bi-search"></i>
+        </button>
+      </div>
+
+      <!-- Botões de Filtro -->
+      <div class="flex justify-center mb-4">
+        <button class="bg-blue-500 text-white py-2 px-4 rounded-l-md">A fazer</button>
+        <button class="bg-gray-300 text-gray-800 py-2 px-4 rounded-r-md">Concluídas</button>
+      </div>
+
+      <!-- Menu Suspenso -->
+      <div class="mb-4">
+        <select id="taskFilter" class="w-full p-2 border rounded-md">
+          <option value="today">Tarefas para hoje</option>
+          <option value="past">Tarefas que já passaram</option>
+          <option value="future">Futuras tarefas</option>
+        </select>
+      </div>
+
+      <!-- Lista de Tarefas -->
+      <div id="taskList" class="space-y-2">
+        {% for evento in eventos %}
+        <div class="task-item flex items-center p-2 bg-white rounded-md shadow" data-date="{{ evento.data_inicio }}">
+          <input type="checkbox" class="mr-2">
+          <span>{{ evento.nome }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Botão de Adição -->
+    <button class="fixed right-4 bottom-24 bg-blue-500 text-white p-4 rounded-full shadow-lg focus:outline-none">
+      <i class="bi bi-plus-lg text-2xl"></i>
+    </button>
+
+    <!-- Barra de Navegação -->
+    <div class="w-full bg-gray-300 p-4 flex justify-around items-center rounded-t-3xl fixed bottom-0 z-50">
+      <a href="{% url 'home' %}" class="flex items-center justify-center h-12 w-12 bg-gray-400 rounded-full shadow-lg">
+        <i class="bi bi-house"></i>
+      </a>
+      <a href="{% url 'campos' %}" class="flex items-center justify-center h-12 w-12 bg-gray-400 rounded-full shadow-lg">
+        <i class="bi bi-tree"></i>
+      </a>
+      <a href="{% url 'calendario' %}" class="flex items-center justify-center h-12  w-12 bg-white ring-2 ring-gray-700 rounded-full shadow-lg">
+        <i class="bi bi-calendar"></i>
+      </a>
+      <a href="#" class="flex items-center justify-center h-12 w-12 bg-gray-400 rounded-full shadow-lg">
+        <i class="bi bi-box-seam"></i>
+      </a>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const taskFilter = document.getElementById('taskFilter');
+        const taskList = document.getElementById('taskList');
+        const today = new Date().toISOString().split('T')[0];
+
+        function fetchAtividades() {
+          fetch(`/atividades/${today}/`)
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error("Network response was not ok");
+              }
+              return response.json();
+            })
+            .then((data) => {
+              taskList.innerHTML =
+                data.html ||
+                '<p class="text-gray-600">Nenhuma atividade atribuída ao dia de hoje.</p>';
+            })
+            .catch((error) => {
+              console.error("Erro ao buscar atividades:", error);
+              taskList.innerHTML =
+                '<p class="text-gray-600">Erro ao carregar atividades.</p>';
+            });
+        }
+
+        taskFilter.addEventListener('change', function() {
+          const filterValue = this.value;
+          const tasks = taskList.getElementsByClassName('task-item');
+
+          for (let task of tasks) {
+            const taskDate = task.getAttribute('data-date');
+
+            if (filterValue === 'today' && taskDate === today) {
+              task.style.display = 'flex';
+            } else if (filterValue === 'past' && taskDate < today) {
+              task.style.display = 'flex';
+            } else if (filterValue === 'future' && taskDate > today) {
+              task.style.display = 'flex';
+            } else {
+              task.style.display = 'none';
+            }
+          }
+        });
+
+        // Fetch atividades on page load
+        fetchAtividades();
+      });
+
+      document.getElementById('activityFilter').addEventListener('change', function() {
+        const filter = this.value;
+        const today = new Date();
+        const activities = [
+          { id: 1, name: 'Atividade 1', date: '2023-10-01' },
+          { id: 2, name: 'Atividade 2', date: '2023-10-15' },
+          { id: 3, name: 'Atividade 3', date: '2023-10-20' },
+          // Adicione mais atividades conforme necessário
+        ];
+
+        const filteredActivities = activities.filter(activity => {
+          const activityDate = new Date(activity.date);
+          if (filter === 'past') {
+            return activityDate < today;
+          } else if (filter === 'today') {
+            return activityDate.toDateString() === today.toDateString();
+          } else if (filter === 'future') {
+            return activityDate > today;
+          }
+        });
+
+        const activityList = document.getElementById('activityList');
+        activityList.innerHTML = '';
+        filteredActivities.forEach(activity => {
+          const activityItem = document.createElement('div');
+          activityItem.textContent = activity.name + ' - ' + activity.date;
+          activityList.appendChild(activityItem);
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,319 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Visualizar Campo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" />
+    <script src="https://unpkg.com/interactjs/dist/interact.min.js"></script>
+    <style>
+        .selected {
+            background-color: rgba(75, 85, 99, 0.8);
+            border: 2px solid rgba(31, 41, 55, 1);
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen overflow-y-auto">
+    <header class="p-4 flex items-center justify-between">
+        <a href="{% url 'campos' %}" id="back-button" class="p-2">
+            <i class="bi bi-arrow-left text-2xl"></i>
+        </a>
+
+        {# INICIO BOTÕES DE TOGGLE DE VISUALIZAÇÃO #}
+        <div class="flex rounded-md space-x-3 h-10">
+            <div class="grid grid-cols-[49%,2%,49%] divide-black rounded-lg">
+                <button id="ver_colunas" class="pr-2 pl-3 rounded-l-md bg-gray-400">
+                    <img src="{% static '/app/images/iconcoluna.svg' %}" class="h-6">
+                </button>
+                <div class="bg-gray-800"></div>
+                <button id="ver_grids" class="pr-3 pl-2 rounded-r-md bg-gray-200">
+                    <img src="{% static '/app/images/iconblocks.svg' %}" class="h-6">
+                </button>
+            </div>
+
+            <button type="button" class="flex items-center justify-center bg-gray-200 px-2 rounded-lg" onclick="window.location.href='{% url 'editar-campo' campo_id=campo_id %}'">
+                <img src="{% static '/app/images/iconeditar.svg' %}" class="h-6">
+            </button>
+            
+        </div>
+        {# FIM BOTÕES DE TOGGLE DE VISUALIZAÇÃO #}
+
+
+    </header>
+
+    <main class="p-4 min-h-screen">
+        <!-- Bloco para exibir nome ou barra de exclusão -->
+        <div id="name-or-delete-bar" class="bg-gray-300 p-4 rounded-lg mb-6 flex items-center justify-between">
+            <h1 id="campo-nome-text" class="text-xl font-bold text-center w-full">{{ campo.nome }}</h1>
+            <div id="delete-bar" class="hidden w-full flex items-center gap-3">
+                <button id="cancel-selection" class="text-white bg-gray-500 px-4 py-2 rounded-lg">
+                    <i class="text-xl bi bi-x"></i>
+                </button>
+                <button id="delete-plants" class="bg-gray-500 hover:bg-gray-600 px-4 font-bold py-2 rounded-lg w-full">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </div>
+        </div>
+
+        {# INICIO VISUALIZAÇÃO COLUNAS #}
+        <div id="columns-view" class="grid grid-cols-4 gap-1">
+            {% for key, plantas in subcampo_no.items %}
+                {% if plantas %}
+                    <div class="bg-gray-400 p-1 space-y-2 rounded-md column">
+                        {% for planta_cultivada in plantas %}
+                            <div class="plant relative aspect-square bg-gray-200 rounded-lg flex flex-col items-center justify-center p-2 mx-1 mt-1" data-id="{{ planta_cultivada.id }}">
+                                <i class="bi bi-card-image text-4xl"></i>
+                                <span class="text-center text-sm">{{ planta_cultivada.planta.nome }}</span>
+                            </div>
+                        {% endfor %}
+                        <div class="mb-1"></div>
+                    </div>
+                {% else %}
+                {% endif %}
+            {% endfor %}
+        </div>
+        {# FIM VISUALIZAÇÃO COLUNAS #}
+
+        {# INICIO VISUALIZAÇÃO GRID #}
+        <div id="grid-view" class="grid grid-cols-3 gap-1 hidden">
+            {% for key, plantas in subcampo_no.items %}
+                {% if plantas %}
+                        {% for planta_cultivada in plantas %}
+                            <div class="plant relative aspect-square bg-gray-200 rounded-lg flex flex-col items-center justify-center p-2 mx-1 mt-1" data-id="{{ planta_cultivada.id }}">
+                                <i class="bi bi-card-image text-4xl"></i>
+                                <span class="text-center text-sm">{{ planta_cultivada.planta.nome }}</span>
+                            </div>
+                        {% endfor %}
+                {% else %}
+                {% endif %}
+            {% endfor %}
+        </div>
+        {# FIM VISUALIZAÇÃO GRID #}
+
+        {# INICIO INFORMAÇÕES #}
+        <div class="p-4 rounded-lg bg-gray-300 mt-6">
+            <h2 class="text-lg font-bold mb-4 text-center">Informações</h2>
+            <div class="space-y-2">
+                <div class="bg-white p-3 rounded-lg flex justify-between items-center">
+                    <div class="mx-auto">
+                        <span class="text-gray-600 text-center font-semibold">Tipo do campo:</span>
+                        <span class="ml-2 text-center font-semibold">{{ campo.tipo_campo }}</span>
+                    </div>
+                </div>
+                <div class="bg-white p-3 rounded-lg flex justify-between items-center">
+                    <div class="mx-auto">
+                        <span class="text-gray-600 font-semibold">Tipo do solo:</span>
+                        <span class="ml-2 font-semibold">{{ campo.tipo_solo }}</span>
+                    </div>
+                </div>
+                <div class="bg-white p-3 rounded-lg flex justify-between items-center">
+                    <div class="mx-auto">
+                        <span class="text-gray-600 font-semibold">Quantidade de plantas:</span>
+                        <span class="ml-2 font-semibold">{{ qtd_plantas }}</span>
+                    </div>
+                </div>
+                <div class="bg-white p-3 rounded-lg flex justify-between items-center">
+                    <div class="mx-auto">
+                        <span class="text-gray-600 font-semibold">Tipos de plantas:</span>
+                        <span class="ml-2 font-semibold">{{ tipos_plantas }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {# FIM INFORMAÇÕES #}
+
+
+        <!-- Modal para confirmar exclusão -->
+        <div id="confirm-delete-modal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            <div class="bg-white p-6 rounded-lg w-80">
+                <h2 class="text-xl font-bold py-6 text-center mb-6">Apagar as plantas selecionadas?</h2>
+                <div class="gap-4 space-y-4">
+                    <button id="confirm-delete-button" class="text-xl bg-gray-500 font-bold w-full p-4 rounded-xl">Continuar</button>
+                    <button id="cancel-delete-button" class="text-xl font-bold border-black border-2 w-full p-4 rounded-xl">Cancelar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal para confirmar sucesso -->
+        <div id="success-modal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+            <div class="bg-white p-6 rounded-lg w-80">
+                <h2 class="text-xl font-bold mb-4 text-center">Plantas removidas com sucesso!</h2>
+                <button id="close-success-modal" class="bg-gray-500 text-white px-4 py-2 rounded-lg w-full">Continuar</button>
+            </div>
+        </div>
+
+    </main>
+
+    {% include 'components/footer.html' %}
+    {% include 'components/component_fab.html' with options=options %}
+
+    {# INICIO SCRIPT BOTÕES DE TOGGLE DE VISUALIZAÇÃO #}
+    <script>
+        document.addEventListener("DOMContentLoaded", (event) => {
+
+            toggle_one = document.getElementById("ver_colunas");
+            toggle_two = document.getElementById("ver_grids");
+            column_view = document.getElementById("columns-view");
+            grid_view = document.getElementById("grid-view");
+
+            toggle_one.addEventListener("click", () => {
+                toggle_one.classList.remove('bg-gray-200');
+                toggle_one.classList.add('bg-gray-400');
+                toggle_two.classList.remove('bg-gray-400');
+                toggle_two.classList.add('bg-gray-200');
+
+                grid_view.classList.add("hidden");
+                column_view.classList.remove("hidden");
+            });
+
+            toggle_two.addEventListener("click", () => {
+                toggle_two.classList.remove('bg-gray-200');
+                toggle_two.classList.add('bg-gray-400');
+                toggle_one.classList.remove('bg-gray-400');
+                toggle_one.classList.add('bg-gray-200');
+
+                grid_view.classList.remove("hidden");
+                column_view.classList.add("hidden");
+            });
+            
+        })
+    </script>
+    {# FIM SCRIPT BOTÕES DE TOGGLE DE VISUALIZAÇÃO #}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            let selectedPlants = new Set();
+            const nameOrDeleteBar = document.getElementById("name-or-delete-bar");
+            const campoNomeText = document.getElementById("campo-nome-text");
+            const deleteBar = document.getElementById("delete-bar");
+            const deletePlantsButton = document.getElementById("delete-plants");
+            const cancelSelectionButton = document.getElementById("cancel-selection");
+            const plants = document.querySelectorAll(".plant");
+    
+            const confirmDeleteModal = document.getElementById("confirm-delete-modal");
+            const confirmDeleteButton = document.getElementById("confirm-delete-button");
+            const cancelDeleteButton = document.getElementById("cancel-delete-button");
+    
+            const successModal = document.getElementById("success-modal");
+            const closeSuccessModalButton = document.getElementById("close-success-modal");
+    
+            function updateSelectedCount() {
+                deletePlantsButton.textContent = `Apagar plantas (${selectedPlants.size})`;
+            }
+    
+            function toggleNameOrDeleteBar(showDeleteBar) {
+                if (showDeleteBar) {
+                    campoNomeText.classList.add("hidden");
+                    deleteBar.classList.remove("hidden");
+                } else {
+                    campoNomeText.classList.remove("hidden");
+                    deleteBar.classList.add("hidden");
+                }
+            }
+    
+            function togglePlantSelection(plantElement) {
+                const plantId = plantElement.dataset.id;
+    
+                if (selectedPlants.has(plantId)) {
+                    selectedPlants.delete(plantId);
+                    plantElement.classList.remove("bg-gray-600", "opacity-75");
+                } else {
+                    selectedPlants.add(plantId);
+                    plantElement.classList.add("bg-gray-600", "opacity-75");
+                }
+    
+                if (selectedPlants.size > 0) {
+                    toggleNameOrDeleteBar(true);
+                    updateSelectedCount();
+                } else {
+                    toggleNameOrDeleteBar(false);
+                }
+            }
+    
+            plants.forEach((plant) => {
+                let pressTimer;
+    
+                plant.addEventListener("mousedown", (e) => {
+                    pressTimer = setTimeout(() => {
+                        togglePlantSelection(plant);
+                    }, 500);
+                });
+    
+                plant.addEventListener("touchstart", (e) => {
+                    pressTimer = setTimeout(() => {
+                        togglePlantSelection(plant);
+                    }, 500);
+                });
+    
+                plant.addEventListener("mouseup", (e) => clearTimeout(pressTimer));
+                plant.addEventListener("mouseleave", (e) => clearTimeout(pressTimer));
+                plant.addEventListener("touchend", (e) => clearTimeout(pressTimer));
+            });
+    
+            cancelSelectionButton.addEventListener("click", () => {
+                selectedPlants.clear();
+                plants.forEach((plant) => plant.classList.remove("bg-gray-600", "opacity-75"));
+                toggleNameOrDeleteBar(false);
+            });
+    
+            // Abrir modal de confirmação
+            deletePlantsButton.addEventListener("click", () => {
+                confirmDeleteModal.classList.remove("hidden");
+            });
+    
+            // Cancelar exclusão e fechar modal de confirmação
+            cancelDeleteButton.addEventListener("click", () => {
+                confirmDeleteModal.classList.add("hidden");
+            });
+    
+            // Confirmar exclusão
+            confirmDeleteButton.addEventListener("click", () => {
+                confirmDeleteModal.classList.add("hidden");
+    
+                const csrfToken = "{{ csrf_token }}";
+                const deleteUrl = "{% url 'deletar-planta' 0 %}".replace("/0/", "/");
+    
+                const promises = Array.from(selectedPlants).map((plantId) =>
+                    fetch(`${deleteUrl}${plantId}/`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": csrfToken,
+                        },
+                    })
+                        .then((response) => {
+                            if (!response.ok) throw new Error(`Failed to delete plant ${plantId}`);
+                            return response.json();
+                        })
+                        .catch((error) => console.error(error))
+                );
+    
+                Promise.all(promises)
+                    .then(() => {
+                        plants.forEach((plant) => {
+                            if (selectedPlants.has(plant.dataset.id)) {
+                                plant.remove();
+                            }
+                        });
+    
+                        selectedPlants.clear();
+                        toggleNameOrDeleteBar(false);
+    
+                        // Mostrar modal de sucesso
+                        successModal.classList.remove("hidden");
+                    })
+                    .catch((error) => console.error("Erro ao excluir plantas:", error));
+            });
+    
+            // Fechar modal de sucesso
+            closeSuccessModalButton.addEventListener("click", () => {
+                successModal.classList.add("hidden");
+            });
+        });
+    </script>
+</body>
+</html>

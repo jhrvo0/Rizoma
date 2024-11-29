@@ -1,0 +1,147 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Campo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+</head>
+<body class="bg-white">
+    <div class="px-6 mx-auto p-4">
+
+        <!-- Header -->
+        <header class="flex items-center justify-between my-12">
+            <a href="{% url 'detalhes-campo' campo.id %}" id="back-button" class="p-2">
+                <i class="bi bi-arrow-left text-5xl text-gray-700"></i>
+            </a>
+            <h1 class="text-2xl font-bold flex-1 text-right">Editar campo</h1>
+        </header>
+
+        {% include 'components/component_modal.html' with message="Campo editado com sucesso!" link="campos" %}
+
+        <!-- Formulário -->
+        <form id="edit-form" action="{% url 'edicao_campo' campo.id %}" method="post" class="space-y-4">
+            {% csrf_token %}
+            
+            <!-- Field: Nome -->
+            <div class="field">
+                <label for="{{ form.nome.id_for_label }}" class="block font-semibold text-lg">{{ form.nome.label }}</label>
+                {{ form.nome }}
+            </div>
+
+            <!-- Field: Descrição -->
+            <div class="space-y-2 pt-2">
+                <label for="id_descricao" class="block font-medium">Adicionar descrição (opcional)</label>
+                <textarea id="id_descricao" name="descricao" placeholder="Adicionar descrição" class="w-full p-3 bg-gray-200 rounded-lg resize-none h-24">{{ campo.descricao }}</textarea>
+            </div>
+            
+            <!-- Field: Tipo Campo -->
+            <div class="pt-2">
+                <!-- Template de foto -->
+                <div class="bg-gray-300 h-24 rounded-t-xl flex items-center justify-center">
+                    <i class="bi bi-card-image text-4xl text-gray-600"></i>
+                </div>
+
+                <!-- Dropdown - Tipo de campo -->
+                <div class="relative">
+                    {{ form.tipo_campo }}
+                    <i class="bi bi-caret-down-fill absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
+                </div>
+            </div>
+        
+            <!-- Field: Tipo Solo -->
+            <div class="field">
+                <label for="{{ form.tipo_solo.id_for_label }}" class="block font-semibold text-lg">{{ form.tipo_solo.label }}</label>
+                {{ form.tipo_solo }}
+            </div>
+        
+            <!-- Submit Button -->
+            <div class="field mt-6">
+                <button id="submit-button" type="button" class="w-full px-3 py-6 bg-gray-300 rounded-lg font-bold text-xl mt-6">Concluir</button>
+            </div>
+        </form>
+        
+        
+        {% if form.errors %}
+            <div class="error-messages">
+                <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+         <!-- Botão de envio -->
+
+
+         <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const submitButton = document.getElementById("submit-button");
+                const editForm = document.getElementById("edit-form");
+                const modalContainer = document.getElementById("popup-container");
+                const modalContent = document.getElementById("popup-modal");
+        
+                submitButton.addEventListener("click", (event) => {
+                    event.preventDefault();
+                    console.log("Botão 'Concluir' clicado");
+        
+                    // Ensure the CSRF token is present in the request
+                    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        
+                    fetch(editForm.action, {
+                        method: "POST",
+                        body: new FormData(editForm),
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest",
+                            "X-CSRFToken": csrfToken,  // Include CSRF token here for security
+                        },
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log("Dados recebidos:", data);
+                        if (data.success) {
+                            showModal(); // Show modal on success
+                            // Wait for the modal animation to finish before redirecting
+                            setTimeout(() => {
+                                window.location.href = editForm.dataset.redirectUrl;
+                            }, 2000);  // Delay to match modal display duration
+        
+                            // Animate the modal content smoothly
+                            anime({
+                                targets: modalContent,
+                                scale: [0.8, 1],
+                                opacity: [0, 1],
+                                duration: 500,
+                                easing: "easeOutExpo",
+                            });
+                        } else {
+                            alert(`Erro ao editar o campo: ${data.message}`);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Erro ao enviar o formulário:", error);
+                        alert("Ocorreu um erro inesperado. Por favor, tente novamente.");
+                    });
+                });
+        
+                function showModal() {
+                    console.log("Exibir modal");
+                    modalContainer.classList.remove("hidden"); // Make the modal visible
+                }
+            });
+        </script>
+        
+    </div>
+</body>
+</html>

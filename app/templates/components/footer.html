@@ -1,0 +1,81 @@
+{% load static %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+<div class="w-full bg-gray-300 p-4 grid grid-cols-4 gap-4 justify-around rounded-t-3xl sticky fixed bottom-0 z-50">
+    <div class="flex flex-col items-center">
+        <a href="{% url 'home' %}" class="flex items-center justify-center h-10 w-10 clickable-icon">
+            <img class="h-10 w-10"  
+                 src="{% if current_page == 'home' %}
+                        {% static '/app/images/homefill.svg' %}
+                      {% else %}
+                        {% static '/app/images/home.svg' %}
+                      {% endif %}" 
+                 alt="" srcset="">
+        </a>
+        <span class="font-bold text-sm text-center mt-1">Início</span>
+    </div>
+    <div class="flex flex-col items-center">
+        <a href="{% url 'campos' %}" class="flex items-center justify-center h-10 w-10 clickable-icon">
+            <img class="h-10 w-10" 
+                 src="{% if current_page == 'campos' %}
+                        {% static '/app/images/campofill.svg' %}
+                      {% else %}
+                        {% static '/app/images/campo.svg' %}
+                      {% endif %}" 
+                 alt="" srcset="">
+        </a>
+        <span class="font-bold text-sm text-center mt-1">Campos</span>
+    </div>
+    <div class="flex flex-col items-center">
+        <a href="{% url 'calendario' %}" class="flex items-center justify-center h-10 w-10 clickable-icon">
+            <img class="h-10 w-10" 
+                 src="{% if current_page == 'calendario' %}
+                        {% static '/app/images/calendariofill.svg' %}
+                      {% else %}
+                        {% static '/app/images/calendar.svg' %}
+                      {% endif %}" 
+                 alt="" srcset="">
+        </a>
+        <span class="font-bold text-sm text-center mt-1">Calendário</span>
+    </div>
+    <div class="flex flex-col items-center">
+        <a href="#" class="flex items-center justify-center h-10 w-10 clickable-icon">
+            <img class="h-10 w-10" 
+                 src="{% if current_page == 'perfil' %}
+                        {% static '/app/images/entregasfill.svg' %}
+                      {% else %}
+                        {% static '/app/images/entregas.svg' %}
+                      {% endif %}" 
+                 alt="" srcset="">
+        </a>
+        <span class="font-bold text-sm text-center mt-1">Entregas</span>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const clickableIcons = document.querySelectorAll(".clickable-icon");
+
+        clickableIcons.forEach((icon) => {
+            icon.addEventListener("click", function (event) {
+           
+                event.preventDefault();
+
+                const img = icon.querySelector("img");
+
+                anime({
+                    targets: img,
+                    scale: [1, 1.4], 
+                    duration: 80, 
+                    easing: "easeInOutQuad",
+                    direction: "alternate", 
+                    complete: function () {
+                        
+                        window.location.href = icon.href;
+                    },
+                });
+            });
+        });
+    });
+</script>

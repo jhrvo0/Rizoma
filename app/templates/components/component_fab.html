@@ -1,0 +1,81 @@
+{% load static %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+
+  <div id="fab-container">
+    <!-- FAB -->
+    <button id="fab-button" class="fixed right-7 bottom-28 bg-gray-500 text-white p-2 rounded-xl shadow-lg focus:outline-none">
+        <i id="fab-icon" class="text-gray-600 bi bi-plus-lg text-4xl"></i>
+    </button>
+
+    <!-- OPTIONS -->
+    <div id="fab-behavior">
+        {% if options %}
+            <div id="fab-menu" class="fixed right-4 bottom-44 w-44 bg-gray-300 rounded-lg p-1 hidden">
+                <div class="p-2">
+                    <ul class="space-y-3">
+                        {% for option in options %}
+                        <li class="bg-slate rounded-xl py-1 flex align-center items-center gap-4">
+                            <img class="h-8 w-8" src="{% static option.icon %}" alt="" srcset="">
+                            <a href="{% if option.args %}{% url option.link option.args.0 %}{% else %}{% url option.link %}{% endif %}" class="font-bold text-md">
+                                {{ option.name }}
+                            </a>
+                        </li>                        
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <script>
+        const fab_button = document.getElementById("fab-button");
+        const fab_icon = document.getElementById("fab-icon");
+
+        function animateFabClick() {
+            anime({
+                targets: fab_button,
+                scale: [1, 1.2, 1],
+                duration: 200,
+                easing: 'easeInOutQuad'
+            });
+        }
+
+        function togglePopupMenu() {
+            const popup_menu = document.getElementById("fab-menu");
+
+            if (popup_menu && popup_menu.classList.contains("hidden")) {
+                popup_menu.classList.remove("hidden");
+
+                anime({
+                    targets: "#fab-menu",
+                    opacity: [0, 1],
+                    translateY: [20, 0],
+                    duration: 500,
+                    easing: "easeOutExpo"
+                });
+
+                fab_icon.classList.replace("bi-plus-lg", "bi-x-lg");
+            } else if (popup_menu) {
+                anime({
+                    targets: "#fab-menu",
+                    opacity: [1, 0],
+                    translateY: [0, 20],
+                    duration: 200,
+                    easing: "easeInExpo",
+                    complete: function () {
+                        popup_menu.classList.add("hidden");
+                    }
+                });
+
+                fab_icon.classList.replace("bi-x-lg", "bi-plus-lg");
+            }
+        }
+
+        fab_button.addEventListener("click", () => {
+            animateFabClick();
+            togglePopupMenu();
+        });
+    </script>
+  </div>
+</html>

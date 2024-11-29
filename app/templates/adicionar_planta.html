@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adicionar Planta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css">
+</head>
+<body class="min-h-screen bg-gray-50 p-6">
+    <div class="flex items-center mb-6">
+        <button class="p-2" onclick="history.back()">
+            <i class="bi bi-arrow-left text-2xl text-gray-700"></i>
+        </button>
+        <h1 class="text-3xl font-bold flex-1 text-right">Nova planta</h1>
+    </div>
+    <div class="flex flex-col items-center mb-6">   
+        <div class="mt-10">
+            <div class="w-48 h-48 bg-gray-200 rounded-lg flex items-center justify-center mb-2">
+                <i class="bi bi-card-image text-8xl text-gray-400"></i>
+            </div>
+            <div class="bg-gray-200 px-4 mt-5 py-2 rounded-lg font-blod w-full text-center font-bold text-3xl">{{ planta.nome }}</div>
+        </div>
+    </div>
+
+    <div class="items-center m-8">
+        <h1 class="text-2xl font-bold flex-1 text-center">Quantidade de sementes</h1>
+    </div>
+      
+    <form id="plantas-cultivadas-form" class="space-y-6 w-full" action="{% url 'adicionar-planta' campo.id planta.id %}" method="POST">
+        {% csrf_token %}
+
+        <div class="flex items-center justify-center h-14"> <!-- Add a defined height to the parent -->
+            <button id="decrease-btn" class="w-1/5 h-full bg-gray-400 rounded-lg flex items-center justify-center" type="button">
+                <i class="bi bi-dash text-5xl"></i>
+            </button>             
+        
+            <input id="quantidade-input" class="w-2/3 h-full mx-4 text-center text-2xl font-bold bg-gray-200 rounded-lg" name="quantidade_plantada" type="number" value="{{ planta_cultivada.quantidade_plantada|default:1 }}" min="1" step="1" readonly>
+        
+            <button id="increase-btn" class="w-1/5 h-full bg-gray-400 rounded-lg flex items-center justify-center" type="button"> 
+                <i class="bi bi-plus text-5xl"></i> 
+            </button>
+        </div>        
+
+        <div class="text-center">
+            <button type="submit" class="px-4 w-full py-5 mt-2 bg-gray-200 font-semibold rounded-lg mx-auto text-2xl flex items-center justify-between">
+                <span class="ml-2">Adicionar ao campo</span>
+                <i class="bi bi-grid-fill text-gray-500"></i>
+            </button>
+        </div>
+    </form>
+
+    <script>
+        const decreaseBtn = document.getElementById('decrease-btn');
+        const increaseBtn = document.getElementById('increase-btn');
+        const quantidadeInput = document.getElementById('quantidade-input');
+
+        decreaseBtn.addEventListener('click', () => {
+            let value = parseInt(quantidadeInput.value) || 1;
+            if (value > 1) quantidadeInput.value = value - 1;
+        });
+
+        increaseBtn.addEventListener('click', () => {
+            let value = parseInt(quantidadeInput.value) || 1;
+            quantidadeInput.value = value + 1;
+        });
+    </script>
+</body>
+</html>

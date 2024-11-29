@@ -1,0 +1,45 @@
+{% load socialaccount %}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Cadastro - Rizoma</title>
+		<script src="https://cdn.tailwindcss.com"></script>
+	</head>
+	<body class="min-h-screen flex items-center justify-center px-4 md:px-8 lg:px-12">
+		<div class="max-w-md w-full p-6 rounded-lg shadow-lg bg-gray-300">
+			<div class="text-center mb-6">
+				<h2 class="text-3xl font-bold text-[#777]">Cadastrar-se</h2>
+			</div>
+
+			<!-- Formulário de cadastro tradicional -->
+			<form method="post" class="space-y-4">
+				{% csrf_token %} {% for field in form %}
+				<div>
+					<label for="{{ field.id_for_label }}" class="block mb-1 text-[#333] font-medium">{{ field.label }}</label>
+					{{ field }} {% if field.errors %}
+					<div class="text-red-600">{{ field.errors }}</div>
+					{% endif %}
+				</div>
+				{% endfor %}
+				<button type="submit" class="w-full px-4 py-2 rounded-md bg-gray-500 font-medium">Cadastrar</button>
+			</form>
+
+			<div class="flex items-center justify-center my-4">
+				<span class="text-gray-900">ou</span>
+			</div>
+
+			<!--  Google -->
+			<div class="flex justify-center">
+				<a href="{% url 'social:begin' 'google-oauth2' %}" class="w-full px-4 py-2 rounded-md bg-gray-500 font-medium text-center">Cadastro com Google</a>
+			</div>
+
+			<!-- Link para login caso o cara ja tenha conta criada -->
+			<div class="text-center mt-4">
+				<span class="text-[#333]">Já tem uma conta?</span>
+				<a href="{% url 'login' %}" class="text-[#333] font-medium">Clique aqui para fazer login</a>
+			</div>
+		</div>
+	</body>
+</html>

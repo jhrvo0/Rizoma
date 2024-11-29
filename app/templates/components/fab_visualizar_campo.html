@@ -1,0 +1,19 @@
+<body>
+	{% include 'components/fab_btn.html' %}
+</body>
+
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		const fabBtn = document.getElementById("fab-btn");
+
+		if (fabBtn) {
+	
+			fabBtn.addEventListener("click", () => {
+				window.location.href="/lista-plantas";
+			});
+
+		} else {
+			console.error("Element(s) not found: ensure all required elements exist.");
+		}
+	});
+</script>

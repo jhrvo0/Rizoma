@@ -27,18 +27,6 @@
         <span class="font-bold text-sm text-center mt-1">Campos</span>
     </div>
     <div class="flex flex-col items-center">
-        <a href="{% url 'calendario' %}" class="flex items-center justify-center h-10 w-10 clickable-icon">
-            <img class="h-10 w-10" 
-                 src="{% if current_page == 'calendario' %}
-                        {% static '/app/images/calendariofill.svg' %}
-                      {% else %}
-                        {% static '/app/images/calendar.svg' %}
-                      {% endif %}" 
-                 alt="" srcset="">
-        </a>
-        <span class="font-bold text-sm text-center mt-1">Calendário</span>
-    </div>
-    <div class="flex flex-col items-center">
         <a href="#" class="flex items-center justify-center h-10 w-10 clickable-icon">
             <img class="h-10 w-10" 
                  src="{% if current_page == 'perfil' %}

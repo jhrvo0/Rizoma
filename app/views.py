@@ -13,7 +13,6 @@ from django.utils.decorators import method_decorator
 import json
 from datetime import datetime
 from django.template.loader import render_to_string
-from .weather_api import get_weather_data
 from django.http import JsonResponse
 from django.db.models import Sum
 
@@ -172,9 +171,9 @@ class VisualizarCampoView(LoginRequiredMixin, View):
 
             # Ordenação com base na opção selecionada
             if sort == "az":
-                campos = campos.order_by("nome__lower")  # Ordenação case-insensitive
+                campos = campos.order_by("nome__lor")  # Ordenação case-insensitive
             elif sort == "za":
-                campos = campos.order_by("-nome__lower")  # Ordenação reversa case-insensitive
+                campos = campos.order_by("-nome__lor")  # Ordenação reversa case-insensitive
             elif sort == "recent":
                 campos = campos.order_by("-created_at")  # Ordenar por mais recente
 

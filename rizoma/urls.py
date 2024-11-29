@@ -6,7 +6,6 @@ from app.views import SelecionarQuantidadeParaAdicionarPlantaView, SelecionarSub
 urlpatterns = [
     path('', LandingView.as_view(), name='landing'),
     path('admin/', admin.site.urls),
-    path('admin/clearcache/', include('clearcache.urls')),
     path('auth/', include('social_django.urls', namespace='social')),
     path('login/', LoginView.as_view(), name='login'),
     path('social-login/', google_login, name='social_login'),
